@@ -34,6 +34,9 @@ define([
     "esri/symbols/SimpleLineSymbol",
     "dijit/form/CheckBox",
     "dijit/Toolbar",
+      "esri/Color",
+        "esri/layers/LabelLayer",
+  "esri/symbols/TextSymbol",
     "esri/geometry/Polygon", "esri/InfoTemplate",
     "dojo/dom",
     "dojo/dom-class",
@@ -45,13 +48,13 @@ define([
             MH_Zoom2FeatureLayers, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
         SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
-        CheckBox, Toolbar, Polygon,InfoTemplate, dom, domClass, registry, mouse, on, Map
+        CheckBox, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map
 ) {
 
     return declare([], {
         Phase1: function () {
-            var iCEDID = getTokens()['CEDID'];    //*****************************************************Justin Change this to your Django CEID id variable!!!!!!!!
-            if (typeof iCEDID != 'undefined') {
+            var H2O_ID = getTokens()['CEDID'];    //*****************************************************Justin Change this to your Django CEID id variable!!!!!!!!
+            if (typeof H2O_ID != 'undefined') {
                 var arrayCenterZoom = [-111, 45.5];
                 var izoomVal = 5;
             } else {
@@ -78,21 +81,36 @@ define([
 
 
             var portalUrl4Shapefile = "https://www.arcgis.com";
-            var strHFL_URL = "https://utility.arcgis.com/usrsvcs/servers/e09a9437e03d4190a3f3a8f2e36190b4/rest/services/Development_Src_v2/FeatureServer/0";
-            pSrcFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL, {
-                mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*']
-            });
+            var strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
+            pUMHWFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "3", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*']});
 
-            if (typeof iCEDID != 'undefined') {
-                pSrcFeatureLayer.setDefinitionExpression("(project_id = " + iCEDID + ")");
+            pUMHW_MASKFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
+
+            var strlabelField1 = "Name";
+            pHUC8FeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            if (typeof H2O_ID != 'undefined') {
+                pHUC8FeatureLayer.setDefinitionExpression("(project_id = " + H2O_ID + ")");
+            } else {
+                pHUC8FeatureLayer.setDefinitionExpression("HUC8 in (10020004,10020005,10020006,10020008,10020007,10020003,10020002,10020001)");
             }
-            app.map.addLayers([pSrcFeatureLayer]);
 
-            if (typeof iCEDID != 'undefined') {
-                //app.dblExpandNum = 3.75;
-                app.dblExpandNum = 1;
-                app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
-                app.pSup.qry_Zoom2FeatureLayerExtent(pSrcFeatureLayer);
+
+            var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
+            var pLabel1 = new TextSymbol().setColor(vGreyColor);
+            pLabel1.font.setSize("10pt");
+            pLabel1.font.setFamily("arial");
+            var pLabelRenderer1 = new SimpleRenderer(pLabel1);
+            var plabels1 = new LabelLayer({ id: "labels1" });
+            plabels1.addFeatureLayer(pHUC8FeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
+
+            app.map.addLayers([pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, plabels1]);
+
+            app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
+            app.dblExpandNum = 1;
+            if (typeof H2O_ID != 'undefined') {
+                app.pSup.qry_Zoom2FeatureLayerExtent(pHUC8FeatureLayer);
+            } else {
+                app.pSup.qry_Zoom2FeatureLayerExtent(pUMHWFeatureLayer);
             }
             
             function err(err) {
@@ -110,7 +128,7 @@ define([
 
             function showCoordinates(evt) {
                 var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
-                dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.x.toFixed(4) + ", Longitude:" + mp.y.toFixed(4);  //display mouse coordinates
+                dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + ", Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
             }
 
             function getTokens() {

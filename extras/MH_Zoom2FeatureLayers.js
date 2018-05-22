@@ -28,6 +28,10 @@ define([
             pQuery1.outFields = ["objectid"];
 
             var strQuery1 = pFeatureLayer1.getDefinitionExpression();
+
+            if (strQuery1 == undefined) {
+                strQuery1 = "objectid > -1";
+            }
             pQuery1.where = strQuery1;
 
             var FLayer1, pPromises

@@ -205,15 +205,21 @@ define([
                           jQuery('#display').append(trHTML);
                       
                           var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
+                          strSiteFlowStatus += " (Thersholds " + iLateFlowPref4ConsvValue.toString() + "/" + iLateFlowConsvValue.toString() + "/" + iLateFlowClosureValueFlow.toString() + " cfs)";
+
                           var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
 
-                          //determine the site's status based on water temperature
+                          iTempClosureValueCelsius = (iTempClosureValue - 32) * (5 / 9);
+                          strSiteTempStatus += " (Thershold " + Math.round(iTempClosureValueCelsius).toString() + " Celsius)";
+
                           dblLatestTempFahrenhet = dblLatestTemp * 9 / 5 + 32;
+                          //determine the site's status based on water temperature
                           if (dblLatestTempFahrenhet > iTempClosureValue) { strSiteTempStatus = "RIVER CLOSURE (CLOSED TO FISHING) CRITERIA"; }
+
                           //determine the site's status based on discharge
-                          if ((dblLatestCFS >= iLateFlowPref4ConsvValue) & (dblLatestCFS < iLateFlowConsvValue)) { strSiteFlowStatus = "PREPARE FOR CONSERVATION"; }
-                          if ((dblLatestCFS >= iLateFlowConsvValue) & (dblLatestCFS < iLateFlowClosureValueFlow)) { strSiteFlowStatus = "CONSERVATION"; }
-                          if (dblLatestCFS >= iLateFlowClosureValueFlow) { strSiteFlowStatus = "RIVER CLOSURE (CLOSED TO FISHING)"; }
+                          if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue))  { strSiteFlowStatus = "PREPARE FOR CONSERVATION"; }
+                          if ((dblLatestCFS <= iLateFlowConsvValue) & (dblLatestCFS > iLateFlowClosureValueFlow)) { strSiteFlowStatus = "CONSERVATION"; }
+                          if (dblLatestCFS <= iLateFlowClosureValueFlow) { strSiteFlowStatus = "RIVER CLOSURE (CLOSED TO FISHING)"; }
                       
                           var blnAddNew = true;
 
@@ -237,8 +243,8 @@ define([
                               }
                           }
                           if (blnAddNew) {
-                              app.pGage.m_arrray_RiverSectionStatus.push([strSiteName, strHyperlinkURL,
-                                                                         dteLatestDateTimeTemp, dblLatestTemp, strSiteTempStatus,
+                              app.pGage.m_arrray_RiverSectionStatus.push([strSiteName.replace(", MT", "").replace(" MT", ""), strHyperlinkURL,
+                                                                         dteLatestDateTimeTemp, dblLatestTemp.replace("-999999","Data Not Available"), strSiteTempStatus,
                                                                          dteLatestDateTimeCFS, dblLatestCFS, strSiteFlowStatus, strID]);
                           }
 
@@ -262,7 +268,8 @@ define([
                           }
                           tableHighlightRow();
                       } else {
-                          app.pGage.Start("2017-08-13", "2017-08-16");
+                          //app.pGage.Start("2017-08-13", "2017-08-16");
+                          app.pGage.Start(dteStartDay2Check, dteEndDay2Check);
                       }
 
                   })

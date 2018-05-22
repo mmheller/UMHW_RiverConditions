@@ -62,9 +62,15 @@ Date:        February 2018-->
 
             var dteDateTime = new Date();
             var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
+            var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
+
             var dteDateTimeMinus3 = new Date();
             dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
             var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
+            var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
+
+            document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
+            
 
             app.pGage.Start(strDateTimeMinus3, strDateTime);
             //app.pGage.Start("2017-08-13", "2017-08-16");
@@ -89,12 +95,11 @@ Date:        February 2018-->
                data-dojo-props="region:'left'" style="background-color:rgb(151, 118, 123); width:550px;">
 
               <div data-dojo-type="dijit/layout/AccordionContainer">
-                  <div data-dojo-type="dijit/layout/ContentPane" id="legendPane" data-dojo-props='title:"Legend and Layer Options", iconClass:"palette3Icon"'>
-                      <center><h2>Layer Visibility</h2></center>
+                  <div data-dojo-type="dijit/layout/ContentPane" id="legendPane" data-dojo-props='title:"River Section Status", iconClass:"palette3Icon"'>
 
-                      <h2>Note:Some layers simplified for performance</h2>
-
-                      <table class="TableListJS" id="entries">
+                      <p id="txtFromToDate"></p>
+                     
+                       <table class="TableListJS" id="entries">
                           <thead>
                               <tr>
                                   <th>Site Name</th>
@@ -127,16 +132,11 @@ Date:        February 2018-->
                           </tbody>
                       </table>
 
-                      <center><h2>Go to Locations</h2></center>
                       <div id="search"></div>
                       <input id="btn_query_QS" type="button" value="Run Search/Filter" style="visibility: hidden;" />
-
                   </div>
 
-                  <div data-dojo-type="dijit/layout/ContentPane" id="prjinfopane" data-dojo-props="title:'Project Background'">
-                      <div id="Div2">
-                          <p>Sample text</p>
-                      </div>
+                  <div data-dojo-type="dijit/layout/ContentPane" id="prjinfopane" data-dojo-props="title:'Data Details'">
                       <table class="red" style="width: 100%; height: 100%;">
                           <thead>
                               <tr>
@@ -161,27 +161,12 @@ Date:        February 2018-->
 
           <div class="panelTitle bg rounded shadow">
               <div>
-                  <h1>DRAFT Missouri River Headwaters River Conditions</h1>
+                  <h1>DRAFT Upper Missouri River Headwaters River Conditions</h1>
                   <h2>version 1.0</h2>
               </div>
 
-              <div id="templatePickerDiv"></div>
-
-              <div id="editorDiv"></div>
-
               <div style='margin-top:15px'><hr /></div>
 
-              <form enctype="multipart/form-data" method="post" id="uploadForm">
-                  <div class="field" id="upload_Field" style='margin-top:15px'>
-                      <label class="file-upload" id="upload_label">
-                          <span style='margin-right:5px'><strong>Add Zipped-up Shapefile</strong></span>
-                          <input type="file" name="file" id="inFile" style='margin-top:8px; width:100%' />
-                      </label>
-                  </div>
-                  <span class="file-upload-status" style="opacity:1;margin-right:5px;" id="upload-status"></span>
-                  <span class="file-upload-status" style="opacity:1;margin-right:5px;" id="userId"></span>
-              </form>
-              <!--<img id="loadingImg" src="{% static 'ced_main/images/grsgmap/loading.gif' %}" style="position:fixed; right:40%; top:50%; z-index:100;" />-->
               <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
           </div>
       </div>
