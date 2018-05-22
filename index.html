@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--Created By:  Matt Heller, U.S. Fish and Wildlife Service, Region 6 Science Applications
+Date:        February 2018-->
+
+<!--{% load staticfiles %}-->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Missouri River Headwater River Conditions</title>
+   
+    <link rel="stylesheet" href="https://js.arcgis.com/3.20/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.20/esri/css/esri.css" />
+    <link rel="stylesheet" type="text/css" href="Styles/panel2.css" />
+    <link rel="stylesheet" href="/Styles/tablelist.css" type="text/css" />
+    <script src="extras/tablelist.js" type="text/javascript"></script>
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'ced_main/images/grsgmap/Styles/panel2.css' %}" />-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+
+    <script type="text/javascript">var dojoConfig = {paths: { extras: location.pathname.replace(/\/[^/]+$/, "") + "/extras" }};</script>      
+    <!--<script type="text/javascript"> var dojoConfig = { paths: { extras: "{% static 'ced_main/images/grsgmap/extras' %}"} };</script>-->
+
+    <script src="https://js.arcgis.com/3.23/"></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+
+    <script type="text/javascript">
+      //var map;
+      var editorWidget;
+      var pSrcFeatureLayer;
+      var pFCol;
+      var app = {};
+      require([
+        "extras/MH_Setup",
+        "extras/MH_GetGageData", 
+        "esri/arcgis/Portal", "esri/arcgis/OAuthInfo", "esri/IdentityManager",
+        "esri/config",
+        "esri/map",
+        "dojo/dom",
+        "dojo/dom-style", "dojo/dom-attr",
+        "dojo/dom-class",
+        "dojo/dom-construct",
+        "dojo/json",
+        "dojo/on",
+        "dojo/parser",
+        "esri/Color",
+        "dojo/_base/lang",
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+        "dojo/domReady!"
+      ],
+        function (MH_Setup, MH_GetGageData, arcgisPortal, OAuthInfo, esriId,
+        esriConfig, Map, dom, domStyle, domAttr, domClass, domConstruct, JSON, on, parser,  Color, lang
+      ) {
+            parser.parse();
+            esriConfig.defaults.io.proxyUrl = "/proxy/";
+
+            app.pSup = new MH_Setup({}); // instantiate the class
+            app.pSup.Phase1();
+            app.pGage = new MH_GetGageData({}); // instantiate the class
+
+            var dteDateTime = new Date();
+            var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
+            var dteDateTimeMinus3 = new Date();
+            dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
+            var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
+
+            app.pGage.Start(strDateTimeMinus3, strDateTime);
+            //app.pGage.Start("2017-08-13", "2017-08-16");
+            //app.pGage.Start("2018-04-13", "2018-04-16");
+        });
+      </script>
+  </head>
+  <body class="claro">    
+      <div id="content" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:false"
+           style="width: 100%; height: 100%; margin: 0; background-color:rgb(151, 118, 123); font-family: Arial;">
+
+          <!--<div id="content" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:false"
+             style="width: 100%; height: 100%; margin: 0; background-color:rgb(127, 105, 127); font-family: Arial;">-->
+
+
+          <div id="topPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top', splitter:false">
+              <!--//empty-->
+          </div>
+
+          <div id="leftPane"
+               data-dojo-type="dijit/layout/ContentPane"
+               data-dojo-props="region:'left'" style="background-color:rgb(151, 118, 123); width:550px;">
+
+              <div data-dojo-type="dijit/layout/AccordionContainer">
+                  <div data-dojo-type="dijit/layout/ContentPane" id="legendPane" data-dojo-props='title:"Legend and Layer Options", iconClass:"palette3Icon"'>
+                      <center><h2>Layer Visibility</h2></center>
+
+                      <h2>Note:Some layers simplified for performance</h2>
+
+                      <table class="TableListJS" id="entries">
+                          <thead>
+                              <tr>
+                                  <th>Site Name</th>
+                                  <th></th>
+                                  <th></th>
+                              </tr>
+                          </thead>
+                          <tbody data-bind="foreach: gageRecords">
+                              <tr>
+                                  <td width="25%">
+                                      Stream Section: <br />
+                                      <div>Discharge (cfs) </div>
+                                      <div>Flow Status </div>
+                                      <div>Water Temp (C)</div>
+                                      <div>Temp Status </div>
+                                  </td>
+                                  <td width="65%">
+                                      <div>
+                                          <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a><br />
+                                          <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span></div>
+                                          <div><span data-bind='text: SiteFlowStatus'></span></div>
+                                          <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span></div>
+                                          <div><span data-bind='text: SiteTempStatus'></span></div>
+                                      </div>
+                                  </td>
+                                  <td width="10%">
+                                       <img width='100%' src="images/greenlight.jpg" alt="" /><br />
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+
+                      <center><h2>Go to Locations</h2></center>
+                      <div id="search"></div>
+                      <input id="btn_query_QS" type="button" value="Run Search/Filter" style="visibility: hidden;" />
+
+                  </div>
+
+                  <div data-dojo-type="dijit/layout/ContentPane" id="prjinfopane" data-dojo-props="title:'Project Background'">
+                      <div id="Div2">
+                          <p>Sample text</p>
+                      </div>
+                      <table class="red" style="width: 100%; height: 100%;">
+                          <thead>
+                              <tr>
+                                  <th class="right">Site Name</th>
+                                  <th class="right">agency</th>
+                                  <th>value</th>
+                                  <th class="right">Var/Unit</th>
+                                  <th class="right">DateTime</th>
+                              </tr>
+                          </thead>
+                          <tbody id="display" class="no-border-x"></tbody>
+                      </table>
+                  </div>
+
+ 
+              </div>
+          </div>
+
+          <div id="map" style="height:100%;"></div>
+
+          <div id="txt_xyCoords" style="position:absolute; left:295px; bottom:1px; color:#404040; z-index:50; font-size:11px"></div>
+
+          <div class="panelTitle bg rounded shadow">
+              <div>
+                  <h1>DRAFT Missouri River Headwaters River Conditions</h1>
+                  <h2>version 1.0</h2>
+              </div>
+
+              <div id="templatePickerDiv"></div>
+
+              <div id="editorDiv"></div>
+
+              <div style='margin-top:15px'><hr /></div>
+
+              <form enctype="multipart/form-data" method="post" id="uploadForm">
+                  <div class="field" id="upload_Field" style='margin-top:15px'>
+                      <label class="file-upload" id="upload_label">
+                          <span style='margin-right:5px'><strong>Add Zipped-up Shapefile</strong></span>
+                          <input type="file" name="file" id="inFile" style='margin-top:8px; width:100%' />
+                      </label>
+                  </div>
+                  <span class="file-upload-status" style="opacity:1;margin-right:5px;" id="upload-status"></span>
+                  <span class="file-upload-status" style="opacity:1;margin-right:5px;" id="userId"></span>
+              </form>
+              <!--<img id="loadingImg" src="{% static 'ced_main/images/grsgmap/loading.gif' %}" style="position:fixed; right:40%; top:50%; z-index:100;" />-->
+              <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
+          </div>
+      </div>
+  
+      <div id="bot" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:true">
+          <div id="myTableNode"></div>
+      </div>
+
+  </body>
+</html>
