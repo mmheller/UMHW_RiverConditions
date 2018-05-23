@@ -11,14 +11,6 @@
 }
 
 function getArray2Process() {
-    //var siteNameArrray = [["BIG HOLE", "06024450", 1, 60, 40, 20, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "4/1", "6/30", 160, "Water users with CCAA site plans will be required to implement their plans. Non-CCAA water users will be contacted by DNRC and MFWP, advised of flow conditions and encouraged to implement conservation measures. This target is specific to the CCAA goal of maintaining spawning and rearing flow requirements for Arctic grayling."]];
-
-
-    //var siteNameArrray = [
-    //             ["BIG HOLE", "06024580", 2, 170, 140, 100, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "4/1", "6/30", 450, "Water users with CCAA site plans will be required to implement their plans. Non-CCAA water users will be contacted by DNRC and MFWP, advised of flow conditions and encouraged to implement conservation measures. This target is specific to the CCAA goal of maintaining spawning and rearing flow requirements for Arctic grayling."],
-    //             ["BIG HOLE", "06024450", 1, 60, 40, 20, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "4/1", "6/30", 160, "Water users with CCAA site plans will be required to implement their plans. Non-CCAA water users will be contacted by DNRC and MFWP, advised of flow conditions and encouraged to implement conservation measures. This target is specific to the CCAA goal of maintaining spawning and rearing flow requirements for Arctic grayling."]];
-
-
     var siteNameArrray = [["BIG HOLE", "06026420", 5, 200, 150, 100, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "", "", "", ""],
               ["BIG HOLE", "06026210", 4, 290, 240, 190, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "", "", "", ""],
               ["BIG HOLE", "06025250", 3, 250, 200, 150, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "", "", "", ""],
@@ -27,9 +19,7 @@ function getArray2Process() {
     return siteNameArrray;
 }
 
-
 //Explore drilldown examples https://js.devexpress.com/Demos/WidgetsGallery/Demo/Charts/ChartsDrillDown/Knockout/Light/
-
 
 define([
   "dojo/_base/declare",
@@ -205,12 +195,12 @@ define([
                           jQuery('#display').append(trHTML);
                       
                           var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
-                          strSiteFlowStatus += " (Thersholds " + iLateFlowPref4ConsvValue.toString() + "/" + iLateFlowConsvValue.toString() + "/" + iLateFlowClosureValueFlow.toString() + " cfs)";
+                          strSiteFlowStatus += " (Thresholds " + iLateFlowPref4ConsvValue.toString() + "/" + iLateFlowConsvValue.toString() + "/" + iLateFlowClosureValueFlow.toString() + " cfs)";
 
                           var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
 
                           iTempClosureValueCelsius = (iTempClosureValue - 32) * (5 / 9);
-                          strSiteTempStatus += " (Thershold " + Math.round(iTempClosureValueCelsius).toString() + " Celsius)";
+                          strSiteTempStatus += " (Threshold " + Math.round(iTempClosureValueCelsius).toString() + " Celsius)";
 
                           dblLatestTempFahrenhet = dblLatestTemp * 9 / 5 + 32;
                           //determine the site's status based on water temperature
@@ -277,20 +267,7 @@ define([
                       var err = textStatus + ", " + error;
                       console.log("Request Failed: " + err);
                   });
-            //}
 
-            ////determine the site's status based on water temperature
-            //if (dteLatestTemp > iTempClosureValue) { strSiteTempStatus = "RIVER CLOSURE (CLOSED TO FISHING) CRITERIA"; }
-            ////determine the site's status based on discharge
-            //if ((dblLatestCFS >= iLateFlowPref4ConsvValue) & (dblLatestCFS < iLateFlowConsvValue)) { strSiteFlowStatus = "PREPARE FOR CONSERVATION"; }
-            //if ((dblLatestCFS >= iLateFlowConsvValue) & (dblLatestCFS < iLateFlowClosureValueFlow)) {strSiteFlowStatus = "CONSERVATION"; }
-            //if (dblLatestCFS >= iLateFlowClosureValueFlow) {strSiteFlowStatus = "RIVER CLOSURE (CLOSED TO FISHING)"; }
-
-            //if (strSiteName != "") {
-            //    this.m_arrray_RiverSectionStatus.append([strSiteName, strHyperlinkURL,
-            //                                        dteLatestDateTimeTemp, dteLatestTemp, strSiteTempStatus,
-            //                                        dteLatestDateTimeCFS, dteLatestCFS, strSiteFlowStatus]);
-            //}
         },
 
         err2: function (err) {
