@@ -63,7 +63,7 @@ define([
 
     return declare([], {
         Phase1: function () {
-            var H2O_ID = getTokens()['CEDID'];   
+            var H2O_ID = getTokens()['H2O_ID'];
             if (typeof H2O_ID != 'undefined') {
                 var arrayCenterZoom = [-111, 45.5];
                 var izoomVal = 5;
@@ -76,7 +76,7 @@ define([
             //app.map = new esri.Map("map", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, slider: true, sliderPosition: "bottom-right" });
 
             // Get a reference to the ArcGIS Map class
-            app.map = BootstrapMap.create("mapDiv", { basemap: "national-geographic", center: [-110, 47], zoom: 12, scrollWheelZoom: false});
+            app.map = BootstrapMap.create("mapDiv", { basemap: "national-geographic", center: [-110, 47], zoom: 4, scrollWheelZoom: false});
             
             if (app.map.loaded) {
                 mapLoaded();
@@ -132,7 +132,7 @@ define([
             var strlabelField1 = "Name";
             pHUC8FeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
             if (typeof H2O_ID != 'undefined') {
-                pHUC8FeatureLayer.setDefinitionExpression("(project_id = " + H2O_ID + ")");
+                pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 = '" + H2O_ID + "'");
             } else {
                 pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 in ('10020004','10020005','10020006','10020008_1','10020008_2','10020007','10020003','10020002','10020001','10030101_1')");
             }
