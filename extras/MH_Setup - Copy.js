@@ -76,7 +76,7 @@ define([
             //app.map = new esri.Map("map", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, slider: true, sliderPosition: "bottom-right" });
 
             // Get a reference to the ArcGIS Map class
-            app.map = BootstrapMap.create("mapDiv", { basemap: "national-geographic", center: [-110, 47], zoom: 12, scrollWheelZoom: false});
+            app.map = BootstrapMap.create("mapDiv", { basemap: "national-geographic", center: [-122.45, 37.77], zoom: 12, scrollWheelZoom: false});
             
             if (app.map.loaded) {
                 mapLoaded();
@@ -91,9 +91,9 @@ define([
                  }
             });
 
-            ////var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, app.map.root));
-            ////infoWindow.startup();
-            ////app.map.setInfoWindow(infoWindow);
+            var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, app.map.root));
+            infoWindow.startup();
+            app.map.setInfoWindow(infoWindow);
 
 
             var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" });
@@ -117,17 +117,20 @@ define([
             pFASFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFAS, "opacity": 0.3, outFields: ['*'] });
             
+
             var templateBLM = new InfoTemplate();
             templateBLM.setTitle("<b>${Facility_Name} BLM Facility</b>");
             templateBLM.setContent("<a href=${URL} target='_blank'>Link to BLM Facility</a>");
             pBLMFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "1",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, "opacity": 0.6, outFields: ['*'] });
 
+
             var templateFWP = new InfoTemplate();
             templateFWP.setTitle("<b>${TITLE}</b>");
             templateFWP.setContent("${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
             pFWPFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0",
             { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'] });
+
 
             var strlabelField1 = "Name";
             pHUC8FeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
@@ -144,17 +147,18 @@ define([
             var pLabelRenderer1 = new SimpleRenderer(pLabel1);
             var plabels1 = new LabelLayer({ id: "labels1" });
             plabels1.addFeatureLayer(pHUC8FeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
-                        
-            app.map.addLayers([pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, plabels1]);
-            app.map.infoWindow.resize(300, 65);
 
-            app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
-            app.dblExpandNum = 1;
-            if (typeof H2O_ID != 'undefined') {
-                app.pSup.qry_Zoom2FeatureLayerExtent(pHUC8FeatureLayer);
-            } else {
-                app.pSup.qry_Zoom2FeatureLayerExtent(pUMHWFeatureLayer);
-            }
+            app.map.addLayers([pUMHWFeatureLayer]);
+            ////app.map.addLayers([pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, plabels1]);
+            ////app.map.infoWindow.resize(300, 65);
+
+            //app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
+            //app.dblExpandNum = 1;
+            //if (typeof H2O_ID != 'undefined') {
+            //    app.pSup.qry_Zoom2FeatureLayerExtent(pHUC8FeatureLayer);
+            //} else {
+            //    app.pSup.qry_Zoom2FeatureLayerExtent(pUMHWFeatureLayer);
+            //}
 
 
 
@@ -171,10 +175,10 @@ define([
                 //////app.basemapGallery.on("error", function (msg) { console.log("basemap gallery error:  ", msg); });
             }
 
-            //function showCoordinates(evt) {
-            //    var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
-            //    dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + ", Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
-            //}
+            function showCoordinates(evt) {
+                var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
+                dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + ", Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
+            }
 
             function getTokens() {
                 var tokens = [];
