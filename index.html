@@ -18,14 +18,15 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
-    var package_path = "//esri.github.com/bootstrap-map-js/src/js";
-    var dojoConfig = {
-        packages: [{
-            name: "application",
-            location: package_path
-        }],
-        paths: { extras: location.pathname.replace(/\/[^/]+$/, "") + "/extras" }
-    };
+        var package_path = "https://esri.github.com/bootstrap-map-js/src/js";
+        //var package_path = "//esri.github.com/bootstrap-map-js/src/js";
+        var dojoConfig = {
+            packages: [{
+                name: "application",
+                location: package_path
+            }],
+            paths: { extras: location.pathname.replace(/\/[^/]+$/, "") + "/extras" }
+        };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="//js.arcgis.com/3.13compact"></script>
