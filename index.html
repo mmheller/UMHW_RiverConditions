@@ -22,7 +22,7 @@
         //var package_path = "https://esri.github.com/bootstrap-map-js/src/js";
         //var package_path = "https://esri.github.io/bootstrap-map-js/src/js/bootstrapmap.min.js";
         //var package_path = "//esri.github.com/bootstrap-map-js/src/js";
-        var package_path = "/assets";
+        var package_path = location.pathname.replace(/\/[^/]+$/, "") + "/assets";
         var dojoConfig = {
             packages: [{
                 name: "application",
