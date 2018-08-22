@@ -43,6 +43,16 @@
         }
     </style>-->
 
+
+      '10020008_1' upper gallatin (will combine later)
+      '10020008_2' lower gallatin (will combine later)
+      '10020007' Madison
+      '10020003' Ruby
+      '10020002' Beaverhead (will combine later)
+      '10020001' Centennial
+      '10030101_1' broadwater-->
+
+
   </head>
 
   <body>
@@ -60,17 +70,24 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <form class="navbar-form navbar-right">
-            <button type="submit" class="btn btn-success">Sample1</button>
-            <button type="submit" class="btn btn-default">Sample2</button>
-            <button type="submit" class="btn btn-primary btn-lg">Sample3</button>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020004" target="_blank">Big Hole,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020005" target="_blank">Jefferson,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020006" target="_blank">Boulder,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020008_1" target="_blank">Upper Gallatin,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020008_2" target="_blank">Lower Gallatin,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020007" target="_blank">Madison,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020003" target="_blank">Ruby,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020002" target="_blank">Beaverhead,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10020001" target="_blank">Centennial,</a>
+                <a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=10030101_1" target="_blank">Broadwater</a>
           </form>
         </div><!--/.navbar-collapse -->
       </div>
     </nav>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container" style="margin-bottom:10px;">
+    <div class="jumbotron" style="margin-bottom:-10px; padding-bottom:15px; padding-top:15px;" >
+      <div class="container" style="">
         <h2>Hello, watershed coordinators!</h2> This is DRAFT tool to help with providing examples of data, functionality, and style
           
         <a class="btn btn-primary btn-lg" href="#" role="button">Learn more (coming soon) &raquo;</a>
@@ -80,28 +97,26 @@
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
-        <div class="col-md-5">
-          <h2>Sample of Retrieving Gage Data and Unofficial Conditions</h2>
-          <p>This will be imporived soon</p>
-          <!--<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>-->
+        <div class="col-md-4">
+            <h2>Sample of Retrieving Gage Data and Unofficial Conditions</h2>
+            <p>This will be developed to show other watershed conditions</p>
             <p id="txtFromToDate"></p>
-
             <table class="TableListJS" id="entries">
                 <thead>
-                    <tr>
+                    <!--<tr>
                         <th>Site Name</th>
                         <th></th>
                         <th></th>
-                    </tr>
+                    </tr>-->
                 </thead>
-                <tbody data-bind="foreach: gageRecords">
+                <tbody data-bind="foreach: gageRecords" style="font-size: 13px;">
                     <tr>
-                        <td width="25%">
+                        <td width="30%">
                             Stream Section: <br />
-                            <div>Discharge (cfs) </div>
-                            <div>Flow Status </div>
-                            <div>Water Temp (C)</div>
-                            <div>Temp Status </div>
+                            <div>Discharge(cfs)</div>
+                            <div>Flow Status</div>
+                            <div>Water Temp(C)</div>
+                            <div>Temp Status</div>
                         </td>
                         <td width="65%">
                             <div>
@@ -112,19 +127,16 @@
                                 <div><span data-bind='text: SiteTempStatus'></span></div>
                             </div>
                         </td>
-                        <td width="10%">
+                        <td width="5%">
                             <img width='100%' src="images/greenlight.jpg" alt="" /><br />
                         </td>
                     </tr>
                 </tbody>
             </table>
-
             <div id="search"></div>
             <input id="btn_query_QS" type="button" value="Run Search/Filter" style="visibility: hidden;" />
-
-
         </div>
-        <div class="col-md-7">
+        <div class="col-md-8">
           <h2>DRAFT/Unofficial Map</h2>
           <div id="mapDiv"></div>
           <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
