@@ -27,9 +27,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <!--<script src="//js.arcgis.com/3.13compact"></script>-->
-    <!--<script src="https://js.arcgis.com/3.13compact"></script>-->
-      <script src="https://js.arcgis.com/3.14/"></script>
-
+    <script src="https://js.arcgis.com/3.13compact"></script>
 
     <link href="Styles/jumbotron.css" rel="stylesheet">    <!-- Custom styles for this template -->
     <link rel="stylesheet" href="Styles/tablelist.css" type="text/css" />
@@ -37,15 +35,13 @@
     <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.13/esri/css/esri.css">
     <!--<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.13/esri/css/esri.css">-->
     <link rel="stylesheet" type="text/css" href="https://esri.github.io/bootstrap-map-js/src/css/bootstrapmap.css">
-    <style>
-        .esriBasemapGalleryThumbnail {  
-              height: 30px;  
-              width: 30px;  
-            }  
-        .esriBasemapGalleryNode {  
-          width: 30px;  
-        }  
-    </style>
+    <!--<style>
+        /* Set the responsive map size here */
+        #mapDiv {
+            min-height: 100px;
+            max-height: 1200px;
+        }
+    </style>-->
 
 
       '10020008_1' upper gallatin (will combine later)
@@ -144,8 +140,6 @@
           <h2>DRAFT/Unofficial Map</h2>
           <div id="mapDiv"></div>
           <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
-
-          <div id="basemapGallery"></div>
 
           <div class="row">
                 <div class="col-xs-4">

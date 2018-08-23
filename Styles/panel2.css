@@ -25,14 +25,9 @@
 
         /* Set the responsive map size here */
         #mapDiv {
-            min-height: 75px;
+            min-height: 100px;
             max-height: 1200px;
         }
-
-
-
-
-
 
 /* Classes */
 .bg {

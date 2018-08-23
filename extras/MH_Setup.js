@@ -12,8 +12,7 @@ function hideLoading(error) {
 }
 
 define([
-    "extras/MH_Zoom2FeatureLayers", "esri/basemaps",
-    "esri/layers/WebTiledLayer", "esri/config", "esri/dijit/BasemapLayer", "esri/dijit/BasemapGallery", "esri/dijit/Basemap", "esri/arcgis/utils", "dojo/parser",
+    "extras/MH_Zoom2FeatureLayers",
     "esri/geometry/webMercatorUtils",
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -48,14 +47,10 @@ define([
         "esri/dijit/InfoWindowLite",
         "esri/InfoTemplate",
         "esri/layers/FeatureLayer",
-        "dojo/dom-construct", "application/bootstrapmap",
-        "dijit/TitlePane",
+        "dojo/dom-construct","application/bootstrapmap",
         "dojo/domReady!"
 ], function (
-            MH_Zoom2FeatureLayers,
-            Basemaps,
-             WebTiledLayer, esriConfig, BasemapLayer, BasemapGallery, Basemap, arcgisUtils,parser,
-            webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
+            MH_Zoom2FeatureLayers, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
         SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
         CheckBox, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
@@ -76,59 +71,24 @@ define([
                 var arrayCenterZoom = [-111, 45.5];
                 var izoomVal = 10;
             }
-
+                        
             esri.config.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
             //app.map = new esri.Map("map", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, slider: true, sliderPosition: "bottom-right" });
-            parser.parse();
-
-            var customBasemap2 = new Basemap({
-                layers: [{ url: "https://services.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer" }],
-                thumbnailUrl: "https://www.arcgis.com/sharing/rest/content/items/b165c3df453e4be6b5ac4fdb241effbe/info/thumbnail/ago_downloaded.jpg",
-                title: "DeLorme_World_Base_Map/"
-            });
-
 
             // Get a reference to the ArcGIS Map class
-            //app.map = BootstrapMap.create("mapDiv", { basemap: "mybasemap", center: [-110, 47], zoom: 4, scrollWheelZoom: false });
-            app.map = BootstrapMap.create("mapDiv", { basemap: "topo", center: [-111, 45.5], zoom: 6, scrollWheelZoom: false });
-
-            var baseLayer = new BasemapLayer({
-                templateUrl: "http://${subDomain}.tile.stamen.com/toner/${level}/${col}/${row}.png",
-                type: "WebTiledLayer",
-                copyright: "Stamen",
-                subDomains: ["a", "b", "c"]
-            });
-
-            var customBasemap = new Basemap({
-                layers: [baseLayer],
-                thumbnailUrl: "http://stamen-tiles.a.ssl.fastly.net/toner/10/177/409.png",
-                title: "Stamen"
-            });
-
-            //add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
-            var basemapGallery = new BasemapGallery({
-                basemaps: [customBasemap, customBasemap2],
-                showArcGISBasemaps: true,
-                map: app.map
-            }, "basemapGallery");
-            basemapGallery.startup();
-
-            basemapGallery.on("error", function (msg) {
-                console.log("basemap gallery error:  ", msg);
-            });
-
-
+            app.map = BootstrapMap.create("mapDiv", { basemap: "national-geographic", center: [-110, 47], zoom: 4, scrollWheelZoom: false});
+            
             if (app.map.loaded) {
                 mapLoaded();
             } else {
                 app.map.on("load", function () { mapLoaded(); });
             }
 
-            on(app.map, "layers-add-result", function (e) {
-                for (var i = 0; i < e.layers.length; i++) {
-                    var result = (e.layers[i].error == undefined) ? "OK" : e.layers[i].error.message;
-                    console.log(" - " + e.layers[i].layer.id + ": " + result);
-                }
+            on(app.map, "layers-add-result", function(e) {
+              for (var i = 0; i < e.layers.length; i++) {
+                 var result = (e.layers[i].error == undefined) ? "OK": e.layers[i].error.message;
+                 console.log(" - " +e.layers[i].layer.id + ": " +result);
+                 }
             });
 
             ////var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, app.map.root));
@@ -156,7 +116,7 @@ define([
             templateFAS.setContent("${BOAT_FAC}<br><a href=${WEB_PAGE} target='_blank'>Link to Fish Access Site</a>");
             pFASFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFAS, "opacity": 0.3, outFields: ['*'] });
-
+            
             var templateBLM = new InfoTemplate();
             templateBLM.setTitle("<b>${Facility_Name} BLM Facility</b>");
             templateBLM.setContent("<a href=${URL} target='_blank'>Link to BLM Facility</a>");
@@ -184,12 +144,12 @@ define([
             var pLabelRenderer1 = new SimpleRenderer(pLabel1);
             var plabels1 = new LabelLayer({ id: "labels1" });
             plabels1.addFeatureLayer(pHUC8FeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
-
+                        
             app.map.addLayers([pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, plabels1]);
             app.map.infoWindow.resize(300, 65);
 
             app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
-            app.dblExpandNum = 0.5;
+            app.dblExpandNum = 1;
             if (typeof H2O_ID != 'undefined') {
                 app.pSup.qry_Zoom2FeatureLayerExtent(pHUC8FeatureLayer);
             } else {
@@ -229,7 +189,7 @@ define([
                 });
                 return tokens;
             }
-
+       
         },
 
         err: function (err) {
@@ -237,5 +197,5 @@ define([
         }
 
     });
-}
+  }
 );
