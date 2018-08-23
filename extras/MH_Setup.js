@@ -13,6 +13,7 @@ function hideLoading(error) {
 
 define([
     "extras/MH_Zoom2FeatureLayers",
+    "esri/dijit/BasemapGallery", "esri/arcgis/utils", "dojo/parser", "esri/layers/OpenStreetMapLayer",
     "esri/geometry/webMercatorUtils",
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -50,7 +51,9 @@ define([
         "dojo/dom-construct","application/bootstrapmap",
         "dojo/domReady!"
 ], function (
-            MH_Zoom2FeatureLayers, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
+            MH_Zoom2FeatureLayers,
+            BasemapGallery, arcgisUtils, parser, OpenStreetMapLayer,
+      webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
         SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
         CheckBox, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
@@ -63,6 +66,8 @@ define([
 
     return declare([], {
         Phase1: function () {
+            parser.parse();
+
             var H2O_ID = getTokens()['H2O_ID'];
             if (typeof H2O_ID != 'undefined') {
                 var arrayCenterZoom = [-111, 45.5];
@@ -76,13 +81,45 @@ define([
             //app.map = new esri.Map("map", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, slider: true, sliderPosition: "bottom-right" });
 
             // Get a reference to the ArcGIS Map class
-            app.map = BootstrapMap.create("mapDiv", { basemap: "national-geographic", center: [-110, 47], zoom: 4, scrollWheelZoom: false});
+            app.map = BootstrapMap.create("mapDiv", { center: [-110, 47], zoom: 6, scrollWheelZoom: false });
+            openStreetMapLayer = new OpenStreetMapLayer();
             
+
             if (app.map.loaded) {
                 mapLoaded();
             } else {
                 app.map.on("load", function () { mapLoaded(); });
             }
+
+
+            //add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
+            var basemapGallery = new BasemapGallery({
+                showArcGISBasemaps: true,
+                map: app.map
+            }, "basemapGallery");
+            basemapGallery.startup();
+
+            basemapGallery.on("error", function (msg) {
+                console.log("basemap gallery error:  ", msg);
+            });
+
+            basemapGallery.on("load", function () {
+                var tot = basemapGallery.basemaps.length;
+                for (var cnt = tot - 1; cnt >= 0; cnt--) {
+                    if (basemapGallery.basemaps[cnt].title === "Oceans" ||
+                        basemapGallery.basemaps[cnt].title === "Imagery" ||
+                        basemapGallery.basemaps[cnt].title === "Light Gray Canvas" ||
+                        basemapGallery.basemaps[cnt].title === "National Geographic" ||
+                        basemapGallery.basemaps[cnt].title === "USGS National Map" ||
+                        basemapGallery.basemaps[cnt].title === "Streets" ||
+                        basemapGallery.basemaps[cnt].title === "Terrain with Labels" ||
+                        basemapGallery.basemaps[cnt].title === "USA Topo Maps") {
+                        console.log("Removing..." + basemapGallery.basemaps[cnt].title);
+                        basemapGallery.remove(basemapGallery.basemaps[cnt].id);
+                    }
+                }
+            });
+
 
             on(app.map, "layers-add-result", function(e) {
               for (var i = 0; i < e.layers.length; i++) {
@@ -145,7 +182,7 @@ define([
             var plabels1 = new LabelLayer({ id: "labels1" });
             plabels1.addFeatureLayer(pHUC8FeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
                         
-            app.map.addLayers([pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, plabels1]);
+            app.map.addLayers([openStreetMapLayer, pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, plabels1]);
             app.map.infoWindow.resize(300, 65);
 
             app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
