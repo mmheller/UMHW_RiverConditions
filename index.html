@@ -27,43 +27,33 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <!--<script src="//js.arcgis.com/3.13compact"></script>-->
-    <!--<script src="https://js.arcgis.com/3.13compact"></script>-->
-      <script src="https://js.arcgis.com/3.14/"></script>
+    <script src="https://js.arcgis.com/3.13compact"></script>
 
-    <link href="Styles/rivcond.css" rel="stylesheet">    <!-- Custom styles for this template -->
+    <link href="Styles/jumbotron.css" rel="stylesheet">    <!-- Custom styles for this template -->
     <link rel="stylesheet" href="Styles/tablelist.css" type="text/css" />
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.13/esri/css/esri.css">
     <!--<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.13/esri/css/esri.css">-->
     <link rel="stylesheet" type="text/css" href="https://esri.github.io/bootstrap-map-js/src/css/bootstrapmap.css">
-      <style>
-          .esriBasemapGalleryThumbnail {
-              height: 40px;
-              width: 40px;
-          }
-          .esriBasemapGalleryNode {
-              width: 40px;
-          }
+    <style>
+        #mapDiv {/* Set the responsive map size here */
+            min-height: 80px;
+            max-height: 600px;
+        }
 
-          /*.esriScalebarLabel
-          {
-              font: Arial;
-              font-family: Arial;
-              font-size: 11px;
-              font-style:normal;
-          }
+        .esriScalebar{
+            bottom:145px;
+            margin-left: 0px;
+        }
+        .esriBasemapGalleryThumbnail {
+            height: 40px;
+            width: 40px;
+        }
+        .esriBasemapGalleryNode {
+            width: 40px;
+        }
+    </style>
 
-          .esriScalebar
-          {
-              text-align:left;
-              bottom:150px;
-              margin-left:0px;
-              font-family: Arial;
-              font-size: 11px;
-              font-style:normal;
-          }*/
-
-      </style>
 
       '10020008_1' upper gallatin (will combine later)
       '10020008_2' lower gallatin (will combine later)
@@ -161,15 +151,10 @@
           <h2>DRAFT/Unofficial Map</h2>
           <div id="mapDiv"></div>
           <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
-          
           <div style="position:absolute; right:15px; bottom:130px; z-Index:999;">
               <div id="basemapGallery"></div>
           </div>
-          
-            
           <div id="txt_xyCoords" style="position:absolute; left:25px; bottom:125px; color:#404040; z-index:50; font-size:11px"></div>
-
-
           <div class="row">
                 <div class="col-xs-4">
                     <h5>Legend</h5>
@@ -177,8 +162,8 @@
                     <p>content</p>
                     <p>content</p>
                 </div>
-                <p>This map will be updated soon.. </p>
-                <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+              <p>This map will be updated soon.. </p>
+              <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
           </div>
         </div>
         <div class="col-md-12">

@@ -13,8 +13,8 @@ function hideLoading(error) {
 
 define([
     "extras/MH_Zoom2FeatureLayers",
-      "esri/renderers/UniqueValueRenderer",   
-    "esri/dijit/BasemapGallery", "esri/arcgis/utils", "dojo/parser", "esri/layers/OpenStreetMapLayer",
+    "esri/dijit/BasemapGallery",
+    "esri/renderers/UniqueValueRenderer",
     "esri/geometry/webMercatorUtils",
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -52,10 +52,7 @@ define([
         "dojo/dom-construct","application/bootstrapmap",
         "dojo/domReady!"
 ], function (
-            MH_Zoom2FeatureLayers,
-            UniqueValueRenderer, 
-            BasemapGallery, arcgisUtils, parser, OpenStreetMapLayer,
-      webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
+            MH_Zoom2FeatureLayers, BasemapGallery, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
         SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
         CheckBox, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
@@ -68,21 +65,17 @@ define([
 
     return declare([], {
         Phase1: function () {
-            parser.parse();
-
             var H2O_ID = getTokens()['H2O_ID'];
             if (typeof H2O_ID != 'undefined') {
-                var arrayCenterZoom = [-112.0178, 46.5856];
-                var izoomVal = 12;
+                var arrayCenterZoom = [-112.0163, 46.5857];
+                var izoomVal = 10;
             } else {
-                var arrayCenterZoom = [-111, 45.5];
-                var izoomVal = 7;
+                var arrayCenterZoom = [-112.0163, 46.5857];
+                var izoomVal = 9;
             }
                         
             esri.config.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
-
-            app.map = BootstrapMap.create("mapDiv", { center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false });            // Get a reference to the ArcGIS Map class
-            openStreetMapLayer = new OpenStreetMapLayer();
+            app.map = BootstrapMap.create("mapDiv", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false });// Get a reference to the ArcGIS Map class
             
             if (app.map.loaded) {
                 mapLoaded();
@@ -90,16 +83,11 @@ define([
                 app.map.on("load", function () { mapLoaded(); });
             }
 
-            var basemapGallery = new BasemapGallery({//add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
-                showArcGISBasemaps: true,
-                map: app.map
-            }, "basemapGallery");
+            var basemapGallery = new BasemapGallery({showArcGISBasemaps: true, map: app.map}, "basemapGallery");
             basemapGallery.startup();
-
             basemapGallery.on("error", function (msg) {
                 console.log("basemap gallery error:  ", msg);
             });
-
             basemapGallery.on("load", function () {
                 var tot = basemapGallery.basemaps.length;
                 for (var cnt = tot - 1; cnt >= 0; cnt--) {
@@ -109,6 +97,7 @@ define([
                         basemapGallery.basemaps[cnt].title === "National Geographic" ||
                         basemapGallery.basemaps[cnt].title === "USGS National Map" ||
                         basemapGallery.basemaps[cnt].title === "Streets" ||
+                        basemapGallery.basemaps[cnt].title === "OpenStreetMap" ||
                         basemapGallery.basemaps[cnt].title === "Terrain with Labels" ||
                         basemapGallery.basemaps[cnt].title === "USA Topo Maps") {
                         console.log("Removing..." + basemapGallery.basemaps[cnt].title);
@@ -117,13 +106,17 @@ define([
                 }
             });
 
-
             on(app.map, "layers-add-result", function(e) {
               for (var i = 0; i < e.layers.length; i++) {
                  var result = (e.layers[i].error == undefined) ? "OK": e.layers[i].error.message;
                  console.log(" - " +e.layers[i].layer.id + ": " +result);
                  }
             });
+
+            ////var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, app.map.root));
+            ////infoWindow.startup();
+            ////app.map.setInfoWindow(infoWindow);
+
 
             var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" });
             app.loading = dojo.byId("loadingImg");  //loading image. id
@@ -140,7 +133,7 @@ define([
             var defaultLineSymbol = new SimpleFillSymbol().setStyle(SimpleLineSymbol.STYLE_SOLID);
             defaultLineSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
             var rendererEPOINT = new UniqueValueRenderer(defaultLineSymbol, "Start_End");
-            var slsStart = new SimpleLineSymbol(  SimpleLineSymbol.STYLE_DASH,  new Color([0, 255, 0]),  12);
+            var slsStart = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color([100, 204, 102]), 12);
             var slsEnd = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DOT, new Color([255, 0, 0]), 17);
             rendererEPOINT.addValue("Start", slsStart);
             rendererEPOINT.addValue("End", slsEnd);
@@ -149,6 +142,7 @@ define([
             templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
             pEPointsFeatureLayer.setRenderer(rendererEPOINT);
+
 
             pUMHWFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
             pUMHW_MASKFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
@@ -171,13 +165,35 @@ define([
             pFWPFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0",
             { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'] });
 
+
+            var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+              new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+              new Color([255, 0, 0]), 2), new Color([255, 255, 255, 0.25])
+            );
+            var rendererHUC8 = new SimpleRenderer(sfs);
             var strlabelField1 = "Name";
-            pHUC8FeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            pHUC8FeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
             if (typeof H2O_ID != 'undefined') {
                 pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 = '" + H2O_ID + "'");
             } else {
                 pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 in ('10020004','10020005','10020006','10020008_1','10020008_2','10020007','10020003','10020002','10020001','10030101_1')");
             }
+            pHUC8FeatureLayer.setRenderer(rendererHUC8);
+
+
+            var sfsMask = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+              new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+              new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25])
+            );
+            var rendererHUC8Mask = new SimpleRenderer(sfsMask);
+            var strlabelField1 = "Name";
+            pHUC8MaskFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            if (typeof H2O_ID != 'undefined') {
+                pHUC8MaskFeatureLayer.setDefinitionExpression("HUC_8_12 <> '" + H2O_ID + "'");
+            } else {
+                pHUC8MaskFeatureLayer.setDefinitionExpression("HUC_8_12 in ('')");
+            }
+            pHUC8MaskFeatureLayer.setRenderer(rendererHUC8Mask);
 
             var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
             var pLabel1 = new TextSymbol().setColor(vGreyColor);
@@ -187,8 +203,7 @@ define([
             var plabels1 = new LabelLayer({ id: "labels1" });
             plabels1.addFeatureLayer(pHUC8FeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
                         
-            app.map.addLayers([openStreetMapLayer, pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1]);
-            app.map.addLayers([openStreetMapLayer, pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, plabels1]);
+            app.map.addLayers([pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8MaskFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1]);
             app.map.infoWindow.resize(300, 65);
 
             app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
@@ -199,8 +214,6 @@ define([
                 app.pSup.qry_Zoom2FeatureLayerExtent(pUMHWFeatureLayer);
             }
 
-
-
             function err(err) {
                 console.log("Failed to get stat results due to an error: ", err);
             }
@@ -208,10 +221,6 @@ define([
             function mapLoaded() {        // map loaded//            // Map is ready
                 app.map.on("mouse-move", showCoordinates); //after map loads, connect to listen to mouse move & drag events
                 app.map.on("mouse-drag", showCoordinates);
-                //////app.basemapGallery = new BasemapGallery({ showArcGISBasemaps: true, map: app.map }, "basemapGallery");
-                //////app.basemapGallery.startup();
-                //////app.basemapGallery.on("selection-change", function () { domClass.remove("panelBasemaps", "panelBasemapsOn"); });
-                //////app.basemapGallery.on("error", function (msg) { console.log("basemap gallery error:  ", msg); });
             }
 
             function showCoordinates(evt) {
