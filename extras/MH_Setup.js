@@ -13,6 +13,7 @@ function hideLoading(error) {
 
 define([
     "extras/MH_Zoom2FeatureLayers",
+      "esri/renderers/UniqueValueRenderer",   
     "esri/dijit/BasemapGallery", "esri/arcgis/utils", "dojo/parser", "esri/layers/OpenStreetMapLayer",
     "esri/geometry/webMercatorUtils",
     "dojo/_base/declare",
@@ -52,6 +53,7 @@ define([
         "dojo/domReady!"
 ], function (
             MH_Zoom2FeatureLayers,
+            UniqueValueRenderer, 
             BasemapGallery, arcgisUtils, parser, OpenStreetMapLayer,
       webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
@@ -70,30 +72,25 @@ define([
 
             var H2O_ID = getTokens()['H2O_ID'];
             if (typeof H2O_ID != 'undefined') {
-                var arrayCenterZoom = [-111, 45.5];
-                var izoomVal = 5;
+                var arrayCenterZoom = [-112.0178, 46.5856];
+                var izoomVal = 12;
             } else {
                 var arrayCenterZoom = [-111, 45.5];
-                var izoomVal = 10;
+                var izoomVal = 7;
             }
                         
             esri.config.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
-            //app.map = new esri.Map("map", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, slider: true, sliderPosition: "bottom-right" });
 
-            // Get a reference to the ArcGIS Map class
-            app.map = BootstrapMap.create("mapDiv", { center: [-110, 47], zoom: 6, scrollWheelZoom: false });
+            app.map = BootstrapMap.create("mapDiv", { center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false });            // Get a reference to the ArcGIS Map class
             openStreetMapLayer = new OpenStreetMapLayer();
             
-
             if (app.map.loaded) {
                 mapLoaded();
             } else {
                 app.map.on("load", function () { mapLoaded(); });
             }
 
-
-            //add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
-            var basemapGallery = new BasemapGallery({
+            var basemapGallery = new BasemapGallery({//add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
                 showArcGISBasemaps: true,
                 map: app.map
             }, "basemapGallery");
@@ -128,11 +125,6 @@ define([
                  }
             });
 
-            ////var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, app.map.root));
-            ////infoWindow.startup();
-            ////app.map.setInfoWindow(infoWindow);
-
-
             var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" });
             app.loading = dojo.byId("loadingImg");  //loading image. id
             dojo.connect(app.map, "onUpdateStart", showLoading);
@@ -144,6 +136,19 @@ define([
             template.setTitle("<b>${GageTitle}</b>");
             template.setContent("Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
             pGageFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
+
+            var defaultLineSymbol = new SimpleFillSymbol().setStyle(SimpleLineSymbol.STYLE_SOLID);
+            defaultLineSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
+            var rendererEPOINT = new UniqueValueRenderer(defaultLineSymbol, "Start_End");
+            var slsStart = new SimpleLineSymbol(  SimpleLineSymbol.STYLE_DASH,  new Color([0, 255, 0]),  12);
+            var slsEnd = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DOT, new Color([255, 0, 0]), 17);
+            rendererEPOINT.addValue("Start", slsStart);
+            rendererEPOINT.addValue("End", slsEnd);
+            var templateEPOINT = new InfoTemplate();
+            templateEPOINT.setTitle("<b>${Endpoint_Name}</b>");
+            templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
+            pEPointsFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
+            pEPointsFeatureLayer.setRenderer(rendererEPOINT);
 
             pUMHWFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
             pUMHW_MASKFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
@@ -182,6 +187,7 @@ define([
             var plabels1 = new LabelLayer({ id: "labels1" });
             plabels1.addFeatureLayer(pHUC8FeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
                         
+            app.map.addLayers([openStreetMapLayer, pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1]);
             app.map.addLayers([openStreetMapLayer, pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, plabels1]);
             app.map.infoWindow.resize(300, 65);
 
@@ -200,18 +206,18 @@ define([
             }
 
             function mapLoaded() {        // map loaded//            // Map is ready
-                //app.map.on("mouse-move", showCoordinates); //after map loads, connect to listen to mouse move & drag events
-                //app.map.on("mouse-drag", showCoordinates);
+                app.map.on("mouse-move", showCoordinates); //after map loads, connect to listen to mouse move & drag events
+                app.map.on("mouse-drag", showCoordinates);
                 //////app.basemapGallery = new BasemapGallery({ showArcGISBasemaps: true, map: app.map }, "basemapGallery");
                 //////app.basemapGallery.startup();
                 //////app.basemapGallery.on("selection-change", function () { domClass.remove("panelBasemaps", "panelBasemapsOn"); });
                 //////app.basemapGallery.on("error", function (msg) { console.log("basemap gallery error:  ", msg); });
             }
 
-            //function showCoordinates(evt) {
-            //    var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
-            //    dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + ", Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
-            //}
+            function showCoordinates(evt) {
+                var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
+                dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + ", Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
+            }
 
             function getTokens() {
                 var tokens = [];
