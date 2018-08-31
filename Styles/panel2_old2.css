@@ -1,0 +1,104 @@
+﻿.dj_ie .infowindow .window .top .right .user .content { position: relative; }
+      .dj_ie .simpleInfoWindow .content {position: relative;}
+
+      html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow:hidden; }
+      #leftPane{
+        width:200px;
+        border:none;
+      }
+      #map{
+        padding:0;
+      }
+      #header{
+        font-weight:600;
+        font-size:14pt;
+        color:#666666;
+        padding-left:20px;
+      }
+
+     .esriScalebar
+     {
+        /*left:102px;*/ 
+        bottom:35px;
+        margin-left: 270px;
+     }
+
+        /* Set the responsive map size here */
+        #mapDiv {
+            min-height: 100px;
+            max-height: 1200px;
+        }
+
+/* Classes */
+.bg {
+	display: block;
+	background-color: rgb(151, 118, 123);
+	filter: alpha(opacity=80);
+	-moz-opacity: 0.80;
+	-khtml-opacity: 0.80;
+	opacity: 0.80;
+}
+.rounded {
+	-moz-border-radius: 0px 0px 0px 0px;
+	-webkit-border-radius: 0px 0px 0px 0px;
+	border-radius: 0px 0px 0px 0px;
+}
+.shadow {
+	-moz-box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+	-webkit-box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+	box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=10, Direction=135, Color='#000000')";
+}
+.panelTitle {
+	position: absolute;
+	height: 220px;
+	right: 15px;
+	top: 15px;
+	color: #FFFFFF;
+	font-size: 15px;
+	font-weight: normal;
+	line-height: 5px;
+	padding: 0px;
+	text-align: right;
+	font-family: Arial;
+    width:320px;
+}
+
+
+
+
+.line {
+	border-left: 1px solid #fff;
+}
+          
+    h1 {
+      font-size: 25px;
+      color: #FFF;
+      margin-right:5px;
+      line-height:150%;
+    }
+    
+    h2 {
+       font-size: 9px;
+       margin-right:5px;
+       /*font-family: 'Tahoma', cursive;*/
+    }    
+     .file-upload-status {
+    	vertical-align: middle;
+    	padding: 5px 11px;
+        margin-right: 5px;
+    	font-size: 12px;
+    	}
+ 
+    .selectClass {
+       font-size: 12px;
+       font-family: 'Tahoma', cursive;
+       width: 95%;
+    }​
+  
+     /*.esriScalebar
+     {
+        left:2px; 
+        bottom:35px;
+     }*/
+     

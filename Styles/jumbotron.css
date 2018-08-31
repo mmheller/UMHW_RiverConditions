@@ -3,9 +3,14 @@ body {
   padding-top: 5px;
   padding-bottom: 5px;
 }
-     /*.esriScalebar
-     {
-  
-        bottom:125px;
-        margin-left: 0px;
-     }*/
+
+
+
+#block_container
+{
+    text-align:center;
+}
+#bloc1, #bloc2, #bloc3, #bloc4, #bloc5, #bloc6, #bloc7, #bloc8, #bloc9, #bloc10
+{
+    display:inline;
+}
