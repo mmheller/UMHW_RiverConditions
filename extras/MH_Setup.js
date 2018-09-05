@@ -65,8 +65,8 @@ define([
 
     return declare([], {
         Phase1: function () {
-            var H2O_ID = getTokens()['H2O_ID'];
-            if (typeof H2O_ID != 'undefined') {
+            app.H2O_ID = getTokens()['H2O_ID'];
+            if (typeof app.H2O_ID != 'undefined') {
                 var arrayCenterZoom = [-112.0163, 46.5857];
                 var izoomVal = 10;
             } else {
@@ -113,22 +113,17 @@ define([
                  }
             });
 
-            ////var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, app.map.root));
-            ////infoWindow.startup();
-            ////app.map.setInfoWindow(infoWindow);
-
-
             var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" });
             app.loading = dojo.byId("loadingImg");  //loading image. id
             dojo.connect(app.map, "onUpdateStart", showLoading);
             dojo.connect(app.map, "onUpdateEnd", hideLoading);
 
-            var strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
+            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
 
             var template = new InfoTemplate();
             template.setTitle("<b>${GageTitle}</b>");
             template.setContent("Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
-            pGageFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
+            pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
             var defaultLineSymbol = new SimpleFillSymbol().setStyle(SimpleLineSymbol.STYLE_SOLID);
             defaultLineSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
@@ -140,12 +135,12 @@ define([
             var templateEPOINT = new InfoTemplate();
             templateEPOINT.setTitle("<b>${Endpoint_Name}</b>");
             templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
-            pEPointsFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
+            pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
             pEPointsFeatureLayer.setRenderer(rendererEPOINT);
 
 
-            pUMHWFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
-            pUMHW_MASKFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
+            pUMHWFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
+            pUMHW_MASKFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
 
             var templateFAS = new InfoTemplate();
             templateFAS.setTitle("<b>${NAME} MT FAS (Fishing Access Site)</b>");
@@ -156,7 +151,7 @@ define([
             var templateBLM = new InfoTemplate();
             templateBLM.setTitle("<b>${Facility_Name} BLM Facility</b>");
             templateBLM.setContent("<a href=${URL} target='_blank'>Link to BLM Facility</a>");
-            pBLMFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "1",
+            pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, "opacity": 0.6, outFields: ['*'] });
 
             var templateFWP = new InfoTemplate();
@@ -172,9 +167,9 @@ define([
             );
             var rendererHUC8 = new SimpleRenderer(sfs);
             var strlabelField1 = "Name";
-            pHUC8FeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
-            if (typeof H2O_ID != 'undefined') {
-                pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 = '" + H2O_ID + "'");
+            pHUC8FeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            if (typeof app.H2O_ID != 'undefined') {
+                pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 = '" + app.H2O_ID + "'");
             } else {
                 pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 in ('10020004','10020005','10020006','10020008_1','10020008_2','10020007','10020003','10020002','10020001','10030101_1')");
             }
@@ -187,9 +182,9 @@ define([
             );
             var rendererHUC8Mask = new SimpleRenderer(sfsMask);
             var strlabelField1 = "Name";
-            pHUC8MaskFeatureLayer = new esri.layers.FeatureLayer(strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
-            if (typeof H2O_ID != 'undefined') {
-                pHUC8MaskFeatureLayer.setDefinitionExpression("HUC_8_12 <> '" + H2O_ID + "'");
+            pHUC8MaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            if (typeof app.H2O_ID != 'undefined') {
+                pHUC8MaskFeatureLayer.setDefinitionExpression("HUC_8_12 <> '" + app.H2O_ID + "'");
             } else {
                 pHUC8MaskFeatureLayer.setDefinitionExpression("HUC_8_12 in ('')");
             }
@@ -208,7 +203,7 @@ define([
 
             app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 1;
-            if (typeof H2O_ID != 'undefined') {
+            if (typeof app.H2O_ID != 'undefined') {
                 app.pSup.qry_Zoom2FeatureLayerExtent(pHUC8FeatureLayer);
             } else {
                 app.pSup.qry_Zoom2FeatureLayerExtent(pUMHWFeatureLayer);

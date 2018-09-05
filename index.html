@@ -101,19 +101,14 @@
     <div class="container">
         <!-- Example row of columns -->
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4" style="padding-left: 1px; padding-right: 1px">
                 <h2>Unofficial: Summary of Conditions</h2>
                 <p>This will be developed to show other watershed conditions</p>
                 <p id="txtFromToDate"></p>
                 <table class="TableListJS" id="entries">
                     <thead>
-                        <!--<tr>
-                            <th>Site Name</th>
-                            <th></th>
-                            <th></th>
-                        </tr>-->
                     </thead>
-                    <tbody data-bind="foreach: gageRecords" style="font-size: 13px;">
+                    <tbody data-bind="foreach: {data: gageRecords}" style="font-size: 13px;">
                         <tr>
                             <td width="30%">
                                 Stream Section: <br />
@@ -122,7 +117,7 @@
                                 <div>Water Temp(C)</div>
                                 <div>Temp Status</div>
                             </td>
-                            <td width="65%">
+                            <td width="70%">
                                 <div>
                                     <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a><br />
                                     <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span></div>
@@ -130,9 +125,6 @@
                                     <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span></div>
                                     <div><span data-bind='text: SiteTempStatus'></span></div>
                                 </div>
-                            </td>
-                            <td width="5%">
-                                <img width='100%' src="images/greenlight.jpg" alt="" /><br />
                             </td>
                         </tr>
                     </tbody>

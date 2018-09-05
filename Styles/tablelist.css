@@ -14,6 +14,25 @@ td {
     padding: 3px 2px;
 }
 
+tr { 
+  border: solid;
+  border-width: 1px 0;
+}
+
+tr:first-child {
+  border-top: none;
+}
+tr:last-child {
+  border-bottom: none;
+}
+
+.TableListJS {
+     /*border: 1px;
+  border: solid;
+  border-width: 1px 0;*/
+       border-collapse: collapse;
+}
+
 thead > tr, tbody{ display:block;}
 
 #entries tr.clicked { background: #ccd; }

@@ -10,6 +10,30 @@
     return strHyperlinkURL;
 }
 
+//function getArray2Process(strURL, strQuery) {
+
+
+//    var queryTask = new QueryTask(strURL);
+//    var query = new Query();
+//    query.returnGeometry = false;
+
+//    query.spatialRelationship = "intersects";  // this is the default
+//    query.outFields = [
+//              "Watershed", "StreamName", "Gage_AgencyID", "GageTitle", "GageURL", "Agency", "Stream_Reservoir",
+//              "StartMonthDay", "EndMonthDay", "TempCollected",
+//              "CFS_Prep4Conserv", "CFS_Conserv", "CFS_NotOfficialClosure",
+//              "CFS_Note_Prep4Conserv", "CFS_Note_Conserv", "CFS_Note_NotOfficialClosure",
+//              "ConsvTemp", "Symbology"
+//                ];
+
+//    queryTask.execute(query, showResults)
+//      .then(function (response) {
+//          var siteNameArrray = [];
+//      });
+
+//    return siteNameArrray;
+//}
+
 function getArray2Process() {
     var siteNameArrray = [["BIG HOLE", "06026420", 5, 200, 150, 100, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "", "", "", ""],
               ["BIG HOLE", "06026210", 4, 290, 240, 190, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "", "", "", ""],
@@ -18,6 +42,7 @@ function getArray2Process() {
               ["BIG HOLE", "06024450", 1, 60, 40, 20, 73, "Fishing prohibited 2pm – 12am and in place until re-opening criteria are met", 73, "4/1", "6/30", 160, "Water users with CCAA site plans will be required to implement their plans. Non-CCAA water users will be contacted by DNRC and MFWP, advised of flow conditions and encouraged to implement conservation measures. This target is specific to the CCAA goal of maintaining spawning and rearing flow requirements for Arctic grayling."]];
     return siteNameArrray;
 }
+
 
 //Explore drilldown examples https://js.devexpress.com/Demos/WidgetsGallery/Demo/Charts/ChartsDrillDown/Knockout/Light/
 
@@ -72,6 +97,9 @@ define([
             //});
         },
         
+
+
+
         readingsViewModel: function () {
             var self = this;
             
@@ -88,7 +116,12 @@ define([
                                                                   app.pGage.m_arrray_RiverSectionStatus[i][6],
                                                                   app.pGage.m_arrray_RiverSectionStatus[i][7]))
 
+
+
+
                 self.gageRecords = ko.observableArray(arrayKOTemp);
+
+
 
                 self.avgTemp = ko.computed(function () {
                     var total = 0;
@@ -105,13 +138,16 @@ define([
         },
         
         Start: function (dteStartDay2Check, dteEndDay2Check) {
-            var arrayProc = getArray2Process();
-            //if (app.pGage.m_ProcessingIndex == null) {
-            //    app.pGage.m_ProcessingIndex = 0
-            //}
+            if (typeof app.H2O_ID != 'undefined') {
+                strQuery = "ObjectID >= 0";
+            } else {
+                strQuery = "Watershed = " + app.H2O_ID + "'";
+            }
+
+            var arrayProc = getArray2Process(app.strHFL_URL + "0", strQuery);
+
             var iProcIndex = app.pGage.m_ProcessingIndex;
             var arraySiteIDInfo = arrayProc[iProcIndex];
-            //this.m_arrray_RiverSectionStatus = [];
             var strStreamName = arraySiteIDInfo[0];
             var strSiteID = arraySiteIDInfo[1];
             var iSectionID = arraySiteIDInfo[2];
@@ -187,7 +223,7 @@ define([
                                   }
                               } 
                               
-                              trHTML += '<tr><td>' + '<a href=' + strHyperlinkURL + ' target="_blank">' + strSiteName + '</a>' + '</td><td>' + strAgencyCode + '</td><td>' + item2.value + '</td><td>' + strvariableDescription.replace("cubic feet per second", "cfs").replace("Temperature, water, degrees Celsius", "Water Temp (C)").replace("Gage height, feet", "Gage height (ft)") + '</td><td>' + strDateTime + '</td></tr>';
+                              trHTML += '<tr style="color:#FFF; background-color:#000"><td>' + '<a href=' + strHyperlinkURL + ' target="_blank">' + strSiteName + '</a>' + '</td><td>' + strAgencyCode + '</td><td>' + item2.value + '</td><td>' + strvariableDescription.replace("cubic feet per second", "cfs").replace("Temperature, water, degrees Celsius", "Water Temp (C)").replace("Gage height, feet", "Gage height (ft)") + '</td><td>' + strDateTime + '</td></tr>';
                           });
                       });
 
@@ -255,7 +291,28 @@ define([
                               (elements)[i].addEventListener("click", function () {
                                   alert(this.innerHTML);
                               });
+
+                                  if ((elements)[i].innerHTML.indexOf("Closed") > -1) {
+                                      (elements)[i].style.color = 'white';
+                                      (elements)[i].style.backgroundColor = 'red';
+                                  }
+                                  else if ((elements)[i].innerHTML.indexOf("CONSERVATION") > -1) {
+                                      (elements)[i].style.color = 'white';
+                                      (elements)[i].style.backgroundColor = 'orange';
+                                  }
+                                  else if ((elements)[i].innerHTML.indexOf("Prepare for Conservation") > -1) {
+                                      (elements)[i].style.color = 'white';
+                                      (elements)[i].style.backgroundColor = 'yellow';
+                                  }
+                                  else if ((elements)[i].innerHTML.indexOf("OPEN") > -1) {
+                                      (elements)[i].style.color = 'green';
+                                      //(elements2)[i].style.backgroundColor = 'white';
+                                  } else {
+                                      var temp2 = "";
+                                  }
+
                           }
+
                           tableHighlightRow();
                       } else {
                           //app.pGage.Start("2017-08-13", "2017-08-16");
