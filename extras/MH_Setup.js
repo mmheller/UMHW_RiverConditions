@@ -125,22 +125,22 @@ define([
             template.setContent("Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
             pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
-            var defaultLineSymbol = new SimpleFillSymbol().setStyle(SimpleLineSymbol.STYLE_SOLID);
-            defaultLineSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
-            var rendererEPOINT = new UniqueValueRenderer(defaultLineSymbol, "Start_End");
-            var slsStart = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color([100, 204, 102]), 12);
-            var slsEnd = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DOT, new Color([255, 0, 0]), 17);
-            rendererEPOINT.addValue("Start", slsStart);
-            rendererEPOINT.addValue("End", slsEnd);
+            //var defaultLineSymbol = new SimpleFillSymbol().setStyle(SimpleLineSymbol.STYLE_SOLID);
+            //defaultLineSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
+            //var rendererEPOINT = new UniqueValueRenderer(defaultLineSymbol, "Start_End");
+            //var slsStart = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color([100, 204, 102]), 12);
+            //var slsEnd = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DOT, new Color([255, 0, 0]), 17);
+            //rendererEPOINT.addValue("Start", slsStart);
+            //rendererEPOINT.addValue("End", slsEnd);
             var templateEPOINT = new InfoTemplate();
             templateEPOINT.setTitle("<b>${Endpoint_Name}</b>");
             templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
-            pEPointsFeatureLayer.setRenderer(rendererEPOINT);
+            //pEPointsFeatureLayer.setRenderer(rendererEPOINT);
 
+            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, outFields: ['*'] });
 
-            pUMHWFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
-            pUMHW_MASKFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
+            pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
 
             var templateFAS = new InfoTemplate();
             templateFAS.setTitle("<b>${NAME} MT FAS (Fishing Access Site)</b>");
@@ -161,34 +161,47 @@ define([
             { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'] });
 
 
+
+            pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, outFields: ['*'] });
+
+
             var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
               new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
               new Color([255, 0, 0]), 2), new Color([255, 255, 255, 0.25])
             );
-            var rendererHUC8 = new SimpleRenderer(sfs);
+            var rendererWatersheds = new SimpleRenderer(sfs);
             var strlabelField1 = "Name";
-            pHUC8FeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
             if (typeof app.H2O_ID != 'undefined') {
-                pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 = '" + app.H2O_ID + "'");
+                pWatershedsFeatureLayer.setDefinitionExpression("Name = '" + app.H2O_ID + "'");
             } else {
-                pHUC8FeatureLayer.setDefinitionExpression("HUC_8_12 in ('10020004','10020005','10020006','10020008_1','10020008_2','10020007','10020003','10020002','10020001','10030101_1')");
+                pWatershedsFeatureLayer.setDefinitionExpression("Name in ('Beaverhead','Broadwater','Ruby','Big Hole','Jefferson','Boulder','Madison','Gallatin')");
             }
-            pHUC8FeatureLayer.setRenderer(rendererHUC8);
-
+            pWatershedsFeatureLayer.setRenderer(rendererWatersheds);
 
             var sfsMask = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
               new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
               new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25])
             );
-            var rendererHUC8Mask = new SimpleRenderer(sfsMask);
+            var rendererWatershedsMask = new SimpleRenderer(sfsMask);
             var strlabelField1 = "Name";
-            pHUC8MaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
             if (typeof app.H2O_ID != 'undefined') {
-                pHUC8MaskFeatureLayer.setDefinitionExpression("HUC_8_12 <> '" + app.H2O_ID + "'");
+                pWatershedsMaskFeatureLayer.setDefinitionExpression("Name <> '" + app.H2O_ID + "'");
             } else {
-                pHUC8MaskFeatureLayer.setDefinitionExpression("HUC_8_12 in ('')");
+                pWatershedsMaskFeatureLayer.setDefinitionExpression("Name in ('')");
             }
-            pHUC8MaskFeatureLayer.setRenderer(rendererHUC8Mask);
+            pWatershedsMaskFeatureLayer.setRenderer(rendererWatershedsMask);
+
+            var sfsBasinMask = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+              new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+              new Color([200, 200, 200]), 2), new Color([255, 255, 0, 0.25])
+            );
+            var rendererBasinMask = new SimpleRenderer(sfsBasinMask);
+            pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
+            pBasinsMaskFeatureLayer.setDefinitionExpression("Basin IS NULL");
+            //pBasinsMaskFeatureLayer.setDefinitionExpression("Basin <> 'Upper Missouri Headwaters'");
+            pBasinsMaskFeatureLayer.setRenderer(rendererBasinMask);
 
             var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
             var pLabel1 = new TextSymbol().setColor(vGreyColor);
@@ -196,17 +209,34 @@ define([
             pLabel1.font.setFamily("arial");
             var pLabelRenderer1 = new SimpleRenderer(pLabel1);
             var plabels1 = new LabelLayer({ id: "labels1" });
-            plabels1.addFeatureLayer(pHUC8FeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
+            plabels1.addFeatureLayer(pWatershedsFeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
+
+            //var strlabelField2 = "Label";
+            //var pLabel2 = new TextSymbol().setColor(vGreyColor);
+            //pLabel2.font.setSize("10pt");
+            //pLabel2.font.setFamily("arial");
+            //var pLabelRenderer2 = new SimpleRenderer(pLabel2);
+            //var plabels2 = new LabelLayer({ id: "labels2" });
+            //plabels2.addFeatureLayer(pCartoFeatureLayer, pLabelRenderer2, "{" + strlabelField2 + "}");
+
+            //var vBlueColor = new Color("#0000FF");              // create a text symbol to define the style of labels
+            //var strlabelField3 = "SectionName";
+            //var pLabel3 = new TextSymbol().setColor(vBlueColor);
+            //pLabel3.font.setSize("20pt");
+            //pLabel3.font.setFamily("arial");
+            //var pLabelRenderer3 = new SimpleRenderer(pLabel3);
+            //var plabels3 = new LabelLayer({ id: "labels3" });
+            //plabels3.addFeatureLayer(pSectionsFeatureLayer, pLabelRenderer3, "{" + strlabelField3 + "}");
                         
-            app.map.addLayers([pUMHWFeatureLayer, pUMHW_MASKFeatureLayer, pHUC8MaskFeatureLayer, pHUC8FeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1]);
+            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pSectionsFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1]);
             app.map.infoWindow.resize(300, 65);
 
             app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 1;
             if (typeof app.H2O_ID != 'undefined') {
-                app.pSup.qry_Zoom2FeatureLayerExtent(pHUC8FeatureLayer);
+                app.pSup.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer);
             } else {
-                app.pSup.qry_Zoom2FeatureLayerExtent(pUMHWFeatureLayer);
+                app.pSup.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer);
             }
 
             function err(err) {
