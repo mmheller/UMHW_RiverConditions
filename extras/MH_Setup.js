@@ -136,9 +136,17 @@ define([
             templateEPOINT.setTitle("<b>${Endpoint_Name}</b>");
             templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
+
+            if (typeof app.H2O_ID != 'undefined') {
+                pEPointsFeatureLayer.setDefinitionExpression("Watershed_Name = '" + app.H2O_ID + "'");
+            }
+
             //pEPointsFeatureLayer.setRenderer(rendererEPOINT);
 
             pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, outFields: ['*'] });
+            if (typeof app.H2O_ID != 'undefined') {
+                pSectionsFeatureLayer.setDefinitionExpression("Watershed = '" + app.H2O_ID + "'");
+            }
 
             pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
 
@@ -159,9 +167,7 @@ define([
             templateFWP.setContent("${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
             pFWPFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0",
             { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'] });
-
-
-
+            
             pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, outFields: ['*'] });
 
 
