@@ -66,43 +66,43 @@ define([
             var items = dom.map(results, function (result) {
                 return result;
             });
-
             var streamSectionArrray = [];
             var strGageID_Source = null;
-            var strGageTitle = null;
-            var strGageURL = null;
+            //var strGageTitle = null;
+            //var strGageURL = null;
             var strTempCollected = null;
 
             dom.map(items[0].features, function (itemSection) {
-                //query by     Watershed , StreamName, Section_ID 
-
-                dom.map(items[1].features, function (itemGage) {
+                strGageID_Source = null;
+                dom.map(items[1].features, function (itemGage) {                //query by     Watershed , StreamName, Section_ID 
                     if ((itemGage.attributes.Watershed === itemSection.attributes.Watershed) &
                         (itemGage.attributes.StreamName === itemSection.attributes.StreamName) &
                         (itemGage.attributes.Section_ID === itemSection.attributes.SectionID) &
                         (itemGage.attributes.Symbology === "TRIGGER MEASURE LOCATION")) {
 
                         strGageID_Source = itemGage.attributes.GageID_Source;
-                        strGageTitle = itemGage.attributes.strGageTitle ;
-                        strGageURL = itemGage.attributes.strGageURL;
+                        //strGageTitle = itemGage.attributes.GageTitle ;
+                        //strGageURL = itemGage.attributes.GageURL;
                         strTempCollected = itemGage.attributes.TempCollected;
                     }
                 })
 
-
-                streamSectionArrray.push([itemSection.attributes.StreamName,
-                                         strGageID_Source,
-                                         itemSection.attributes.SectionID,
-                                         itemSection.attributes.CFS_Prep4Conserv,
-                                         itemSection.attributes.CFS_Conserv,
-                                         itemSection.attributes.CFS_NotOfficialClosure,
-                                         itemSection.attributes.ConsvTemp,
-                                         "startDate", "toDate", "someval", "somenote",
-                                         itemSection.attributes.CFS_Note_Prep4Conserv,
-                                         itemSection.attributes.CFS_Note_Conserv,
-                                         itemSection.attributes.CFS_Note_NotOfficialClosure,
-                                         strTempCollected
-                ]);
+                if (strGageID_Source != null){
+                    streamSectionArrray.push([itemSection.attributes.StreamName,
+                                             strGageID_Source,
+                                             itemSection.attributes.SectionID,
+                                             itemSection.attributes.CFS_Prep4Conserv,
+                                             itemSection.attributes.CFS_Conserv,
+                                             itemSection.attributes.CFS_NotOfficialClosure,
+                                             itemSection.attributes.ConsvTemp,
+                                             "startDate", "toDate", "someval", "somenote",
+                                             itemSection.attributes.CFS_Note_Prep4Conserv,
+                                             itemSection.attributes.CFS_Note_Conserv,
+                                             itemSection.attributes.CFS_Note_NotOfficialClosure,
+                                             strTempCollected
+                    
+                    ]);
+                }
             })
 
 
@@ -216,7 +216,8 @@ define([
                   var dblLatestCFS = "";
                   var arrayTempsAbove = [];
                   var strSiteName = "";
-                  var strID = ""
+                  var strID = "";
+
 
                   arrayJSONValues = jsonResult.value.timeSeries;
 
@@ -268,9 +269,11 @@ define([
                                   }
 
                                   if (strvariableDescription == "Discharge, cubic feet per second") { //water temp
-                                      if ((dteDateTime > dteLatestDateTimeCFS) | (dteLatestDateTimeCFS == "")) {
-                                          dteLatestDateTimeCFS = dteDateTime;
-                                          dblLatestCFS = item2.value;
+                                      if (item2.value != -999999) {
+                                          if ((dteDateTime > dteLatestDateTimeCFS) | (dteLatestDateTimeCFS == "")) {
+                                              dteLatestDateTimeCFS = dteDateTime;
+                                              dblLatestCFS = item2.value;
+                                          }
                                       }
                                   }
 
@@ -278,6 +281,7 @@ define([
                               });
                           }
                       })
+
                       //display the detailed info
                       //jQuery('#display').append(trHTML);  //Don't Delete unless absolutly sure!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -298,27 +302,40 @@ define([
                       if ((dblLatestCFS <= iLateFlowConsvValue) & (dblLatestCFS > iLateFlowClosureValueFlow)) { strSiteFlowStatus = "CONSERVATION"; }
                       if (dblLatestCFS <= iLateFlowClosureValueFlow) { strSiteFlowStatus = "UNOFFICIAL RIVER CLOSURE"; }
 
-                      var blnAddNew = true;
+                      
 
-                      for (var ii in app.pGage.m_arrray_RiverSectionStatus) {
-                          if (app.pGage.m_arrray_RiverSectionStatus[ii][8] == strID) {
-                              blnAddNew = false;
-                              if (dblLatestTemp != "") {
-                                  app.pGage.m_arrray_RiverSectionStatus[ii][2] = dteLatestDateTimeTemp;
-                                  app.pGage.m_arrray_RiverSectionStatus[ii][3] = dblLatestTemp;
-                                  app.pGage.m_arrray_RiverSectionStatus[ii][4] = strSiteTempStatus;
-                              }
-                              if (dblLatestCFS != "") {
-                                  app.pGage.m_arrray_RiverSectionStatus[ii][5] = dteLatestDateTimeCFS;
-                                  app.pGage.m_arrray_RiverSectionStatus[ii][6] = dblLatestCFS;
-                                  app.pGage.m_arrray_RiverSectionStatus[ii][7] = strSiteFlowStatus;
-                              }
-                          }
+                      //for (var ii in app.pGage.m_arrray_RiverSectionStatus) {
+                      //    if (app.pGage.m_arrray_RiverSectionStatus[ii][8] == strID) {
+                      //        blnAddNew = false;
+                      //        if (dblLatestTemp != "") {
+                      //            app.pGage.m_arrray_RiverSectionStatus[ii][2] = dteLatestDateTimeTemp;
+                      //            app.pGage.m_arrray_RiverSectionStatus[ii][3] = dblLatestTemp;
+                      //            app.pGage.m_arrray_RiverSectionStatus[ii][4] = strSiteTempStatus;
+                      //        }
+                      //        if (dblLatestCFS != "") {
+                      //            app.pGage.m_arrray_RiverSectionStatus[ii][5] = dteLatestDateTimeCFS;
+                      //            app.pGage.m_arrray_RiverSectionStatus[ii][6] = dblLatestCFS;
+                      //            app.pGage.m_arrray_RiverSectionStatus[ii][7] = strSiteFlowStatus;
+                      //        }
+                      //    }
+                      //}
+
+                      if ((dblLatestTemp != "") & (dblLatestCFS != "")) {
+                          blnAddNew = true;
                       }
+
                       if (blnAddNew) {
                           app.pGage.m_arrray_RiverSectionStatus.push([strSiteName.replace(", MT", "").replace(" MT", ""), strHyperlinkURL,
                                                                      dteLatestDateTimeTemp, dblLatestTemp.replace("-999999", "Data Not Available"), strSiteTempStatus,
                                                                      dteLatestDateTimeCFS, dblLatestCFS, strSiteFlowStatus, strID, strStreamName, iSectionID]);
+
+                          var blnAddNew = false;
+                          dteLatestDateTimeTemp = "";
+                          dteLatestDateTimeCFS = "";
+                          dblLatestTemp = "";
+                          dblLatestCFS = "";
+                          arrayTempsAbove = [];
+                          strSiteName = "";
                       }
 
                   });
