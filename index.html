@@ -74,11 +74,10 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <form class="navbar-form navbar-right">
                     <div id="block_container" style="color:white; ">
-                        <div id="bloc1"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Beaverhead" style="color:white" target="_self">Beaverhead</a></div> |
+                        <div id="bloc1"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Beaverhead" style="color:white" target="_self">Beaverhead/Centennial</a></div> |
                         <div id="bloc8"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Big Hole" style="color:white"  target="_self">Big Hole</a></div> |
                         <div id="bloc3"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Boulder" style="color:white"  target="_self">Boulder</a></div> |
                         <div id="bloc10"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Broadwater" style="color:white"  target="_self">Broadwater</a></div> |
-                        <div id="bloc9"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Beaverhead" style="color:white"  target="_self">Centennial</a></div> |
                         <div id="bloc2"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Jefferson" style="color:white"  target="_self">Jefferson</a></div> |
                         <div id="bloc5"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Gallatin" style="color:white"  target="_self">Gallatin-Lower</a></div> |
                         <div id="bloc4"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Gallatin" style="color:white" target="_self">Gallatin-Upper</a></div> |
@@ -113,6 +112,8 @@
                         <tr>
                             <td width="30%">
                                 Stream Section: <br />
+                                <div>Stream Name</div>
+                                <div>SectionID</div>
                                 <div>Discharge(cfs)</div>
                                 <div>Flow Status</div>
                                 <div>Water Temp(C)</div>
@@ -121,6 +122,8 @@
                             <td width="70%">
                                 <div>
                                     <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a><br />
+                                    <div><span data-bind='text: StreamName'></span></div>
+                                    <div><span data-bind='text: SectionID'></span></div>
                                     <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span></div>
                                     <div><span data-bind='text: SiteFlowStatus'></span></div>
                                     <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span></div>

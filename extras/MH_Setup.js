@@ -239,12 +239,12 @@ define([
             app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pSectionsFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1]);
             app.map.infoWindow.resize(300, 65);
 
-            app.pSup = new MH_Zoom2FeatureLayers({}); // instantiate the class
+            app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 1;
             if (typeof app.H2O_ID != 'undefined') {
-                app.pSup.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer);
+                app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer);
             } else {
-                app.pSup.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer);
+                app.pZoom.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer);
             }
 
             function err(err) {
