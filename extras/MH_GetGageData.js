@@ -210,44 +210,50 @@ define([
             
             $.getJSON(app.strURLGage)   //http://api.jquery.com/jquery.getjson/
               .done(function (jsonResult) {
-                  var dteLatestDateTimeTemp = "";
-                  var dteLatestDateTimeCFS = "";
-                  var dblLatestTemp = "";
-                  var dblLatestCFS = "";
-                  var arrayTempsAbove = [];
-                  var strSiteName = "";
-                  var strID = "";
-
-
                   arrayJSONValues = jsonResult.value.timeSeries;
 
-                  var trHTML = '';
-                  jQuery.each(arrayJSONValues, function (k, item) {
-                      strID = item.name;
-                      strID = strID.substring(strID.indexOf(":") + 1, strID.length);
-                      strID = strID.substring(1, strID.indexOf(":"));
+                  dom.map(arrayProc, function (itemSectionRefined) {  //loop through the sections
+                      strStreamName = itemSectionRefined[0];
+                      strSiteID = itemSectionRefined[1];
+                      iSectionID = itemSectionRefined[2];
+                      iLateFlowPref4ConsvValue = itemSectionRefined[3];
+                      iLateFlowConsvValue = itemSectionRefined[4];
+                      iLateFlowClosureValueFlow = itemSectionRefined[5];
+                      iLateFlowHootValue = itemSectionRefined[6];
+                      strHootMessage = itemSectionRefined[7];
+                      iTempClosureValue = itemSectionRefined[8];
+                      strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[9];
+                      strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[10];
+                      iEarlyFlowDroughtManagementTarget = itemSectionRefined[11];
+                      strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[12];
+                      strTempCollected = itemSectionRefined[13];
 
-                      // need to figure out what to do with sections that use the same gage!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                      dom.map(arrayProc, function (itemSectionRefined) {
-                          if ((itemSectionRefined[1] === strID) | (itemSectionRefined[1] === "0" + strID)) {
-                              var strHyperlinkURL = strURLGagePrefix + "&sites=" + "0" + strID;        //siteID
-                              strHyperlinkURL = returnURL4GSgage(strHyperlinkURL);
+                      var dteLatestDateTimeTemp = "";
+                      var dteLatestDateTimeCFS = "";
+                      var dblLatestTemp = "";
+                      var dblLatestCFS = "";
+                      var arrayTempsAbove = [];
+                      var strSiteName = "";
+                      var strID = "";
 
-                              strStreamName = itemSectionRefined[0];
-                              strSiteID = itemSectionRefined[1];
-                              iSectionID = itemSectionRefined[2];
-                              iLateFlowPref4ConsvValue = itemSectionRefined[3];
-                              iLateFlowConsvValue = itemSectionRefined[4];
-                              iLateFlowClosureValueFlow = itemSectionRefined[5];
-                              iLateFlowHootValue = itemSectionRefined[6];
-                              strHootMessage = itemSectionRefined[7];
-                              iTempClosureValue = itemSectionRefined[8];
-                              strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[9];
-                              strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[10];
-                              iEarlyFlowDroughtManagementTarget = itemSectionRefined[11];
-                              strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[12];
-                              strTempCollected = itemSectionRefined[13];
+                      var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
+                      strSiteFlowStatus += " (Thresholds " + iLateFlowPref4ConsvValue.toString() + "/" + iLateFlowConsvValue.toString() + "/" + iLateFlowClosureValueFlow.toString() + " cfs)";
 
+                      var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
+                      iTempClosureValueCelsius = (iTempClosureValue - 32) * (5 / 9);
+                      strSiteTempStatus += " (Threshold " + Math.round(iTempClosureValueCelsius).toString() + " Celsius)";
+
+                      var strHyperlinkURL = strURLGagePrefix + "&sites=" + strSiteID;        //siteID
+                      strHyperlinkURL = returnURL4GSgage(strHyperlinkURL);
+
+                      var trHTML = '';
+
+                      jQuery.each(arrayJSONValues, function (k, item) {
+                          strID = item.name;
+                          strID = strID.substring(strID.indexOf(":") + 1, strID.length);
+                          strID = strID.substring(1, strID.indexOf(":"));
+                      
+                          if ((strSiteID === strID) | (strSiteID === "0" + strID)) {
                               strSiteName = item.sourceInfo.siteName;
                               var strAgencyCode = item.sourceInfo.siteCode[0].agencyCode;
                               var strvariableDescription = item.variable.variableDescription;
@@ -259,9 +265,11 @@ define([
                                   strDateTime += " " + dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
 
                                   if (strvariableDescription == "Temperature, water, degrees Celsius") { //water temp
-                                      if ((dteDateTime > dteLatestDateTimeTemp) | (dteLatestDateTimeTemp == "")) {
-                                          dteLatestDateTimeTemp = dteDateTime;
-                                          dblLatestTemp = item2.value;
+                                      if (item2.value != -999999) {
+                                          if ((dteDateTime > dteLatestDateTimeTemp) | (dteLatestDateTimeTemp == "")) {
+                                              dteLatestDateTimeTemp = dteDateTime;
+                                              dblLatestTemp = item2.value;
+                                          }
                                       }
                                       if (item2.value >= iTempClosureValue) {
                                           arrayTempsAbove.push([dteDateTime, item2.value]);
@@ -278,54 +286,33 @@ define([
                                   }
 
                                   trHTML += '<tr style="color:#FFF; background-color:#000"><td>' + '<a href=' + strHyperlinkURL + ' target="_blank">' + strSiteName + '</a>' + '</td><td>' + strAgencyCode + '</td><td>' + item2.value + '</td><td>' + strvariableDescription.replace("cubic feet per second", "cfs").replace("Temperature, water, degrees Celsius", "Water Temp (C)").replace("Gage height, feet", "Gage height (ft)") + '</td><td>' + strDateTime + '</td></tr>';
+                                  //display the detailed info
+                                  //jQuery('#display').append(trHTML);  //Don't Delete unless absolutly sure!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                               });
                           }
-                      })
+                      });
 
-                      //display the detailed info
-                      //jQuery('#display').append(trHTML);  //Don't Delete unless absolutly sure!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                      var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
-                      strSiteFlowStatus += " (Thresholds " + iLateFlowPref4ConsvValue.toString() + "/" + iLateFlowConsvValue.toString() + "/" + iLateFlowClosureValueFlow.toString() + " cfs)";
-
-                      var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
-
-                      iTempClosureValueCelsius = (iTempClosureValue - 32) * (5 / 9);
-                      strSiteTempStatus += " (Threshold " + Math.round(iTempClosureValueCelsius).toString() + " Celsius)";
-
-                      dblLatestTempFahrenhet = dblLatestTemp * 9 / 5 + 32;
-                      //determine the site's status based on water temperature
-                      if (dblLatestTempFahrenhet > iTempClosureValue) { strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE"; }
-
-                      //determine the site's status based on discharge
-                      if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) { strSiteFlowStatus = "PREPARE FOR CONSERVATION"; }
-                      if ((dblLatestCFS <= iLateFlowConsvValue) & (dblLatestCFS > iLateFlowClosureValueFlow)) { strSiteFlowStatus = "CONSERVATION"; }
-                      if (dblLatestCFS <= iLateFlowClosureValueFlow) { strSiteFlowStatus = "UNOFFICIAL RIVER CLOSURE"; }
-
-                      
-
-                      //for (var ii in app.pGage.m_arrray_RiverSectionStatus) {
-                      //    if (app.pGage.m_arrray_RiverSectionStatus[ii][8] == strID) {
-                      //        blnAddNew = false;
-                      //        if (dblLatestTemp != "") {
-                      //            app.pGage.m_arrray_RiverSectionStatus[ii][2] = dteLatestDateTimeTemp;
-                      //            app.pGage.m_arrray_RiverSectionStatus[ii][3] = dblLatestTemp;
-                      //            app.pGage.m_arrray_RiverSectionStatus[ii][4] = strSiteTempStatus;
-                      //        }
-                      //        if (dblLatestCFS != "") {
-                      //            app.pGage.m_arrray_RiverSectionStatus[ii][5] = dteLatestDateTimeCFS;
-                      //            app.pGage.m_arrray_RiverSectionStatus[ii][6] = dblLatestCFS;
-                      //            app.pGage.m_arrray_RiverSectionStatus[ii][7] = strSiteFlowStatus;
-                      //        }
-                      //    }
-                      //}
-
-                      if ((dblLatestTemp != "") & (dblLatestCFS != "")) {
-                          blnAddNew = true;
+                      if (dblLatestCFS == "") {
+                          dblLatestCFS = "Data Not Available"
+                          dteLatestDateTimeTemp = new Date();
+                      } else {
+                          //determine the site's status based on discharge
+                          if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) { strSiteFlowStatus = "PREPARE FOR CONSERVATION"; }
+                          if ((dblLatestCFS <= iLateFlowConsvValue) & (dblLatestCFS > iLateFlowClosureValueFlow)) { strSiteFlowStatus = "CONSERVATION"; }
+                          if (dblLatestCFS <= iLateFlowClosureValueFlow) {
+                              strSiteFlowStatus = "UNOFFICIAL RIVER CLOSURE";
+                          }
                       }
 
-                      if (blnAddNew) {
-                          app.pGage.m_arrray_RiverSectionStatus.push([strSiteName.replace(", MT", "").replace(" MT", ""), strHyperlinkURL,
+                      if (dblLatestTemp == "") {
+                          dblLatestTemp = "Data Not Available"
+                          dteLatestDateTimeCFS = new Date();
+                      } else {
+                          dblLatestTempFahrenhet = dblLatestTemp * 9 / 5 + 32;
+                          if (dblLatestTempFahrenhet > iTempClosureValue) { strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE"; }
+                      }
+
+                      app.pGage.m_arrray_RiverSectionStatus.push([strSiteName.replace(", MT", "").replace(" MT", "").replace(strStreamName,""), strHyperlinkURL,
                                                                      dteLatestDateTimeTemp, dblLatestTemp.replace("-999999", "Data Not Available"), strSiteTempStatus,
                                                                      dteLatestDateTimeCFS, dblLatestCFS, strSiteFlowStatus, strID, strStreamName, iSectionID]);
 
@@ -336,9 +323,8 @@ define([
                           dblLatestCFS = "";
                           arrayTempsAbove = [];
                           strSiteName = "";
-                      }
-
-                  });
+                      //}
+                  })
 
                     ko.applyBindings(new app.pGage.readingsViewModel());
                     var elements = document.getElementsByTagName('td');  //Sets the click event for the row

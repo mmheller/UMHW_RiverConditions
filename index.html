@@ -111,18 +111,18 @@
                     <tbody data-bind="foreach: {data: gageRecords}" style="font-size: 13px;">
                         <tr>
                             <td width="30%">
-                                Section <br />
-                                <div>Stream Name</div>
-                                <div>SectionID</div>
+                                Stream Name<br>
+                                <div>Section Desc.</div>
+                                <div>Section #</div>
                                 <div>Discharge(cfs)</div>
                                 <div>Flow Status</div>
-                                <div>Water Temp(C)</div>
+                                <div>H2O Temp(C)</div>
                                 <div>Temp Status</div>
                             </td>
                             <td width="70%">
                                 <div>
-                                    <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a><br />
                                     <div><span data-bind='text: StreamName'></span></div>
+                                    <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a><br />
                                     <div><span data-bind='text: SectionID'></span></div>
                                     <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span></div>
                                     <div><span data-bind='text: SiteFlowStatus'></span></div>
