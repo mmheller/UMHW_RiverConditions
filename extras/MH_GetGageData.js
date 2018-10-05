@@ -286,8 +286,11 @@ define([
                                   }
 
                                   trHTML += '<tr style="color:#FFF; background-color:#000"><td>' + '<a href=' + strHyperlinkURL + ' target="_blank">' + strSiteName + '</a>' + '</td><td>' + strAgencyCode + '</td><td>' + item2.value + '</td><td>' + strvariableDescription.replace("cubic feet per second", "cfs").replace("Temperature, water, degrees Celsius", "Water Temp (C)").replace("Gage height, feet", "Gage height (ft)") + '</td><td>' + strDateTime + '</td></tr>';
-                                  //display the detailed info
-                                  //jQuery('#display').append(trHTML);  //Don't Delete unless absolutly sure!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                                  if (arraySiteIDs.length < 7){
+                                      //display the detailed info
+                                      jQuery('#display').append(trHTML);  //Don't Delete unless absolutly sure!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                  }
                               });
                           }
                       });
