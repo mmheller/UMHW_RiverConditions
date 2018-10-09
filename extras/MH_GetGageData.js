@@ -68,8 +68,6 @@ define([
             });
             var streamSectionArrray = [];
             var strGageID_Source = null;
-            //var strGageTitle = null;
-            //var strGageURL = null;
             var strTempCollected = null;
 
             dom.map(items[0].features, function (itemSection) {

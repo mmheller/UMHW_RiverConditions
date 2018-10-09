@@ -12,6 +12,7 @@ function hideLoading(error) {
 }
 
 define([
+    "esri/symbols/Font",
     "extras/MH_Zoom2FeatureLayers",
     "esri/dijit/BasemapGallery",
     "esri/renderers/UniqueValueRenderer",
@@ -52,7 +53,7 @@ define([
         "dojo/dom-construct","application/bootstrapmap",
         "dojo/domReady!"
 ], function (
-            MH_Zoom2FeatureLayers, BasemapGallery, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
+            Font, MH_Zoom2FeatureLayers, BasemapGallery, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
         SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
         CheckBox, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
@@ -75,7 +76,7 @@ define([
             }
                         
             esri.config.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
-            app.map = BootstrapMap.create("mapDiv", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false });// Get a reference to the ArcGIS Map class
+            app.map = BootstrapMap.create("mapDiv", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false});// Get a reference to the ArcGIS Map class
             
             if (app.map.loaded) {
                 mapLoaded();
@@ -192,7 +193,7 @@ define([
               new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25])
             );
             var rendererWatershedsMask = new SimpleRenderer(sfsMask);
-            var strlabelField1 = "Name";
+            //var strlabelField1 = "Name";
             pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
             if (typeof app.H2O_ID != 'undefined') {
                 pWatershedsMaskFeatureLayer.setDefinitionExpression("Name <> '" + app.H2O_ID + "'");
@@ -219,24 +220,16 @@ define([
             var plabels1 = new LabelLayer({ id: "labels1" });
             plabels1.addFeatureLayer(pWatershedsFeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
 
-            //var strlabelField2 = "Label";
-            //var pLabel2 = new TextSymbol().setColor(vGreyColor);
-            //pLabel2.font.setSize("10pt");
-            //pLabel2.font.setFamily("arial");
-            //var pLabelRenderer2 = new SimpleRenderer(pLabel2);
-            //var plabels2 = new LabelLayer({ id: "labels2" });
-            //plabels2.addFeatureLayer(pCartoFeatureLayer, pLabelRenderer2, "{" + strlabelField2 + "}");
+            var strlabelField3 = "SectionID";
+            var sampleLabel = new TextSymbol().setColor(
+              new Color([0, 0, 128])).setAlign(Font.ALIGN_START).setAngle(45).setFont(new Font("10pt").setWeight(Font.WEIGHT_BOLD).setFamily("arial"));
 
-            //var vBlueColor = new Color("#0000FF");              // create a text symbol to define the style of labels
-            //var strlabelField3 = "SectionName";
-            //var pLabel3 = new TextSymbol().setColor(vBlueColor);
-            //pLabel3.font.setSize("20pt");
-            //pLabel3.font.setFamily("arial");
-            //var pLabelRenderer3 = new SimpleRenderer(pLabel3);
-            //var plabels3 = new LabelLayer({ id: "labels3" });
-            //plabels3.addFeatureLayer(pSectionsFeatureLayer, pLabelRenderer3, "{" + strlabelField3 + "}");
-                        
-            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pSectionsFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1]);
+            var sampleLabelRenderer = new SimpleRenderer(sampleLabel);
+            var plabels3 = new LabelLayer({ id: "labels3" });
+            plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
+            plabels3.minScale = 1500000;
+
+            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pSectionsFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1, plabels3]);
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
