@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,6 +16,8 @@
     <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>-->
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart'],'language':'en'}]}"></script>
+    <!--<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>-->
 
     <script type="text/javascript">
         var package_path = location.pathname.replace(/\/[^/]+$/, "") + "/assets";
@@ -40,24 +42,27 @@
     <!--<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.13/esri/css/esri.css">-->
     <link rel="stylesheet" type="text/css" href="https://esri.github.io/bootstrap-map-js/src/css/bootstrapmap.css">
     <style>
-        #mapDiv {/* Set the responsive map size here */
+        #mapDiv { /* Set the responsive map size here */
             min-height: 80px;
             max-height: 600px;
         }
 
-        .esriScalebar{
-            bottom:145px;
-            margin-left: 0px;
+        .esriScalebarLabel {
+            font-size: 11px;
+            font-style: normal;
+            color:#404040;
         }
+
         .esriBasemapGalleryThumbnail {
             height: 40px;
             width: 40px;
         }
+
         .esriBasemapGalleryNode {
             width: 40px;
         }
     </style>
-  </head>
+</head>
 
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -101,34 +106,45 @@
     <div class="container">
         <!-- Example row of columns -->
         <div class="row">
-            <div class="col-md-4" style="padding-left: 1px; padding-right: 1px">
+            <div class="col-md-4" style="padding-left: 1px; padding-right: 1px" id="entriesCon_div">
                 <h2>Unofficial: Summary of Conditions</h2>
                 <p>This will be developed to show other watershed conditions</p>
+                <!--<p id="txtProcMessage">Blank</p>-->
                 <p id="txtFromToDate"></p>
                 <table class="TableListJS" id="entries">
                     <thead>
                     </thead>
                     <tbody data-bind="foreach: {data: gageRecords}" style="font-size: 13px;">
-                        <tr>
-                            <td width="30%">
-                                Stream Name<br>
-                                <div>Section Desc.</div>
-                                <div>Section #</div>
+                        <tr style="cursor:pointer;" data-bind="click: $root.selectThing ">
+                            <td width="95">
+                                <div>Stream Name</div>
+                                <div>Section #/Desc</div>
                                 <div>Discharge(cfs)</div>
                                 <div>Flow Status</div>
-                                <div>H2O Temp(C)</div>
+                                <div>H2O Temp(F)</div>
                                 <div>Temp Status</div>
                             </td>
-                            <td width="70%">
+                            <td>
                                 <div>
                                     <div><span data-bind='text: StreamName'></span></div>
-                                    <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a><br />
-                                    <div><span data-bind='text: SectionID'></span></div>
-                                    <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span></div>
+                                    <div><span data-bind='text: SectionID'></span> <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a></div>
+                                    <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3CFSTrend}" />)</div>
                                     <div><span data-bind='text: SiteFlowStatus'></span></div>
                                     <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span></div>
                                     <div><span data-bind='text: SiteTempStatus'></span></div>
                                 </div>
+                            </td>
+                            <td class="htmlRowNotDisplayed">
+                                <div><span data-bind='text: strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
+                                <div><span data-bind='text: strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
+                                <div><span data-bind='text: iLateFlowPref4ConsvValue'></span></div>
+                                <div><span data-bind='text: iLateFlowConsvValue'></span></div>
+                                <div><span data-bind='text: iLateFlowClosureValueFlow'></span></div>
+                                <div><span data-bind='text: strLateFlowPref4ConsvValue'></span></div>
+                                <div><span data-bind='text: strLateFlowConsvValue'></span></div>
+                                <div><span data-bind='text: strLateFlowClosureValueFlow'></span></div>
+                                <div><span data-bind='text: iTempClosureValue'></span></div>
+                                <div><span data-bind='text: strTempCollected'></span></div>
                             </td>
                         </tr>
                     </tbody>
@@ -140,10 +156,15 @@
                 <h2>DRAFT/Unofficial Map</h2>
                 <div id="mapDiv"></div>
                 <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
-                <div style="position:absolute; right:15px; bottom:130px; z-Index:999;">
+
+                <div style="position:relative; right:5px; bottom:50px; width:250px; z-Index:999;">
                     <div id="basemapGallery"></div>
                 </div>
-                <div id="txt_xyCoords" style="position:absolute; left:25px; bottom:125px; color:#404040; z-index:50; font-size:11px"></div>
+
+
+                <div id="txt_xyCoords" style="position:relative; left:185px; bottom:65px; color:#404040; width:200px; font-size:11px"></div>
+                <span id="scaleDiv" style="position:relative; left:185px; bottom:110px; width:250px; font-size:11px"></span>
+
                 <div class="row">
                     <div class="col-xs-4">
                         <h5>Legend</h5>
@@ -154,11 +175,51 @@
                     <p>This map will be updated soon.. </p>
                     <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
                 </div>
+
+                <!--<div data-bind="text: gageRecords()[0].SiteName"></div>-->
+                <div id="divSectionDetail" style="visibility:collapse">
+                    <div style="margin: 15px 0 0 0;">
+                        <div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
+                        <div>Stream Section Number and Description: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span> <a data-bind="text: $root.CurrentDisplayGageRecord().SiteName, attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank"></a></div>
+                        <div></div>
+                        <div></div>
+                        <div>Stream Status based on Discharge(CFS)<span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
+                        <div>Current Discharge (CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge, attr: {title: $root.CurrentDisplayGageRecord().formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" />)</div>
+                        <div></div>
+                        <div>Discharge Target Definitions for this Stream Section</div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowPref4ConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowPref4ConsvValue'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowConsvValue'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></div>
+                        <div></div>
+                        <div></div>
+                        <!--<div><span data-bind='text: $root.CurrentDisplayGageRecord().Discharge, attr: {title: formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3CFSTrend}" />)</div>-->
+
+                        <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp, attr: {title: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime}'></span></div>
+                        <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
+                        <div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>
+
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
+                        <div></div>
+
+
+                    </div>
+                </div>
             </div>
             <div class="col-md-12">
+
+                
+
                 <h2>DRAFT/Unofficial Detail</h2>
                 <p>This will hold detail inforamtion, tabs to other info, charts/graphs</p>
                 <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+                <div id="ViewModel2Binding_div">
+                    <div id="ViewModel2_line_div" data-bind="googleBarChart: new ViewModel2_LineData, chartOptions: {interpolateNulls: true,
+                             legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
+                    </div>
+                </div>
+
                 <table class="red" style="width: 100%; height: 100%;">
                     <thead>
                         <tr>
@@ -206,14 +267,15 @@
             var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
 
             var dteDateTimeMinus3 = new Date();
-            dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
+            dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 0);
             var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
             var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
 
             document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
 
             app.pGage.Start(strDateTimeMinus3, strDateTime);
-        });
+       
+            });
     </script>
 
 </body>

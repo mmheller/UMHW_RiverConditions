@@ -11,6 +11,8 @@ function hideLoading(error) {
     app.map.showZoomSlider();
 }
 
+
+
 define([
     "esri/symbols/Font",
     "extras/MH_Zoom2FeatureLayers",
@@ -65,6 +67,37 @@ define([
 ) {
 
     return declare([], {
+
+        addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDsRed) {
+            var defaultSymbol = new SimpleFillSymbol().setStyle(SimpleFillSymbol.STYLE_NULL);
+            defaultSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
+
+            var renderer = new UniqueValueRenderer(defaultSymbol, "OBJECTID");//create renderer
+            //add symbol for each possible value
+            for (var i = 0; i < arrayOIDYellow.length; i++) {
+                renderer.addValue(arrayOIDYellow[i], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 255, 0]), 13));
+            }
+            for (var ii = 0; ii < arrayOIDsGold.length; ii++) {
+                renderer.addValue(arrayOIDsGold[ii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([249, 166, 2]), 13));
+            }
+            for (var iii = 0; iii < arrayOIDsOrange.length; iii++) {
+                renderer.addValue(arrayOIDsOrange[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 13));
+            }
+            for (var iiii = 0; i < arrayOIDsRed.length; iiii++) {
+                renderer.addValue(arrayOIDsRed[iiii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 13));
+            }
+
+            var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", {
+                infoTemplate: new InfoTemplate(" ", "${SUB_REGION}"),
+                mode: FeatureLayer.MODE_ONDEMAND,
+                outFields: ["OBJECTID "]
+            });
+            featureLayer.setRenderer(renderer);
+            app.map.addLayer(featureLayer);
+            app.map.reorderLayer(featureLayer, 5);
+        },
+
+
         Phase1: function () {
             app.H2O_ID = getTokens()['H2O_ID'];
             if (typeof app.H2O_ID != 'undefined') {
@@ -114,7 +147,7 @@ define([
                  }
             });
 
-            var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" });
+            var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" }, dojo.byId("scaleDiv")); 
             app.loading = dojo.byId("loadingImg");  //loading image. id
             dojo.connect(app.map, "onUpdateStart", showLoading);
             dojo.connect(app.map, "onUpdateEnd", hideLoading);
@@ -233,7 +266,53 @@ define([
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
-            app.dblExpandNum = 1;
+            app.dblExpandNum = 0.5;
+
+            ko.bindingHandlers.googleBarChart = {
+                init: function (element, valueAccessor, allBindingsAccesor, viewModel, bindingContext) {
+                    var chart = new google.visualization.LineChart(element);
+                    ko.utils.domData.set(element, 'googleLineChart', chart);
+                },
+                update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var value = ko.unwrap(valueAccessor());
+
+                    var tickMarks = [];
+                    for (var i = 0; i < value.getNumberOfRows(); i += 48) {
+                        tickMarks.push(value.getValue(i, 0));
+                    }
+
+                      var options = {
+                        chart: {
+                            "title": "nope",
+                          
+                          }, legend:
+                          {
+                              position: 'right',
+                              textStyle: { fontSize: 12 }
+                          },
+                          hAxis: {
+                              format: 'M/d HH' + ":00",
+                              ticks: tickMarks,
+                              textStyle: {
+                                  fontSize: 12 // or the number you want
+                              }
+                          },
+                          "title": "Stream Section Discharge (CFS)",
+                          "subtitle": "some data not available",
+                          width: '100%',
+                          height: 500,
+                          chartArea: {
+                              left: "5%", top: "5%"
+                          }, trendlines: { 15: {} }    // Draw a trendline for data series 0.
+                      };
+
+                    options = ko.unwrap(options);
+                    var chart = ko.utils.domData.get(element, 'googleLineChart');
+                    chart.draw(value, options);
+                },
+            };
+
+
             if (typeof app.H2O_ID != 'undefined') {
                 app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer);
             } else {
