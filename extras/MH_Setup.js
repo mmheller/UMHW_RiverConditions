@@ -75,16 +75,16 @@ define([
             var renderer = new UniqueValueRenderer(defaultSymbol, "OBJECTID");//create renderer
             //add symbol for each possible value
             for (var i = 0; i < arrayOIDYellow.length; i++) {
-                renderer.addValue(arrayOIDYellow[i], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 255, 0]), 13));
+                renderer.addValue(arrayOIDYellow[i], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 255, 0]), 18));
             }
             for (var ii = 0; ii < arrayOIDsGold.length; ii++) {
-                renderer.addValue(arrayOIDsGold[ii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([249, 166, 2]), 13));
+                renderer.addValue(arrayOIDsGold[ii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([249, 166, 2]), 18));
             }
             for (var iii = 0; iii < arrayOIDsOrange.length; iii++) {
-                renderer.addValue(arrayOIDsOrange[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 13));
+                renderer.addValue(arrayOIDsOrange[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 18));
             }
             for (var iiii = 0; i < arrayOIDsRed.length; iiii++) {
-                renderer.addValue(arrayOIDsRed[iiii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 13));
+                renderer.addValue(arrayOIDsRed[iiii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18));
             }
 
             var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", {
@@ -223,7 +223,7 @@ define([
 
             var sfsMask = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
               new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
-              new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25])
+              new Color([255, 0, 0]), 2), new Color([0, 0, 180, 0.25])
             );
             var rendererWatershedsMask = new SimpleRenderer(sfsMask);
             //var strlabelField1 = "Name";
@@ -237,7 +237,7 @@ define([
 
             var sfsBasinMask = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
               new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-              new Color([200, 200, 200]), 2), new Color([255, 255, 0, 0.25])
+              new Color([200, 200, 200]), 2), new Color([0, 0, 180, 0.35])
             );
             var rendererBasinMask = new SimpleRenderer(sfsBasinMask);
             pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
@@ -290,17 +290,17 @@ define([
                               position: 'right',
                               textStyle: { fontSize: 12 }
                           },
+                          vAxis: {
+                              textStyle: {fontSize: 9 }
+                          },
                           hAxis: {
                               format: 'M/d HH' + ":00",
                               ticks: tickMarks,
-                              textStyle: {
-                                  fontSize: 12 // or the number you want
-                              }
+                              textStyle: {fontSize: 9 }
                           },
                           "title": "Stream Section Discharge (CFS)",
-                          "subtitle": "some data not available",
                           width: '100%',
-                          height: 500,
+                          height: 400,
                           chartArea: {
                               left: "5%", top: "5%"
                           }, trendlines: { 15: {} }    // Draw a trendline for data series 0.

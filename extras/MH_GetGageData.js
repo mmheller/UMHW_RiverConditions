@@ -482,7 +482,8 @@ define([
                                 }
 
                                 var obj = {};
-                                obj["id"] = strStreamName + "," + iSectionID + "," + strSiteID;
+                                obj["id"] = strStreamName + "," + iSectionID;
+                                //obj["id"] = strStreamName + "," + iSectionID + "," + strSiteID;
                                 obj["date"] = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
                                 obj["time"] = dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false });
                                 obj["cfs"] = parseFloat(item2.value);
@@ -571,8 +572,8 @@ define([
                                     arrayOIDsOrange.push(iOID);
                                 }
                             }
-
-                            app.pGage.m_arrray_StationIDs.push(strStreamName + "," + iSectionID + "," + strSiteID + strNoDataLabel4Charting);  // using this array of station id's to pivot the table for charting
+                            //app.pGage.m_arrray_StationIDs.push(strStreamName + "," + iSectionID + "," + strSiteID + strNoDataLabel4Charting);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDs.push(strStreamName + "," + iSectionID + strNoDataLabel4Charting);  // using this array of station id's to pivot the table for charting
                             strSiteName = item.sourceInfo.siteName;
 
                             if (dblLatestTemp == -999999) {
