@@ -134,7 +134,7 @@
                                     <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span></div>
                                     <div><span data-bind='text: SiteTempStatus'></span></div>
                                 </div>
-                            </tdvalign="top">
+                            </td>
                             <td class="htmlRowNotDisplayed">
                                 <div><span data-bind='text: strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
                                 <div><span data-bind='text: strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
@@ -146,6 +146,7 @@
                                 <div><span data-bind='text: strLateFlowClosureValueFlow'></span></div>
                                 <div><span data-bind='text: iTempClosureValue'></span></div>
                                 <div><span data-bind='text: strTempCollected'></span></div>
+                                <div><span data-bind='text: strSiteID'></span></div>
                             </td>
                         </tr>
                     </tbody>
@@ -176,14 +177,7 @@
                     <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
                 </div>
 
-                <div id="ViewModel2Binding_div">
-                    <div id="ViewModel2_line_div" data-bind="googleBarChart: new ViewModel2_LineData, chartOptions: {interpolateNulls: true,
-                             legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
-                    </div>
-                </div>
-
-                <!--<div data-bind="text: gageRecords()[0].SiteName"></div>-->
-                <div id="divSectionDetail" style="visibility:collapse">
+                <div id="divSectionDetail" style="display:none;">
                     <div style="margin: 15px 0 0 0;">
                         <div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
                         <div>Stream Section Number and Description: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span> <a data-bind="text: $root.CurrentDisplayGageRecord().SiteName, attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank"></a></div>
@@ -198,8 +192,6 @@
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></div>
                         <div></div>
                         <div></div>
-                        <!--<div><span data-bind='text: $root.CurrentDisplayGageRecord().Discharge, attr: {title: formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3CFSTrend}" />)</div>-->
-
                         <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp, attr: {title: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime}'></span></div>
                         <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
                         <div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>
@@ -207,18 +199,17 @@
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
-                        <div></div>
-
-
                     </div>
                 </div>
 
 
+                <div id="ViewModel2Binding_div">
+                    <div id="ViewModel2_line_div" data-bind="googleBarChart: new ViewModel2_LineData, chartOptions: {interpolateNulls: true,
+                             legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
+                    </div>
+                </div>
             </div>
             <div class="col-md-12">
-
-                
-
                 <h2>DRAFT/Unofficial Detail</h2>
                 <p>This will hold detail inforamtion, tabs to other info, charts/graphs</p>
                 <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>

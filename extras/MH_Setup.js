@@ -291,12 +291,12 @@ define([
                               textStyle: { fontSize: 12 }
                           },
                           vAxis: {
-                              textStyle: {fontSize: 9 }
+                              textStyle: {fontSize: 10 }
                           },
                           hAxis: {
                               format: 'M/d HH' + ":00",
                               ticks: tickMarks,
-                              textStyle: {fontSize: 9 }
+                              textStyle: {fontSize: 10 }
                           },
                           "title": "Stream Section Discharge (CFS)",
                           width: '100%',
@@ -314,8 +314,10 @@ define([
 
 
             if (typeof app.H2O_ID != 'undefined') {
+                app.dblExpandNum = 0.5;
                 app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer);
             } else {
+                app.dblExpandNum = 1;
                 app.pZoom.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer);
             }
 
