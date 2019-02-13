@@ -576,12 +576,12 @@ define([
                                 iLateFlowPref4ConsvValue = itemSectionRefined[3];
 
                                 if (iLateFlowPref4ConsvValue == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                    iLateFlowPref4ConsvValue = 600;
+                                    iLateFlowPref4ConsvValue = 400;
                                 }
                                 iLateFlowConsvValue = itemSectionRefined[4];
 
                                 if (iLateFlowConsvValue == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                    iLateFlowConsvValue = 500;
+                                    iLateFlowConsvValue = 300;
                                 }
                                 iLateFlowClosureValueFlow = itemSectionRefined[5];
                                 if (iLateFlowClosureValueFlow == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -812,10 +812,12 @@ define([
                                 (elements)[i].style.color = 'black';
                                 (elements)[i].style.backgroundColor = "rgb(255, 255, 0)";
                             }
-
+                            else if (((elements)[i].innerHTML.indexOf('formattedDischargeDateTime}">Not Collected') > -1) & ((elements)[i].innerHTML.indexOf("Temp Not") > -1)) {
+                                (elements)[i].style.color = 'grey';
+                            }
 
                             else if ((elements)[i].innerHTML.indexOf("OPEN") > -1) {
-                                (elements)[i].style.color = 'green';
+                                (elements)[i].style.color = 'black';
                             } else {
                                 var temp2 = "";
                             }

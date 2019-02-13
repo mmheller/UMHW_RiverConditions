@@ -307,7 +307,12 @@ define([
                       };
 
                     if (value.getNumberOfColumns() == 6) {
-                        var options4ChartAreaTrendlines = { 0: {} } ;
+                        var options4ChartAreaTrendlines = {
+                            0: {
+                                labelInLegend: 'CFS Trend Line',
+                                visibleInLegend: true,
+                            }
+                        };
                         options.trendlines = options4ChartAreaTrendlines;
 
                         var optionsSeries = {
@@ -319,7 +324,7 @@ define([
                         };
                         var optionsSeriesColors = [ '#3385ff', //blue
                                                     '#ccced0',  //light grey
-                                                    '#5d6063',  //medium grey
+                                                    '#919191',  //medium grey
                                                     '#61605f', //dark grey
                                                     '#df7206' ];  //dark orange
                         options.series = optionsSeries;

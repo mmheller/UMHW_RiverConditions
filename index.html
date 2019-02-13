@@ -181,13 +181,18 @@
                 <div id="divSectionDetail" style="display:none;">
                     <div style="margin: 15px 0 0 0;">
                         <div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
-                        <div>Stream Section Number and Description: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span> <a data-bind="text: $root.CurrentDisplayGageRecord().SiteName, attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank"></a></div>
+                        <div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
+                        <div>Stream Section Description:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
+                                                
+                        <div>USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a></div>
+                        <div>USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a></div>
+
                         <div></div>
                         <div></div>
-                        <div>Stream Status based on Discharge(CFS)<span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
+                        <div>Stream Status based on Discharge(CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
                         <div>Current Discharge (CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge, attr: {title: $root.CurrentDisplayGageRecord().formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" />)</div>
                         <div></div>
-                        <div>Discharge Target Definitions for this Stream Section</div>
+                        <div><u>Target Definitions for this Stream Section</u></div>
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowPref4ConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowPref4ConsvValue'></span></div>
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowConsvValue'></span></div>
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></div>
@@ -210,29 +215,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <h2>DRAFT/Unofficial Detail</h2>
-                <p>This will hold detail inforamtion, tabs to other info, charts/graphs</p>
-                <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-
-
-                <table class="red" style="width: 100%; height: 100%;">
-                    <thead>
-                        <tr>
-                            <th class="right">Site Name</th>
-                            <th class="right">agency</th>
-                            <th>value</th>
-                            <th class="right">Var/Unit</th>
-                            <th class="right">DateTime</th>
-                        </tr>
-                    </thead>
-                    <tbody id="display" class="no-border-x"></tbody>
-                </table>
-            </div>
         </div>
-
         <hr>
-
         <footer>
             <p>&copy; 2016 Company, Inc.</p>
         </footer>
