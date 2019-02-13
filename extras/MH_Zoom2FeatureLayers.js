@@ -20,11 +20,9 @@ define([
 ) {
 
     return declare([], {
-        qry_Zoom2FeatureLayerExtent: function (pFeatureLayer1) {
+        qry_Zoom2FeatureLayerExtent: function (pFeatureLayer1, strQueryField) {
             var pQueryT1 = new esri.tasks.QueryTask(pFeatureLayer1.url);
             var pQuery1 = new esri.tasks.Query();
-
-            var strQueryField = "FID";
 
             pQuery1.returnGeometry = true;
             pQuery1.outFields = [strQueryField];

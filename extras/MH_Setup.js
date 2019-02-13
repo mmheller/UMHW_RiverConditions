@@ -347,10 +347,10 @@ define([
 
             if (typeof app.H2O_ID != 'undefined') {
                 app.dblExpandNum = 0.5;
-                app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer);
+                app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer, "OBJECTID");
             } else {
                 app.dblExpandNum = 1;
-                app.pZoom.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer);
+                app.pZoom.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer, "FID");
             }
 
             function err(err) {
