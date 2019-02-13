@@ -24,13 +24,16 @@ define([
             var pQueryT1 = new esri.tasks.QueryTask(pFeatureLayer1.url);
             var pQuery1 = new esri.tasks.Query();
 
+            var strQueryField = "FID";
+
             pQuery1.returnGeometry = true;
-            pQuery1.outFields = ["objectid"];
+            pQuery1.outFields = [strQueryField];
 
             var strQuery1 = pFeatureLayer1.getDefinitionExpression();
 
             if (strQuery1 == undefined) {
-                strQuery1 = "objectid > -1";
+                strQuery1 = strQueryField + " > -1";
+                //strQuery1 = "objectid > -1";
             }
             pQuery1.where = strQuery1;
 

@@ -275,12 +275,11 @@ define([
                 },
                 update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var value = ko.unwrap(valueAccessor());
-
                     var tickMarks = [];
+
                     for (var i = 0; i < value.getNumberOfRows(); i += 48) {
                         tickMarks.push(value.getValue(i, 0));
                     }
-
                       var options = {
                         chart: {
                             "title": "nope",
@@ -303,8 +302,41 @@ define([
                           height: 400,
                           chartArea: {
                               left: "5%", top: "5%"
-                          }, trendlines: { 15: {} }    // Draw a trendline for data series 0.
+                          }
+                          //,trendlines: { 0: {} }    // Draw a trendline for data series 0.
                       };
+
+                    if (value.getNumberOfColumns() == 6) {
+                        var options4ChartAreaTrendlines = { 0: {} } ;
+                        options.trendlines = options4ChartAreaTrendlines;
+
+                        var optionsSeries = {
+                            0: { lineWidth: 3 }, //blue
+                            1: { lineWidth: 10, lineDashStyle: [1, 1] },  //light grey
+                            2: { lineWidth: 10, lineDashStyle: [1, 1] },  //medium grey
+                            3: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
+                            4: { lineWidth: 8 }  //dark orange
+                        };
+                        var optionsSeriesColors = [ '#3385ff', //blue
+                                                    '#ccced0',  //light grey
+                                                    '#5d6063',  //medium grey
+                                                    '#61605f', //dark grey
+                                                    '#df7206' ];  //dark orange
+                        options.series = optionsSeries;
+                        options.colors = optionsSeriesColors;
+                    }
+                    
+                    if (value.getNumberOfColumns() == 3) {
+                        var optionsSeries = {
+                            0: { lineWidth: 3 }, //blue
+                            1: { lineWidth: 8 }  //dark orange
+                        };
+                        var optionsSeriesColors = ['#3385ff', //blue
+                                                    '#df7206'];  //dark orange
+                        options.series = optionsSeries;
+                        options.colors = optionsSeriesColors;
+                    }
+
 
                     options = ko.unwrap(options);
                     var chart = ko.utils.domData.get(element, 'googleLineChart');
