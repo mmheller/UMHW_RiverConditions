@@ -276,6 +276,14 @@ define([
                 update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var value = ko.unwrap(valueAccessor());
                     var tickMarks = [];
+                    var strTitle = "";
+
+                    if ((value.getColumnLabel(0) == "DatetimeTMP") | (value.getColumnLabel(0) == "DatetimeTMPSingle")) {
+                        strTitle = "Stream Temperature (F)"
+                    }
+                    else if ((value.getColumnLabel(0) == "DatetimeCFS") | (value.getColumnLabel(0) == "DatetimeCFSSingle")) {
+                        strTitle = "Stream Section Discharge (CFS)"
+                    }
 
                     for (var i = 0; i < value.getNumberOfRows(); i += 48) {
                         tickMarks.push(value.getValue(i, 0));
@@ -297,16 +305,42 @@ define([
                               ticks: tickMarks,
                               textStyle: {fontSize: 10 }
                           },
-                          "title": "Stream Section Discharge (CFS)",
+                          "title": strTitle,
                           width: '100%',
                           height: 400,
                           chartArea: {
                               left: "5%", top: "5%"
                           }
-                          //,trendlines: { 0: {} }    // Draw a trendline for data series 0.
                       };
 
-                    if (value.getNumberOfColumns() == 6) {
+                    
+                    if ((value.getColumnLabel(0) == "DatetimeCFS") & (value.getNumberOfColumns() == 3)) {
+                        var optionsSeries = {
+                            0: { lineWidth: 3 }, //blue
+                            1: { lineWidth: 8 }  //dark orange
+                        };
+                        var optionsSeriesColors = ['#3385ff', //blue
+                                                    '#df7206'];  //dark orange
+                        options.series = optionsSeries;
+                        options.colors = optionsSeriesColors;
+                    } else if (value.getColumnLabel(0) == "DatetimeTMPSingle") {
+                        var options4ChartAreaTrendlines = {
+                            0: {
+                                labelInLegend: 'Temp Trend Line',
+                                visibleInLegend: true,
+                            }
+                        };
+                        options.trendlines = options4ChartAreaTrendlines;
+
+                        var optionsSeries = {
+                            0: { lineWidth: 3 }, //blue
+                            1: { lineWidth: 10, lineDashStyle: [1, 1] },  //medium grey
+                        };
+                        var optionsSeriesColors = ['#3385ff', //blue
+                                                    '#919191'];  //medium grey
+                        options.series = optionsSeries;
+                        options.colors = optionsSeriesColors;
+                    } else if (value.getColumnLabel(0) == "DatetimeCFSSingle") {
                         var options4ChartAreaTrendlines = {
                             0: {
                                 labelInLegend: 'CFS Trend Line',
@@ -322,26 +356,14 @@ define([
                             3: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
                             4: { lineWidth: 8 }  //dark orange
                         };
-                        var optionsSeriesColors = [ '#3385ff', //blue
+                        var optionsSeriesColors = ['#3385ff', //blue
                                                     '#ccced0',  //light grey
                                                     '#919191',  //medium grey
                                                     '#61605f', //dark grey
-                                                    '#df7206' ];  //dark orange
-                        options.series = optionsSeries;
-                        options.colors = optionsSeriesColors;
-                    }
-                    
-                    if (value.getNumberOfColumns() == 3) {
-                        var optionsSeries = {
-                            0: { lineWidth: 3 }, //blue
-                            1: { lineWidth: 8 }  //dark orange
-                        };
-                        var optionsSeriesColors = ['#3385ff', //blue
                                                     '#df7206'];  //dark orange
                         options.series = optionsSeries;
                         options.colors = optionsSeriesColors;
                     }
-
 
                     options = ko.unwrap(options);
                     var chart = ko.utils.domData.get(element, 'googleLineChart');

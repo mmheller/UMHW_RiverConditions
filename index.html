@@ -131,7 +131,7 @@
                                     <!--<div><span data-bind='text: SectionID'></span> <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a></div>-->
                                     <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3CFSTrend}" />)</div>
                                     <div><span data-bind='text: SiteFlowStatus'></span></div>
-                                    <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span></div>
+                                    <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3TMPTrend}" />)</div>
                                     <div><span data-bind='text: SiteTempStatus'></span></div>
                                 </div>
                             </td>
@@ -198,7 +198,7 @@
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></div>
                         <div></div>
                         <div></div>
-                        <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp, attr: {title: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime}'></span></div>
+                        <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp, attr: {title: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
                         <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
                         <div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>
 
@@ -209,8 +209,14 @@
                 </div>
 
 
-                <div id="ViewModel2Binding_div">
-                    <div id="ViewModel2_line_div" data-bind="googleBarChart: new ViewModel2_LineData, chartOptions: {interpolateNulls: true,
+                <div id="ViewModel2CFSBinding_div">
+                    <div id="ViewModel2CFS_line_div" data-bind="googleBarChart: new ViewModel2CFS_LineData, chartOptions: {interpolateNulls: true,
+                             legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
+                    </div>
+                </div>
+
+                <div id="ViewModel2TMPBinding_div">
+                    <div id="ViewModel2TMP_line_div" data-bind="googleBarChart: new ViewModel2TMP_LineData, chartOptions: {interpolateNulls: true,
                              legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
                     </div>
                 </div>

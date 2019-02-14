@@ -10,7 +10,7 @@
     return strHyperlinkURL;
 }
 
-function ProcLinearRegression(arrray_Detail4Interpolation) {
+function ProcLinearRegression(arrray_Detail4Interpolation, strValueKey) {
     var str3DayCFSTrend = "images/blank.png";
     //arrray_Detail4Interpolation.sort(function (a, b) {
     //    var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
@@ -20,7 +20,7 @@ function ProcLinearRegression(arrray_Detail4Interpolation) {
     arrayY = [];
     for (var ilr = 0; ilr < arrray_Detail4Interpolation.length; ilr++) {
         arrayX.push(arrray_Detail4Interpolation[ilr].EPOCH);
-        arrayY.push(arrray_Detail4Interpolation[ilr].cfs);
+        arrayY.push(arrray_Detail4Interpolation[ilr][strValueKey]);
     }
     var lr = linearRegression(arrayY, arrayX);
 
@@ -101,7 +101,8 @@ define([
 
     return declare([], {
         m_arrray_RiverSectionStatus: [],
-        m_arrray_Detail4Chart: [],
+        m_arrray_Detail4ChartCFS: [],
+        m_arrray_Detail4ChartTMP: [],
         m_arrray_Detail4ChartHistoryCFS: [],
         m_arrray_StationIDs: [],
         m_ProcessingIndex: 0,
@@ -121,7 +122,8 @@ define([
                                             iTempClosureValue,
                                             strTempCollected,
                                             strSiteID,
-                                            strDailyStat_URL) {// Class to represent a row in the gage values grid
+                                            strDailyStat_URL,
+                                            str3DayTMPTrend) {// Class to represent a row in the gage values grid
             var self = this;
             self.SiteName = strSiteName;
             self.Hyperlink = strHyperlinkURL;
@@ -158,6 +160,7 @@ define([
             self.strTempCollected = strTempCollected;
             self.strSiteID = strSiteID;
             self.strDailyStat_URL = strDailyStat_URL;
+            self.Day3TMPTrend = str3DayTMPTrend;
         },
         
         handleSectionGageResults: function (results) {
@@ -213,7 +216,7 @@ define([
                     }
                     return a[0] > b[0] ? 1 : -1;
                 });
-            this.app.pGage.SectionsReceived(streamSectionArrray,"","","");
+            this.app.pGage.SectionsReceived(streamSectionArrray,"","","","");
         },
 
         getArray2Process: function (strURL, strQuery) {// Class to represent a row in the gage values grid
@@ -235,11 +238,142 @@ define([
             pPromises = new All([pLayer1, pLayer2]);
             pPromises.then(this.handleSectionGageResults, this.err);
         },
-
-        ViewModel2: function () {  //this is for google charts
+        
+        ViewModel2TMP: function () {  //this is for google charts
             //https://developers.google.com/chart/interactive/docs/datatables_dataviews
             var self = this;
-            self.ViewModel2_LineData = ko.computed(function () {
+            self.ViewModel2TMP_LineData = ko.computed(function () {
+                var strIDTemp = "";
+                var arraystrIDs = [];
+                var arrayPrelimData_1 = [];
+                var arrayPrelimData_2 = [];
+                var arrayPrelimData_3 = [];
+
+                var uniqueSiteIDs = [];  //Remove duplicates from the siteid array
+                $.each(app.pGage.m_arrray_StationIDs, function (i, el) {
+                    if ($.inArray(el, uniqueSiteIDs) === -1) uniqueSiteIDs.push(el);
+                });
+
+                blnSingleCharting = false;
+                var iChart_TMP_ColumnNames = [];
+                if (app.pGage.m_arrray_Detail4ChartTMP.length > 0) {//get the 1st gagedate form comparrison 
+                    var dteDateTimeTemp = app.pGage.m_arrray_Detail4ChartTMP[0].gagedatetime;
+
+                    if (app.pGage.m_arrray_StationIDs.length == 1) {
+                        blnSingleCharting = true;
+                        var iTMPTarget1 = app.pGage.m_arrray_Detail4ChartTMP[0].TMPTarget1;
+                        if (!(isNaN(iTMPTarget1))) { iTMPTarget1 = Number(iTMPTarget1) }
+                        iChart_TMP_ColumnNames = [iTMPTarget1.toString() + "Consv. Target"];
+                    }
+                }
+                //else if (app.pGage.m_arrray_Detail4ChartHistoryTMP.length > 0) {  //if historical data AND NO CURRNET DATA, only gathered for single sections, then add the the datatable
+                //    for (var ih = 0; ih < app.pGage.m_arrray_Detail4ChartHistoryTMP.length; ih++) {
+                //        arrayPrelimData_3.push([app.pGage.m_arrray_Detail4ChartHistoryTMP[ih].gagedatetime, null, Number(app.pGage.m_arrray_Detail4ChartHistoryTMP[ih].TMP)])  //add historical to an array to chart without other values
+                //        for (var iAddhr = 15; iAddhr < 1440; iAddhr += 15) {
+                //            var dteDate4Null = new Date(app.pGage.m_arrray_Detail4ChartHistoryTMP[ih].gagedatetime);
+                //            dteDate4Null.setMinutes(dteDate4Null.getMinutes() + iAddhr);
+                //            arrayPrelimData_3.push([dteDate4Null, null, null])  //add historical to an array to chart without other values
+                //        }
+                //    }
+                //}
+
+                for (var i = 0; i < app.pGage.m_arrray_Detail4ChartTMP.length; i++) {
+                    var strID = app.pGage.m_arrray_Detail4ChartTMP[i].id;
+                    var dteDateTime = app.pGage.m_arrray_Detail4ChartTMP[i].gagedatetime;
+                    var iTMPVal = app.pGage.m_arrray_Detail4ChartTMP[i].TMP;
+
+                    if (dteDateTimeTemp.toString() != dteDateTime.toString()) {
+                        var iHours = dteDateTime.getHours();
+                        var iMinutes = dteDateTime.getMinutes();
+                        var dteDate4Charting = new Date(dteDateTime.getFullYear(), dteDateTime.getMonth(), dteDateTime.getDate(), iHours, iMinutes, 0, 0);
+
+                        arrayPrelimData_2 = [dteDate4Charting];
+
+                        for (var ii = 0; ii < uniqueSiteIDs.length; ii++) {
+                            var strID2 = uniqueSiteIDs[ii];
+                            var f;
+                            var found = arrayPrelimData_1.some(function (item, index) { f = index; return item.id == strID2; });
+                            if (!found) {
+                                var iVal2Chart = null;
+                            } else {
+                                var iVal2Chart = arrayPrelimData_1[f].TMP;
+                                if (iVal2Chart == -999999) {
+                                    iVal2Chart = null;
+                                }
+                            }
+                            arrayPrelimData_2.push(iVal2Chart);
+
+                            if (blnSingleCharting) {
+                                arrayPrelimData_2.push(iTMPTarget1);
+                                //arrayPrelimData_2.push(iTMPTarget2);
+                                //arrayPrelimData_2.push(iTMPTarget3);
+                            }
+                        }
+
+                        //if (app.pGage.m_arrray_Detail4ChartHistoryTMP.length > 0) {  //if historical data, only gathered for single sections, then add the the datatable
+                        //    if ((iHours == 12) & (iMinutes == 00)) {
+                        //        for (var ih = 0; ih < app.pGage.m_arrray_Detail4ChartHistoryTMP.length; ih++) {
+                        //            var dteDate4ChartingHistorycheck = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
+
+                        //            if (app.pGage.m_arrray_Detail4ChartHistoryTMP[ih].date == dteDate4ChartingHistorycheck) {
+                        //                arrayPrelimData_2.push(Number(app.pGage.m_arrray_Detail4ChartHistoryTMP[ih].TMP))  //convert the string value to number type
+                        //                break;  //if found then don't check for more for this date/time
+                        //            }
+                        //        }
+                        //    } else {
+                        //        arrayPrelimData_2.push(null)
+                        //    }
+                        //}
+
+                        arrayPrelimData_3.push(arrayPrelimData_2);
+                        arrayPrelimData_1 = [];
+                    }
+                    var obj22 = {};       // build a temporary array of all the cfs values to use when the date/time switches and will grabe appropriate values based on station id as a key
+                    obj22["id"] = strID;
+                    obj22["TMP"] = iTMPVal;
+                    obj22["gagedatetime"] = dteDateTime;
+                    arrayPrelimData_1.push(obj22);
+                    strIDTemp = strID;
+                    dteDateTimeTemp = dteDateTime;
+                }
+
+                var strDateColumnName = "DatetimeTMP";
+                if (blnSingleCharting) {
+                    strDateColumnName += "Single";
+                }
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('date', strDateColumnName);
+                for (var ii = 0; ii < uniqueSiteIDs.length; ii++) {
+                    data.addColumn('number', uniqueSiteIDs[ii]);
+                }
+
+
+                if (blnSingleCharting) {
+                    for (var ii = 0; ii < iChart_TMP_ColumnNames.length; ii++) {
+                        data.addColumn('number', iChart_TMP_ColumnNames[ii]);
+                    }
+                }
+
+                //if (app.pGage.m_arrray_Detail4ChartHistoryTMP.length > 0) {
+                //    data.addColumn('number', "Historical TMP");
+                //}
+
+                data.addRows(arrayPrelimData_3);
+
+                var date_formatter = new google.visualization.DateFormat({  //this will format the crosshair in the google chart
+                    pattern: "MMM dd, yyyy HH:mm"
+                });
+                date_formatter.format(data, 0);
+
+                return data;
+            });
+        },
+
+        ViewModel2CFS: function () {  //this is for google charts
+            //https://developers.google.com/chart/interactive/docs/datatables_dataviews
+            var self = this;
+            self.ViewModel2CFS_LineData = ko.computed(function () {
                 var strIDTemp = "";
                 var arraystrIDs = [];
                 var arrayPrelimData_1 = [];
@@ -253,16 +387,16 @@ define([
 
                 blnSingleCharting = false;
                 var iChart_CFS_ColumnNames = [];
-                if (app.pGage.m_arrray_Detail4Chart.length > 0) {//get the 1st gagedate form comparrison 
-                    var dteDateTimeTemp = app.pGage.m_arrray_Detail4Chart[0].gagedatetime;
+                if (app.pGage.m_arrray_Detail4ChartCFS.length > 0) {//get the 1st gagedate form comparrison 
+                    var dteDateTimeTemp = app.pGage.m_arrray_Detail4ChartCFS[0].gagedatetime;
 
                     if (app.pGage.m_arrray_StationIDs.length == 1) {
                         blnSingleCharting = true;
-                        var icfsTarget1 = app.pGage.m_arrray_Detail4Chart[0].cfsTarget1;
+                        var icfsTarget1 = app.pGage.m_arrray_Detail4ChartCFS[0].cfsTarget1;
                         if (!(isNaN(icfsTarget1))) { icfsTarget1 = Number(icfsTarget1) }
-                        var icfsTarget2 = app.pGage.m_arrray_Detail4Chart[0].cfsTarget2;
+                        var icfsTarget2 = app.pGage.m_arrray_Detail4ChartCFS[0].cfsTarget2;
                         if (!(isNaN(icfsTarget2))) { icfsTarget2 = Number(icfsTarget2) }
-                        var icfsTarget3 = app.pGage.m_arrray_Detail4Chart[0].cfsTarget3;
+                        var icfsTarget3 = app.pGage.m_arrray_Detail4ChartCFS[0].cfsTarget3;
                         if (!(isNaN(icfsTarget3))) { icfsTarget3 = Number(icfsTarget3) }
                         iChart_CFS_ColumnNames = [icfsTarget1.toString() + "Consv. Target", icfsTarget2.toString() + "Consv. Target", icfsTarget3.toString() + "Consv. Target"];
                     }
@@ -277,10 +411,10 @@ define([
                     }
                 }
                
-                for (var i = 0; i < app.pGage.m_arrray_Detail4Chart.length; i++) {
-                    var strID = app.pGage.m_arrray_Detail4Chart[i].id;
-                    var dteDateTime = app.pGage.m_arrray_Detail4Chart[i].gagedatetime;
-                    var iCFSVal = app.pGage.m_arrray_Detail4Chart[i].cfs;
+                for (var i = 0; i < app.pGage.m_arrray_Detail4ChartCFS.length; i++) {
+                    var strID = app.pGage.m_arrray_Detail4ChartCFS[i].id;
+                    var dteDateTime = app.pGage.m_arrray_Detail4ChartCFS[i].gagedatetime;
+                    var iCFSVal = app.pGage.m_arrray_Detail4ChartCFS[i].cfs;
 
                     if (dteDateTimeTemp.toString() != dteDateTime.toString()) {
                         var iHours = dteDateTime.getHours();
@@ -338,7 +472,12 @@ define([
                 }
 
                 var data = new google.visualization.DataTable();
-                data.addColumn('date', 'Datetime1');
+                var strDateColumnName = "DatetimeCFS";
+                if (blnSingleCharting) {
+                    strDateColumnName += "Single";
+                }
+
+                data.addColumn('date', strDateColumnName);
                 for (var ii = 0; ii < uniqueSiteIDs.length; ii++) {
                     data.addColumn('number', uniqueSiteIDs[ii]);
                 }
@@ -393,7 +532,8 @@ define([
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][20],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][21],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][22],
-                                                                app.pGage.m_arrray_RiverSectionStatus[i][23]));
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][23],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][24]));
 
                 self.gageRecords = ko.observableArray(arrayKOTemp);
                 
@@ -428,7 +568,7 @@ define([
             this.getArray2Process(app.strHFL_URL, strQuery);         
         },
 
-        GraphSingleSEction: function (strStreamName, iSectionID, strSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL) {
+        GraphSingleSEction: function (strStreamName, iSectionID, strSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTMPTarget1) {
             var dteDateTimeMinus0 = new Date();
             dteDateTimeMinus0.setDate(dteDateTimeMinus0.getDate() - 0);
             var dteDateTimeMinus1 = new Date();
@@ -493,7 +633,7 @@ define([
 
                     var streamSectionArrray = [];
                     streamSectionArrray.push([strStreamName, strSiteID, iSectionID]);
-                    app.pGage.SectionsReceived(streamSectionArrray, iCFSTarget1, iCFSTarget2, iCFSTarget3);
+                    app.pGage.SectionsReceived(streamSectionArrray, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1);
                 })
                 .fail(function (jqxhr, textStatus, error) {
                     var err = textStatus + ", " + error;
@@ -501,8 +641,9 @@ define([
                 });
         },
 
-        SectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3) {
-            app.pGage.m_arrray_Detail4Chart = [];
+        SectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1) {
+            app.pGage.m_arrray_Detail4ChartCFS = [];
+            app.pGage.m_arrray_Detail4ChartTMP = [];
             app.pGage.m_arrray_StationIDs = [];
             var EntiretrHTML = "";
             var iCounterTemperature = 0;
@@ -562,11 +703,12 @@ define([
                             return typeof itemArraySearch.name == 'string' && itemArraySearch.name.indexOf(strSiteID) > -1;
                         });
 
-                        var arrray_Detail4Interpolation = [];
+                        var arrray_Detail4InterpolationCFS = [];
+                        var arrray_Detail4InterpolationTMP = [];
                         var arrayTempsAbove = [];
-                        var dteLatestDateTimeTemp = "";
+                        var dteLatestDateTimeTMP = "";
                         var dteLatestDateTimeCFS = "";
-                        var dblLatestTemp = "";
+                        var dblLatestTMP = "";
                         var dblLatestCFS = "";
                         var strSiteName = "";
                         var strID = "";
@@ -608,7 +750,8 @@ define([
                                 strHyperlinkURL = returnURL4GSgage(strHyperlinkURL);
 
                                 blnRealValues = false;
-                                var str3DayCFSTrend = "images/blank.png";
+                                var str3DayCFSTrendCFS = "images/blank.png";
+                                var str3DayCFSTrendTMP = "images/blank.png";
                             }
 
                             //determine if the JSON element is a temperature or discharge reading
@@ -642,23 +785,23 @@ define([
                                         obj["cfsTarget2"] = iCFSTarget2;  //this are only used in single charting situations
                                         obj["cfsTarget3"] = iCFSTarget3;  //this are only used in single charting situations
 
-                                        app.pGage.m_arrray_Detail4Chart.push(obj);//populate the array that contains the data for charting
+                                        app.pGage.m_arrray_Detail4ChartCFS.push(obj);//populate the array that contains the data for charting
                                         obj["EPOCH"] = Date.parse(dteDateTime);
 
-                                        arrray_Detail4Interpolation.push(obj);  //populate the array that is used to determing the flow trent
+                                        arrray_Detail4InterpolationCFS.push(obj);  //populate the array that is used to determing the flow trent
                                     }
                                 });
 
-                                if ((arrray_Detail4Interpolation.length > 0) & (blnRealValues)) { //figure out if the flow trend is increasing or decreasing & the last known values
-                                    arrray_Detail4Interpolation.sort(function (a, b) {
+                                if ((arrray_Detail4InterpolationCFS.length > 0) & (blnRealValues)) { //figure out if the flow trend is increasing or decreasing & the last known values
+                                    arrray_Detail4InterpolationCFS.sort(function (a, b) {
                                         var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
                                         return dateA - dateB //sort by date ascending
                                     })
-                                    var iCFSArrayLength = (arrray_Detail4Interpolation.length -1);
-                                    dteLatestDateTimeCFS = arrray_Detail4Interpolation[iCFSArrayLength].gagedatetime;
-                                    dblLatestCFS = parseFloat(arrray_Detail4Interpolation[iCFSArrayLength].cfs);
+                                    var iCFSArrayLength = (arrray_Detail4InterpolationCFS.length - 1);
+                                    dteLatestDateTimeCFS = arrray_Detail4InterpolationCFS[iCFSArrayLength].gagedatetime;
+                                    dblLatestCFS = parseFloat(arrray_Detail4InterpolationCFS[iCFSArrayLength].cfs);
                                     
-                                    str3DayCFSTrend = ProcLinearRegression(arrray_Detail4Interpolation);
+                                    str3DayCFSTrendCFS = ProcLinearRegression(arrray_Detail4InterpolationCFS, "cfs");
                                 }
                             }
 
@@ -667,16 +810,38 @@ define([
                             if (temperatureItem != "") {
                                 arrayJSONValues22 = temperatureItem.values[0].value;
                                 jQuery.each(arrayJSONValues22, function (k, item22) {
-                                    var dteDateTimeTemperature = new Date(item22.dateTime);
-                                    if ((dteDateTimeTemperature > dteLatestDateTimeTemp) | (dteLatestDateTimeTemp == "")) {
-                                        dteLatestDateTimeTemp = dteDateTimeTemperature;
-                                        dblLatestTemp = parseFloat(item22.value);
+                                    var dteDateTime = new Date(item22.dateTime);
+                                    var strNoData = "";
+
+                                    if (item22.value != -999999) {
+                                        blnRealValues = true;
+                                        var obj = {};
+                                        obj["id"] = strStreamName + "," + iSectionID;
+                                        obj["date"] = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
+                                        obj["time"] = dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false });
+                                        obj["TMP"] = Math.round(parseFloat(item22.value) * 9 / 5 + 32);
+                                        obj["gagedatetime"] = dteDateTime;
+
+                                        obj["TMPTarget1"] = iTMPTarget1;  //this are only used in single charting situations
+
+                                        app.pGage.m_arrray_Detail4ChartTMP.push(obj);//populate the array that contains the data for charting
+                                        obj["EPOCH"] = Date.parse(dteDateTime);
+
+                                        arrray_Detail4InterpolationTMP.push(obj);  //populate the array that is used to determing the flow trent
                                     }
-                                    if (parseFloat(item22.value) >= iTempClosureValue) {
-                                        arrayTempsAbove.push([dteDateTimeTemperature, parseFloat(item22.value)]);
-                                    }  // add this to later determine if over temp for past 3 days
-                                    iCounterTemperature += 1;
                                 });
+
+                                if ((arrray_Detail4InterpolationTMP.length > 0) & (blnRealValues)) { //figure out if the flow trend is increasing or decreasing & the last known values
+                                    arrray_Detail4InterpolationTMP.sort(function (a, b) {
+                                        var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
+                                        return dateA - dateB //sort by date ascending
+                                    })
+                                    var iTMPArrayLength = (arrray_Detail4InterpolationTMP.length - 1);
+                                    dteLatestDateTimeTMP = arrray_Detail4InterpolationTMP[iTMPArrayLength].gagedatetime;
+                                    dblLatestTMP = parseFloat(arrray_Detail4InterpolationTMP[iCFSArrayLength].TMP);
+
+                                    str3DayCFSTrendTMP = ProcLinearRegression(arrray_Detail4InterpolationTMP, "TMP");
+                                }
                             }
 
                             arrayJSONValues22 = []; //clear out the array
@@ -690,12 +855,12 @@ define([
                             var strNoDataLabel4Charting = "";
                             if (dblLatestCFS == -999999) {
                                 dblLatestCFS = "Not Available"
-                                dteLatestDateTimeTemp = new Date();
+                                dteLatestDateTimeCFS = new Date();
                                 strNoDataLabel4Charting = " (No Data)";
                             } else if (dblLatestCFS == "") {
                                 dblLatestCFS = "Not Collected"
                                 strNoDataLabel4Charting = " (No Data)";
-                                dteLatestDateTimeTemp = new Date();
+                                dteLatestDateTimeCFS = new Date();
                             } else {//determine the site's status based on discharge
                                 if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) {
                                     strSiteFlowStatus = "PREPARE FOR CONSERVATION";
@@ -713,15 +878,14 @@ define([
 
                             strSiteName = item.sourceInfo.siteName;
 
-                            if (dblLatestTemp == -999999) {
-                                dblLatestTempFahrenhet = "Temp Not Available"
-                                dteLatestDateTimeCFS = new Date();
-                            } else if (dblLatestTemp == "") {
-                                dblLatestTempFahrenhet = "Temp Not Collected"
-                                dteLatestDateTimeCFS = new Date();
-                            } else {
-                                dblLatestTempFahrenhet = dblLatestTemp * 9 / 5 + 32;
-                                if (dblLatestTempFahrenhet > iTempClosureValue) { strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE"; }
+                            if (dblLatestTMP == -999999) {
+                                dblLatestTMP = "Not Available"
+                                dteLatestDateTimeTMP = new Date();
+                            } else if (dblLatestTMP == "") {
+                                dblLatestTMP = "Not Collected"
+                                dteLatestDateTimeTMP = new Date();
+                            } else if (dblLatestTMP > iTempClosureValue) {
+                                strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE";
                             }
                             
                             app.pGage.m_arrray_StationIDs.push(strStreamName + "," + iSectionID + strNoDataLabel4Charting);  // using this array of station id's to pivot the table for charting
@@ -735,8 +899,8 @@ define([
                                 }
                                 //add to array that populates the river sections summary div
                                 app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName, strHyperlinkURL,     
-                                    dteLatestDateTimeTemp, dblLatestTempFahrenhet.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
-                                    dteLatestDateTimeCFS, dblLatestCFS.toString(), strSiteFlowStatus, strID, strStreamName, iSectionID, str3DayCFSTrend,
+                                    dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
+                                    dteLatestDateTimeCFS, dblLatestCFS.toString(), strSiteFlowStatus, strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
                                     strMONTHDAYEarlyFlowFromDroughtManagementTarget,
                                     strMONTHDAYEarlyFlowToDroughtManagementTarget,
                                     iLateFlowPref4ConsvValue,
@@ -748,15 +912,14 @@ define([
                                     iTempClosureValue,
                                     strTempCollected,
                                     strSiteID,
-                                    strDailyStat_URL
+                                    strDailyStat_URL, str3DayCFSTrendTMP
                                 ]);
                             }
                         }
 
 
-
                         var blnAddNew = false;
-                        dteLatestDateTimeTemp = "";
+                        dteLatestDateTimeTMP = "";
                         dteLatestDateTimeCFS = "";
                         dblLatestTemp = "";
                         dblLatestCFS = "";
@@ -784,6 +947,11 @@ define([
                                 var iCFSTarget2 = strTempText.substring(0, strTempText.indexOf("</span>"));
                                 strTempText = strTempText.substring(strTempText.indexOf("iLateFlowClosureValueFlow") + ("iLateFlowClosureValueFlow".length + 2), strTempText.length);
                                 var iCFSTarget3 = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+                                strTempText = strTempText.substring(strTempText.indexOf("iTempClosureValue") + ("iTempClosureValue".length + 2), strTempText.length);
+                                var iTempCloseValue = strTempText.substring(0, strTempText.indexOf("</span>"));
+                                
+
                                 strTempText = strTempText.substring(strTempText.indexOf("strSiteID") + ("strSiteID".length + 2), strTempText.length);
                                 var strClickSiteID = strTempText.substring(0, strTempText.indexOf("</span>"));
 
@@ -792,7 +960,7 @@ define([
 
                                 app.dblExpandNum = 1;
 
-                                app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL);
+                                app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
                                 app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "4", "(StreamName = '" + strClickStreamName + "') and " + "(SectionID = '" + strClickSegmentID + "')");
                             });
 
@@ -812,8 +980,9 @@ define([
                                 (elements)[i].style.color = 'black';
                                 (elements)[i].style.backgroundColor = "rgb(255, 255, 0)";
                             }
-                            else if (((elements)[i].innerHTML.indexOf('formattedDischargeDateTime}">Not Collected') > -1) & ((elements)[i].innerHTML.indexOf("Temp Not") > -1)) {
-                                (elements)[i].style.color = 'grey';
+                            else if (((elements)[i].innerHTML.indexOf('formattedDischargeDateTime}">Not Collected') > -1) &
+                                     ((elements)[i].innerHTML.indexOf('formattedWaterTempDateTime}">Not Collected') > -1)) {
+                                (elements)[i].style.color = "rgb(128, 128, 128)";
                             }
 
                             else if ((elements)[i].innerHTML.indexOf("OPEN") > -1) {
@@ -828,23 +997,40 @@ define([
 
                     }  //if initial run through, post stream section detail for all the stream sections
                                         
-                    app.pGage.m_arrray_Detail4Chart.sort(function (a, b) {
+                    app.pGage.m_arrray_Detail4ChartCFS.sort(function (a, b) {
+                        var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
+                        return dateA - dateB //sort by date ascending
+                    })
+                    app.pGage.m_arrray_Detail4ChartTMP.sort(function (a, b) {
                         var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
                         return dateA - dateB //sort by date ascending
                     })
 
-                    var ViewModel2_model = new app.pGage.ViewModel2();
-                    var element = $('#ViewModel2Binding_div')[0];
+                    var ViewModel2CFS_model = new app.pGage.ViewModel2CFS();
+                    var elementCFS = $('#ViewModel2CFSBinding_div')[0];
+
+                    var ViewModel2TMP_model = new app.pGage.ViewModel2TMP();
+                    var elementTMP = $('#ViewModel2TMPBinding_div')[0];
+
 
                     if (!(blnIsInitialPageLoad)) {
-                        ko.cleanNode(element);
+                        ko.cleanNode(elementCFS);
+                        ko.cleanNode(elementTMP);
                     }
 
-                    ko.applyBindings(ViewModel2_model, document.getElementById("ViewModel2Binding_div"));
+                    ko.applyBindings(ViewModel2CFS_model, document.getElementById("ViewModel2CFSBinding_div"));
                     $(window).resize(function () { //this is necessary to call for responsivness since google charts are sized are not changeable, must re-create
-                        ko.cleanNode(element);
-                        ko.applyBindings(ViewModel2_model, document.getElementById("ViewModel2Binding_div"));
+                        ko.cleanNode(elementCFS);
+                        ko.applyBindings(ViewModel2CFS_model, document.getElementById("ViewModel2CFSBinding_div"));
                     });
+
+
+                    ko.applyBindings(ViewModel2TMP_model, document.getElementById("ViewModel2TMPBinding_div"));
+                    $(window).resize(function () { //this is necessary to call for responsivness since google charts are sized are not changeable, must re-create
+                        ko.cleanNode(elementTMP);
+                        ko.applyBindings(ViewModel2TMP_model, document.getElementById("ViewModel2TMPBinding_div"));
+                    });
+
                     
                     arrayJSONValues = [];
               })
@@ -864,3 +1050,4 @@ define([
     });
 }
 );
+
