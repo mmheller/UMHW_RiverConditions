@@ -11,8 +11,6 @@ function hideLoading(error) {
     app.map.showZoomSlider();
 }
 
-
-
 define([
     "esri/symbols/Font",
     "extras/MH_Zoom2FeatureLayers",
@@ -38,6 +36,7 @@ define([
     "esri/symbols/SimpleFillSymbol",
     "esri/symbols/SimpleLineSymbol",
     "dijit/form/CheckBox",
+   "esri/dijit/Legend",
     "dijit/Toolbar",
       "esri/Color",
         "esri/layers/LabelLayer",
@@ -58,7 +57,7 @@ define([
             Font, MH_Zoom2FeatureLayers, BasemapGallery, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
         SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
-        CheckBox, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
+        CheckBox, Legend, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
           InfoWindowLite,
           InfoTemplate,
           FeatureLayer,
@@ -95,6 +94,57 @@ define([
             featureLayer.setRenderer(renderer);
             app.map.addLayer(featureLayer);
             app.map.reorderLayer(featureLayer, 5);
+        },
+
+        LayerCheckBoxSetup: function (cbxLayers) {
+            dojo.connect(app.map, 'onLayersAddResult', function (results) {            //add check boxes 
+                if (results !== 'undefined') {
+                    var des = document.getElementById('toggleLayers');
+
+                    dojo.forEach(cbxLayers, function (playerset) {
+                        var strLayerName = playerset.title;
+                        var clayer0 = playerset.layers[0];
+                        var clayer1 = playerset.layers[1];
+                        var pID0 = clayer0.id;
+                        var pID1 = clayer1.id;
+
+                        var blnCheckIt = false;  // determine if checkbox will be on/off
+                        if (clayer0.visible) {
+                            blnCheckIt = true;
+                        }
+                        
+                        var checkboxHTML = document.createElement('input');
+                        checkboxHTML.type = "checkbox";
+                        checkboxHTML.name = strLayerName;
+                        checkboxHTML.value = [clayer0, clayer1];
+                        checkboxHTML.id = pID0 + pID1;
+
+                        if (blnCheckIt) {
+                            checkboxHTML.setAttribute("checked");
+                        }
+                        
+                        checkboxHTML.onchange = function (evt) {
+                            if (clayer0.visible) {
+                                clayer0.hide();
+                                clayer1.hide();
+                            } else {
+                                clayer0.show();
+                                clayer1.show();
+                            }
+                            this.checked = clayer0.visible;
+                        }
+                      
+                        var label = document.createElement('label')
+                        label.htmlFor = pID0 + pID1;
+                        label.appendChild(document.createTextNode(strLayerName));
+
+                        des.appendChild(checkboxHTML);
+                        des.appendChild(document.createTextNode('\u00A0'))
+                        des.appendChild(label);
+                        des.appendChild(document.createTextNode('\u00A0\u00A0\u00A0\u00A0'))
+                    });
+                }
+            });
         },
 
 
@@ -159,23 +209,15 @@ define([
             template.setContent("Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
             pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
-            //var defaultLineSymbol = new SimpleFillSymbol().setStyle(SimpleLineSymbol.STYLE_SOLID);
-            //defaultLineSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
-            //var rendererEPOINT = new UniqueValueRenderer(defaultLineSymbol, "Start_End");
-            //var slsStart = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color([100, 204, 102]), 12);
-            //var slsEnd = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DOT, new Color([255, 0, 0]), 17);
-            //rendererEPOINT.addValue("Start", slsStart);
-            //rendererEPOINT.addValue("End", slsEnd);
             var templateEPOINT = new InfoTemplate();
             templateEPOINT.setTitle("<b>${Endpoint_Name}</b>");
             templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
-
+                        
             if (typeof app.H2O_ID != 'undefined') {
                 pEPointsFeatureLayer.setDefinitionExpression("Watershed_Name = '" + app.H2O_ID + "'");
             }
 
-            //pEPointsFeatureLayer.setRenderer(rendererEPOINT);
             var templateSSection = new InfoTemplate();
             templateSSection.setTitle("<b>Section:${SectionID}</b>");
             templateSSection.setContent("<b>Watershed:</b> ${Watershed}<br><b>Stream:</b> ${StreamName}<br><b>CFS Prep for Conserv:</b> ${CFS_Prep4Conserv}<br><b>Prep for Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Conserv:</b> ${CFS_Conserv}<br><b>Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Un-Official Closure:</b> ${CFS_Conserv}<br><b>Un-Official Closure Desc:</b> ${CFS_Note_NotOfficialClosure}<br><b>Conservation Temp:</b> ${ConsvTemp}");
@@ -190,20 +232,40 @@ define([
             templateFAS.setTitle("<b>${NAME} MT FAS (Fishing Access Site)</b>");
             templateFAS.setContent("${BOAT_FAC}<br><a href=${WEB_PAGE} target='_blank'>Link to Fish Access Site</a>");
             pFASFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFAS, "opacity": 0.3, outFields: ['*'] });
+                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFAS, "opacity": 0.5, outFields: ['*'], visible: false });
+            var vDarkGreyColor = new Color("#3F3F40");              // create a text symbol to define the style of labels
+            var pLabelFAS = new TextSymbol().setColor(vDarkGreyColor);
+            pLabelFAS.font.setSize("9pt");
+            pLabelFAS.font.setFamily("arial");
+            var pLabelRendererFAS = new SimpleRenderer(pLabelFAS);
+            var pLabelsFAS = new LabelLayer({ id: "LabelsFAS" });
+            pLabelsFAS.addFeatureLayer(pFASFeatureLayer, pLabelRendererFAS, "{NAME}");
+            if (typeof app.H2O_ID != 'undefined') {
+                pFASFeatureLayer.visible = true;
+            }
+
             
             var templateBLM = new InfoTemplate();
             templateBLM.setTitle("<b>${Facility_Name} BLM Facility</b>");
             templateBLM.setContent("<a href=${URL} target='_blank'>Link to BLM Facility</a>");
             pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, "opacity": 0.6, outFields: ['*'] });
+                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, outFields: ['*'], visible: false });
+            var pLabelBLM = new TextSymbol().setColor(vDarkGreyColor);
+            pLabelBLM.font.setSize("9pt");
+            pLabelBLM.font.setFamily("arial");
+            var pLabelRendererBLM = new SimpleRenderer(pLabelBLM);
+            var pLabelsBLM = new LabelLayer({ id: "LabelsBLM" });
+            pLabelsBLM.addFeatureLayer(pBLMFeatureLayer, pLabelRendererBLM, "{Facility_Name}");
+            if (typeof app.H2O_ID != 'undefined') {
+                pBLMFeatureLayer.visible = true;
+            }
 
             var templateFWP = new InfoTemplate();
             templateFWP.setTitle("<b>${TITLE}</b>");
             templateFWP.setContent("${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
             pFWPFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0",
-            { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'] });
-            
+                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'] });
+
             pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, outFields: ['*'] });
 
 
@@ -262,11 +324,44 @@ define([
             plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
             plabels3.minScale = 1500000;
 
-            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pSectionsFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1, plabels3]);
+            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pSectionsFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1, plabels3, pLabelsFAS, pLabelsBLM]);
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 0.5;
+
+
+
+            var legendLayers = [];
+            legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
+            legendLayers.push({ layer: pFASFeatureLayer, title: 'FWP Fish Access Sites' });
+            legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locaitons' });
+            legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
+
+            dojo.connect(app.map, 'onLayersAddResult', function (results) {
+                var legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
+                legend.startup();
+            });
+            
+
+
+            var cbxLayers = [];
+            cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
+            //cbxLayers.push({ layers: [pWatershedsFeatureLayer, plabels1], title: 'Watersheds' });
+            //cbxLayers.push({ layers: [pSectionsFeatureLayer, plabels3], title: 'Sections' });
+            //cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Closures' });
+            cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'FWP Fish Access Sites' });
+            cbxLayers.push({ layers: [pEPointsFeatureLayer, pEPointsFeatureLayer], title: 'Start/End Section Locaitons' });
+            cbxLayers.push({ layers: [pGageFeatureLayer, pGageFeatureLayer], title: 'Gages' });
+
+            this.LayerCheckBoxSetup(cbxLayers);
+
+            //$(document).ready(function () {
+            //    $('#btnExpandLegend').click(function () {
+            //        $('#wrapper').toggleClass('open').slideToggle(200);
+            //    });
+            //});
+
 
             ko.bindingHandlers.googleBarChart = {
                 init: function (element, valueAccessor, allBindingsAccesor, viewModel, bindingContext) {

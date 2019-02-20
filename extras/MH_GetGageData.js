@@ -26,7 +26,7 @@ function ProcLinearRegression(arrray_Detail4Interpolation, strValueKey) {
 
     islope = lr.slope;
     if ((islope < 0.000001) & (islope > -0.000001)) {
-        str3DayCFSTrend = "images/flat2.png";
+        str3DayCFSTrend = "images/flatline.png";
     } else if (islope > 0) {
         str3DayCFSTrend = "images/up.png";
     } else {
@@ -850,8 +850,10 @@ define([
                         }
 
                         if (itemFound.length > 0) {
-
                             var item = itemFound[0];
+                            strSiteName = item.sourceInfo.siteName;
+                        }
+
                             var strNoDataLabel4Charting = "";
                             if (dblLatestCFS == -999999) {
                                 dblLatestCFS = "Not Available"
@@ -876,7 +878,7 @@ define([
                                 }
                             }
 
-                            strSiteName = item.sourceInfo.siteName;
+                            
 
                             if (dblLatestTMP == -999999) {
                                 dblLatestTMP = "Not Available"
@@ -915,7 +917,7 @@ define([
                                     strDailyStat_URL, str3DayCFSTrendTMP
                                 ]);
                             }
-                        }
+                        //}
 
 
                         var blnAddNew = false;

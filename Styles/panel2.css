@@ -29,6 +29,23 @@
             max-height: 1200px;
         }
 
+
+
+    #block_container
+    {
+        text-align:left;
+        vertical-align:bottom;
+        /*position:relative;
+        right:5px; 
+        bottom:50px; 
+        width:250px; 
+        z-Index:999;*/
+    }
+    /*#basemapGallery, #toggleLayers
+    {
+        display:inline;
+    }*/
+
 /* Classes */
 .bg {
 	display: block;

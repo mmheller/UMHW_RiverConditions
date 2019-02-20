@@ -61,6 +61,10 @@
         .esriBasemapGalleryNode {
             width: 40px;
         }
+
+      .esriLegendLayer tr{  
+        float:left;  
+      }  
     </style>
 </head>
 
@@ -155,27 +159,26 @@
                 <div id="search"></div>
                 <input id="btn_query_QS" type="button" value="Run Search/Filter" style="visibility: hidden;" />
             </div>
-            <div class="col-md-9" style="padding-right: 1px" >
-                <h2>DRAFT/Unofficial Map</h2>
+            <div class="col-md-9" style="padding-top:20px; padding-right: 1px" >
                 <div id="mapDiv"></div>
                 <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
 
-                <div style="position:relative; right:5px; bottom:50px; width:250px; z-Index:999;">
+                <div id="block_container" style="position:relative; right:5px; bottom:50px; width:3250px; z-Index:999; text-align:left">
                     <div id="basemapGallery"></div>
+
                 </div>
 
-                <div id="txt_xyCoords" style="position:relative; left:185px; bottom:65px; color:#404040; width:200px; font-size:11px"></div>
+                <div id="txt_xyCoords" style="position:relative; left:185px; bottom:65px; color:#404040; width:200px; font-size:11px">Latitude: -, Longitude: -</div>
                 <span id="scaleDiv" style="position:relative; left:185px; bottom:110px; width:250px; font-size:11px"></span>
 
-                <div class="row">
-                    <div class="col-xs-4">
-                        <h5>Legend</h5>
-                        <p>content</p>
-                        <p>content</p>
-                        <p>content</p>
+                <div class="row" id="toggleLayers" style="position:relative; bottom:60px; left:25px; font-size:12px">
+                    <div class="col-md-12">
                     </div>
-                    <p>This map will be updated soon.. </p>
-                    <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+                </div>
+
+                <div class="row">
+                            <h5>Legend</h5>
+                            <div id="legendDiv"  style="width:100%; padding: 2px 2px;"></div>
                 </div>
 
                 <div id="divSectionDetail" style="display:none;">
@@ -222,6 +225,9 @@
                 </div>
             </div>
         </div>
+
+
+
         <hr>
         <footer>
             <p>&copy; 2016 Company, Inc.</p>
