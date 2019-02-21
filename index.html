@@ -61,10 +61,32 @@
         .esriBasemapGalleryNode {
             width: 40px;
         }
+        
+        .esriLegendService {    /*between GIS layers*/
+	        padding-bottom: 5px;
+        }
+        .esriLegendServiceLabel {
+	        font-weight:bold;
+        }
+        .esriLegendLayerLabel {
+	        padding-top: 15px;
+        }
+        
+        .esriLegendLayer tr{   /*the row with all the symbols*/
+            float:left;
+            white-space: nowrap;
+            border: none;
+            border-width: 0px 0;
+        }
 
-      .esriLegendLayer tr{  
-        float:left;  
-      }  
+        .esriLegendLayer {
+            background-color: #BBD1E8;
+        }
+
+        .esriLegendLayer   tbody {   /*the table with all the symbols for a GIS layer*/
+            height: 80%;
+            overflow: hidden;
+        }
     </style>
 </head>
 
@@ -163,7 +185,7 @@
                 <div id="mapDiv"></div>
                 <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
 
-                <div id="block_container" style="position:relative; right:5px; bottom:50px; width:3250px; z-Index:999; text-align:left">
+                <div id="block_container" style="position:relative; right:5px; bottom:50px; width:300px; z-Index:999; text-align:left">
                     <div id="basemapGallery"></div>
 
                 </div>
@@ -176,12 +198,15 @@
                     </div>
                 </div>
 
-                <div class="row">
-                            <h5>Legend</h5>
-                            <div id="legendDiv"  style="width:100%; padding: 2px 2px;"></div>
+                <button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; bottom:55px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>
+                <div id="demo" class="collapse  in"  style="position:relative; left:25px; bottom:55px;">
+                    <h2>Map Legend</h2>
+                    <div id="legendDiv" style="width:100%; padding: 2px 2px;"></div>
                 </div>
 
-                <div id="divSectionDetail" style="display:none;">
+
+                <div id="divSectionDetail" style="display:none; position:relative; bottom:60px; left:25px;">
+                    <h2>Section Detail</h2>
                     <div style="margin: 15px 0 0 0;">
                         <div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
                         <div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
@@ -211,7 +236,7 @@
                     </div>
                 </div>
 
-
+                <h2  style="position:relative; bottom:30px; left:25px;">Flow and Temperature Charts</h2>
                 <div id="ViewModel2CFSBinding_div">
                     <div id="ViewModel2CFS_line_div" data-bind="googleBarChart: new ViewModel2CFS_LineData, chartOptions: {interpolateNulls: true,
                              legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">

@@ -118,10 +118,11 @@ define([
                         checkboxHTML.name = strLayerName;
                         checkboxHTML.value = [clayer0, clayer1];
                         checkboxHTML.id = pID0 + pID1;
+                        checkboxHTML.checked = blnCheckIt;
 
-                        if (blnCheckIt) {
-                            checkboxHTML.setAttribute("checked");
-                        }
+                        //if (blnCheckIt) {
+                        //    checkboxHTML.setAttribute("checked");
+                        //}
                         
                         checkboxHTML.onchange = function (evt) {
                             if (clayer0.visible) {
@@ -202,7 +203,8 @@ define([
             dojo.connect(app.map, "onUpdateStart", showLoading);
             dojo.connect(app.map, "onUpdateEnd", hideLoading);
 
-            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
+            //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
+            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
 
             var template = new InfoTemplate();
             template.setTitle("<b>${GageTitle}</b>");
@@ -240,9 +242,9 @@ define([
             var pLabelRendererFAS = new SimpleRenderer(pLabelFAS);
             var pLabelsFAS = new LabelLayer({ id: "LabelsFAS" });
             pLabelsFAS.addFeatureLayer(pFASFeatureLayer, pLabelRendererFAS, "{NAME}");
-            if (typeof app.H2O_ID != 'undefined') {
-                pFASFeatureLayer.visible = true;
-            }
+            //if (typeof app.H2O_ID != 'undefined') {
+            //    pFASFeatureLayer.visible = true;
+            //}
 
             
             var templateBLM = new InfoTemplate();
@@ -256,10 +258,28 @@ define([
             var pLabelRendererBLM = new SimpleRenderer(pLabelBLM);
             var pLabelsBLM = new LabelLayer({ id: "LabelsBLM" });
             pLabelsBLM.addFeatureLayer(pBLMFeatureLayer, pLabelRendererBLM, "{Facility_Name}");
-            if (typeof app.H2O_ID != 'undefined') {
-                pBLMFeatureLayer.visible = true;
-            }
+            //if (typeof app.H2O_ID != 'undefined') {
+            //    pBLMFeatureLayer.visible = true;
+            //}
 
+
+            var templateSNOTEL = new InfoTemplate();
+            templateSNOTEL.setTitle("<b>${Name} SNOTEL Site</b>");
+
+            var strSNOTELGraphURL = "https://wcc.sc.egov.usda.gov/nwcc/view?intervalType=+View+Current+&report=WYGRAPH&timeseries=Daily&format=plot&sitenum=${stationID}&interval=WATERYEAR";
+            templateSNOTEL.setContent("<a href=${SitePageURL} target='_blank'>Link to SNOTEL Site Page</a>, <a href=" + strSNOTELGraphURL + " target='_blank'>Link to SWE Current/Historical Graphs</a> ");
+            pSNOTELFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8",
+                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSNOTEL, outFields: ['*'], visible: false });
+            var pLabelSNOTEL = new TextSymbol().setColor(vDarkGreyColor);
+            pLabelSNOTEL.font.setSize("9pt");
+            pLabelSNOTEL.font.setFamily("arial");
+            var pLabelRendererSNOTEL = new SimpleRenderer(pLabelSNOTEL);
+            var pLabelsSNOTEL = new LabelLayer({ id: "LabelsSNOTEL" });
+            pLabelsSNOTEL.addFeatureLayer(pSNOTELFeatureLayer, pLabelRendererSNOTEL, "{Name}");
+            //if (typeof app.H2O_ID != 'undefined') {
+            //    pSNOTELFeatureLayer.visible = true;
+            //}
+            
             var templateFWP = new InfoTemplate();
             templateFWP.setTitle("<b>${TITLE}</b>");
             templateFWP.setContent("${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
@@ -324,7 +344,9 @@ define([
             plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
             plabels3.minScale = 1500000;
 
-            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pSectionsFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer, plabels1, plabels3, pLabelsFAS, pLabelsBLM]);
+            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer,
+                               pSectionsFeatureLayer,pSNOTELFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer,
+                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL]);
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
@@ -333,8 +355,9 @@ define([
 
 
             var legendLayers = [];
-            legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
+            legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
             legendLayers.push({ layer: pFASFeatureLayer, title: 'FWP Fish Access Sites' });
+            legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
             legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locaitons' });
             legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
 
@@ -342,17 +365,16 @@ define([
                 var legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
                 legend.startup();
             });
-            
-
 
             var cbxLayers = [];
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
             //cbxLayers.push({ layers: [pWatershedsFeatureLayer, plabels1], title: 'Watersheds' });
             //cbxLayers.push({ layers: [pSectionsFeatureLayer, plabels3], title: 'Sections' });
             //cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Closures' });
-            cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'FWP Fish Access Sites' });
-            cbxLayers.push({ layers: [pEPointsFeatureLayer, pEPointsFeatureLayer], title: 'Start/End Section Locaitons' });
-            cbxLayers.push({ layers: [pGageFeatureLayer, pGageFeatureLayer], title: 'Gages' });
+            cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
+            //cbxLayers.push({ layers: [pEPointsFeatureLayer, pEPointsFeatureLayer], title: 'Start/End Section Locaitons' });
+            //cbxLayers.push({ layers: [pGageFeatureLayer, pGageFeatureLayer], title: 'Gages' });
+            cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
 
             this.LayerCheckBoxSetup(cbxLayers);
 
