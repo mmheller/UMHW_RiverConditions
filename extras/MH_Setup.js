@@ -23,6 +23,7 @@ define([
     "dojo/promise/all",
     "esri/urlUtils",
     "esri/layers/FeatureLayer",
+            "esri/tasks/QueryTask",
     "esri/tasks/query",
     "dojo/promise/all",
     "esri/dijit/Scalebar",
@@ -54,7 +55,7 @@ define([
         "dojo/dom-construct","application/bootstrapmap",
         "dojo/domReady!"
 ], function (
-            Font, MH_Zoom2FeatureLayers, BasemapGallery, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, Query, All,
+            Font, MH_Zoom2FeatureLayers, BasemapGallery, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, QueryTask, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
         SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
         CheckBox, Legend, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
@@ -94,6 +95,50 @@ define([
             featureLayer.setRenderer(renderer);
             app.map.addLayer(featureLayer);
             app.map.reorderLayer(featureLayer, 5);
+        },
+
+        GetSetHeaderWarningContent: function (strAGSIndexTableURL, strH2OID) {
+            if (typeof strH2OID == 'undefined') {
+                strH2OID = "UMH";
+            } 
+            strURLFieldName = "URL";
+            var query = new Query();
+            query.outFields = [strURLFieldName];
+            var queryTask = new QueryTask(strAGSIndexTableURL);
+            query.where = "Name = '" + strH2OID + "'";
+            queryTask.execute(query, showHeaderWarningContentResults);
+
+            function showHeaderWarningContentResults(results) {
+                var resultItems = [];
+                var resultCount = results.features.length;
+                for (var i = 0; i < resultCount; i++) {
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1XRCddd5ique14uehRT7_vc0NyDCsX3AaTBfIN3H6WaI/od6/public/values?alt=json"; //Big Hole
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1eNqK5IJwYV_IrM4nkBQEsRZNJpq8N5WKURq4WLlDJPQ/od6/public/values?alt=json"; //Ruby
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1NFyQSYDrz_oAr1iaeeq1hQ-qQz_0pH-HRlPTki8gS98/od6/public/values?alt=json"; //Madison
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1AWYzsCbDWiECdp5nlkeDsYLvLqFE3mxmE8nFRYrCr4Y/od6/public/values?alt=json"; //Jefferson
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1ZZwKOVI21fE4JVsIFl9joGH2P5Ar8LeUPkZejU7Yjbw/od6/public/values?alt=json"; //Lower Gallatin
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1Z3FUxfeoGwwJjAmrFMP6XWwGsSeY8Q8cMle1E8AR8uQ/od6/public/values?alt=json"; //Upper Gallatin
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1YDX26MA0QZt9-JH-ce6fIfVgtJ1qq7J69nMdonbCKsU/od6/public/values?alt=json"; //Beaverhead Centennial
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/15LfAJ5j-KPdFCf7nQwQVsQqCHB6Z2J8DWOLDQ0jP7GY/od6/public/values?alt=json"; //Broadwater
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1u3ebvjxKxH51bczxAL4gwwlMVVxbL5P826XXTJRssoM/od6/public/values?alt=json"; //Boulder
+                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1ibafkWLqfBNoOSaMoB_u4UXAOntqVFI9u9MWK66mncY/od6/public/values?alt=json"; //UMH
+                    var featureAttributes = results.features[i].attributes;
+                    var strGoogleSheetURL = featureAttributes[strURLFieldName]
+                }
+
+                $.get(strGoogleSheetURL)
+                                   .done(function (jsonResult) {
+                                       if (jsonResult.feed != undefined) {
+                                           var strHeaderTxt = "";
+                                           var strAlertTxt = "";
+                                           var pEntries = jsonResult.feed.entry;
+                                           strHeaderTxt = pEntries[0].gsx$header.$t
+                                           strAlertTxt = pEntries[0].gsx$customalert.$t
+                                           $("#divWatershedBasinInfoTop").html(strHeaderTxt);
+                                           $("#divCustomAlert").html(strAlertTxt);
+                                       }
+                                   });
+            }
         },
 
         LayerCheckBoxSetup: function (cbxLayers) {
@@ -206,6 +251,8 @@ define([
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
 
+            this.GetSetHeaderWarningContent(app.strHFL_URL + "9", app.H2O_ID);
+
             var template = new InfoTemplate();
             template.setTitle("<b>${GageTitle}</b>");
             template.setContent("Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
@@ -217,7 +264,7 @@ define([
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
                         
             if (typeof app.H2O_ID != 'undefined') {
-                pEPointsFeatureLayer.setDefinitionExpression("Watershed_Name = '" + app.H2O_ID + "'");
+                pEPointsFeatureLayer.setDefinitionExpression("Watershed_Name = '" + app.H2O_ID + "'" + OR + " WatershedName_Alt1 = '" + app.H2O_ID + "'" + OR + " WatershedName_Alt2 = '" + app.H2O_ID + "'");
             }
 
             var templateSSection = new InfoTemplate();
@@ -225,7 +272,7 @@ define([
             templateSSection.setContent("<b>Watershed:</b> ${Watershed}<br><b>Stream:</b> ${StreamName}<br><b>CFS Prep for Conserv:</b> ${CFS_Prep4Conserv}<br><b>Prep for Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Conserv:</b> ${CFS_Conserv}<br><b>Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Un-Official Closure:</b> ${CFS_Conserv}<br><b>Un-Official Closure Desc:</b> ${CFS_Note_NotOfficialClosure}<br><b>Conservation Temp:</b> ${ConsvTemp}");
             pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSSection, "opacity": 0.9, outFields: ['*'] });
             if (typeof app.H2O_ID != 'undefined') {
-                pSectionsFeatureLayer.setDefinitionExpression("Watershed = '" + app.H2O_ID + "'");
+                pSectionsFeatureLayer.setDefinitionExpression("Watershed = '" + app.H2O_ID + "'" + OR + " WatershedName_Alt1 = '" + app.H2O_ID + "'" + OR + " WatershedName_Alt2 = '" + app.H2O_ID + "'");
             }
 
             pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
@@ -297,7 +344,7 @@ define([
             var strlabelField1 = "Name";
             pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
             if (typeof app.H2O_ID != 'undefined') {
-                pWatershedsFeatureLayer.setDefinitionExpression("Name = '" + app.H2O_ID + "'");
+                pWatershedsFeatureLayer.setDefinitionExpression("Name = '" + app.H2O_ID + "'" + OR + " Name_Alternate1 = '" + app.H2O_ID + "'" + OR + " Name_Alternate2 = '" + app.H2O_ID + "'");
             } else {
                 pWatershedsFeatureLayer.setDefinitionExpression("Name in ('Beaverhead','Broadwater','Ruby','Big Hole','Jefferson','Boulder','Madison','Gallatin')");
             }
@@ -311,7 +358,7 @@ define([
             //var strlabelField1 = "Name";
             pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
             if (typeof app.H2O_ID != 'undefined') {
-                pWatershedsMaskFeatureLayer.setDefinitionExpression("Name <> '" + app.H2O_ID + "'");
+                pWatershedsMaskFeatureLayer.setDefinitionExpression("Name <> '" + app.H2O_ID + "'" + OR + " Name_Alternate1 <> '" + app.H2O_ID + "'" + OR + " Name_Alternate2 <> '" + app.H2O_ID + "'");
             } else {
                 pWatershedsMaskFeatureLayer.setDefinitionExpression("Name in ('')");
             }
@@ -377,14 +424,6 @@ define([
             cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
 
             this.LayerCheckBoxSetup(cbxLayers);
-
-            //$(document).ready(function () {
-            //    $('#btnExpandLegend').click(function () {
-            //        $('#wrapper').toggleClass('open').slideToggle(200);
-            //    });
-            //});
-
-
             ko.bindingHandlers.googleBarChart = {
                 init: function (element, valueAccessor, allBindingsAccesor, viewModel, bindingContext) {
                     var chart = new google.visualization.LineChart(element);

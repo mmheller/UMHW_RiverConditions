@@ -489,7 +489,7 @@ define([
                 }
 
                 if (app.pGage.m_arrray_Detail4ChartHistoryCFS.length > 0) {
-                    data.addColumn('number', "Historical CFS");
+                    data.addColumn('number', "Historical Daily Mean");
                 }
 
                 data.addRows(arrayPrelimData_3);
