@@ -11,6 +11,20 @@ function hideLoading(error) {
     app.map.showZoomSlider();
 }
 
+function getTokens() {
+    var tokens = [];
+    var query = location.search;
+    query = query.slice(1);
+    query = query.split('&');
+    $.each(query, function (i, value) {
+        var token = value.split('=');
+        var key = decodeURIComponent(token[0]);
+        var data = decodeURIComponent(token[1]);
+        tokens[key] = data;
+    });
+    return tokens;
+}
+
 define([
     "esri/symbols/Font",
     "extras/MH_Zoom2FeatureLayers",
@@ -112,19 +126,11 @@ define([
                 var resultItems = [];
                 var resultCount = results.features.length;
                 for (var i = 0; i < resultCount; i++) {
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1XRCddd5ique14uehRT7_vc0NyDCsX3AaTBfIN3H6WaI/od6/public/values?alt=json"; //Big Hole
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1eNqK5IJwYV_IrM4nkBQEsRZNJpq8N5WKURq4WLlDJPQ/od6/public/values?alt=json"; //Ruby
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1NFyQSYDrz_oAr1iaeeq1hQ-qQz_0pH-HRlPTki8gS98/od6/public/values?alt=json"; //Madison
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1AWYzsCbDWiECdp5nlkeDsYLvLqFE3mxmE8nFRYrCr4Y/od6/public/values?alt=json"; //Jefferson
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1ZZwKOVI21fE4JVsIFl9joGH2P5Ar8LeUPkZejU7Yjbw/od6/public/values?alt=json"; //Lower Gallatin
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1Z3FUxfeoGwwJjAmrFMP6XWwGsSeY8Q8cMle1E8AR8uQ/od6/public/values?alt=json"; //Upper Gallatin
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1YDX26MA0QZt9-JH-ce6fIfVgtJ1qq7J69nMdonbCKsU/od6/public/values?alt=json"; //Beaverhead Centennial
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/15LfAJ5j-KPdFCf7nQwQVsQqCHB6Z2J8DWOLDQ0jP7GY/od6/public/values?alt=json"; //Broadwater
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1u3ebvjxKxH51bczxAL4gwwlMVVxbL5P826XXTJRssoM/od6/public/values?alt=json"; //Boulder
-                    //var strGoogleSheetURL = "https://spreadsheets.google.com/feeds/list/1ibafkWLqfBNoOSaMoB_u4UXAOntqVFI9u9MWK66mncY/od6/public/values?alt=json"; //UMH
                     var featureAttributes = results.features[i].attributes;
                     var strGoogleSheetURL = featureAttributes[strURLFieldName]
                 }
+
+                //strGoogleSheetURL = "junk";
 
                 $.get(strGoogleSheetURL)
                                    .done(function (jsonResult) {
@@ -137,6 +143,9 @@ define([
                                            $("#divWatershedBasinInfoTop").html(strHeaderTxt);
                                            $("#divCustomAlert").html(strAlertTxt);
                                        }
+                                   })
+                                   .always(function (data) {
+                                       app.pSup.Phase2();  //starting up the map and other content becuase the header content can mess up the content dimiensions if done prior
                                    });
             }
         },
@@ -193,9 +202,17 @@ define([
             });
         },
 
-
         Phase1: function () {
             app.H2O_ID = getTokens()['H2O_ID'];
+
+            //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
+            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
+            
+            this.GetSetHeaderWarningContent(app.strHFL_URL + "9", app.H2O_ID);
+        },
+
+        Phase2: function () {
+
             if (typeof app.H2O_ID != 'undefined') {
                 var arrayCenterZoom = [-112.0163, 46.5857];
                 var izoomVal = 10;
@@ -247,11 +264,6 @@ define([
             app.loading = dojo.byId("loadingImg");  //loading image. id
             dojo.connect(app.map, "onUpdateStart", showLoading);
             dojo.connect(app.map, "onUpdateEnd", hideLoading);
-
-            //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
-            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
-
-            this.GetSetHeaderWarningContent(app.strHFL_URL + "9", app.H2O_ID);
 
             var template = new InfoTemplate();
             template.setTitle("<b>${GageTitle}</b>");
@@ -542,19 +554,7 @@ define([
                 dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + ", Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
             }
 
-            function getTokens() {
-                var tokens = [];
-                var query = location.search;
-                query = query.slice(1);
-                query = query.split('&');
-                $.each(query, function (i, value) {
-                    var token = value.split('=');
-                    var key = decodeURIComponent(token[0]);
-                    var data = decodeURIComponent(token[1]);
-                    tokens[key] = data;
-                });
-                return tokens;
-            }
+
        
         },
 

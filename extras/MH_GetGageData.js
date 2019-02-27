@@ -561,11 +561,12 @@ define([
             this.dteEndDay2Check = dteEndDay2Check;
 
             if (typeof app.H2O_ID == "undefined") {
-                strQuery = "OBJECTID >= 0";
+                 strQuery = "OBJECTID >= 0";
             } else {
-                strQuery = "Watershed = '" + app.H2O_ID + "'";
+                //strQuery = "Watershed = '" + app.H2O_ID + "'";
+                strQuery = "Watershed = '" + app.H2O_ID + "'" + " OR " + " WatershedName_Alt1 = '" + app.H2O_ID + "'" + " OR " + " WatershedName_Alt2 = '" + app.H2O_ID + "'";
             }
-            this.getArray2Process(app.strHFL_URL, strQuery);         
+            this.getArray2Process(app.strHFL_URL, strQuery);
         },
 
         GraphSingleSEction: function (strStreamName, iSectionID, strSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTMPTarget1) {
