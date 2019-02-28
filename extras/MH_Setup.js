@@ -111,7 +111,7 @@ define([
             app.map.reorderLayer(featureLayer, 5);
         },
 
-        GetSetHeaderWarningContent: function (strAGSIndexTableURL, strH2OID) {
+        GetSetHeaderWarningContent: function (strAGSIndexTableURL, strH2OID, blnUseAlternateHeader) {
             if (typeof strH2OID == 'undefined') {
                 strH2OID = "UMH";
             } 
@@ -130,15 +130,19 @@ define([
                     var strGoogleSheetURL = featureAttributes[strURLFieldName]
                 }
 
-                //strGoogleSheetURL = "junk";
-
                 $.get(strGoogleSheetURL)
                                    .done(function (jsonResult) {
                                        if (jsonResult.feed != undefined) {
                                            var strHeaderTxt = "";
                                            var strAlertTxt = "";
                                            var pEntries = jsonResult.feed.entry;
-                                           strHeaderTxt = pEntries[0].gsx$header.$t
+
+                                           if (blnUseAlternateHeader) {
+                                               strHeaderTxt = pEntries[0].gsx$headeralt.$t
+                                           } else {
+                                               strHeaderTxt = pEntries[0].gsx$header.$t
+                                           }
+
                                            strAlertTxt = pEntries[0].gsx$customalert.$t
                                            $("#divWatershedBasinInfoTop").html(strHeaderTxt);
                                            $("#divCustomAlert").html(strAlertTxt);
@@ -203,12 +207,39 @@ define([
         },
 
         Phase1: function () {
+            var arrayNavList = [["Ruby", "Ruby"], ["Madison", "Madison"], ["Upper-Gallatin", "Upper Gallatin"],
+                                ["Gallatin-Lower", "Lower Gallatin"], ["Jefferson", "Jefferson"], ["Broadwater", "Broadwater"],
+                                ["Boulder", "Boulder"], ["Big Hole", "Big Hole"], ["Beaverhead/Centennial", "Beaverhead"]
+            ];
+            var strURLPrefix = "../index.html?H2O_ID=";
+            var strURLSuffix = "";
+
             app.H2O_ID = getTokens()['H2O_ID'];
+            var strHeadertextArgument = getTokens()['UseAlternateHeader'];
+            var blnUseAlternateHeader = false;
+            if (strHeadertextArgument != undefined){
+                if (strHeadertextArgument.toUpperCase() == "TRUE") {
+                    blnUseAlternateHeader = true;
+                    strURLSuffix = "&UseAlternateHeader=TRUE";
+                }
+            }
+
+            var ulist = document.getElementById("navList");  //build the naviation options in the header nav bar
+            for (var i = 0; i < arrayNavList.length; i++) {
+                var a = document.createElement("a");
+                var newItem = document.createElement("li");
+
+                a.textContent = arrayNavList[i][0];
+                a.setAttribute('role', "presentation");
+                a.setAttribute('href', strURLPrefix + arrayNavList[i][1] + strURLSuffix);
+                newItem.appendChild(a);
+                ulist.appendChild(newItem);
+            }
 
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
             
-            this.GetSetHeaderWarningContent(app.strHFL_URL + "9", app.H2O_ID);
+            this.GetSetHeaderWarningContent(app.strHFL_URL + "9", app.H2O_ID, blnUseAlternateHeader);
         },
 
         Phase2: function () {
@@ -402,6 +433,20 @@ define([
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 0.5;
+
+
+
+
+            var dteDateTime = new Date();
+            var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
+            var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
+            var dteDateTimeMinus3 = new Date();
+            dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
+            var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
+            var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
+
+            document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
+            app.pGage.Start(strDateTimeMinus3, strDateTime);
 
 
 

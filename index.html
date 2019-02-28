@@ -39,7 +39,6 @@
     <link rel="stylesheet" href="Styles/tablelist.css" type="text/css" />
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.13/esri/css/esri.css">
-    <!--<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.13/esri/css/esri.css">-->
     <link rel="stylesheet" type="text/css" href="https://esri.github.io/bootstrap-map-js/src/css/bootstrapmap.css">
     <style>
         #mapDiv { /* Set the responsive map size here */
@@ -87,6 +86,8 @@
             height: 80%;
             overflow: hidden;
         }
+
+
     </style>
 </head>
 
@@ -104,7 +105,12 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <form class="navbar-form navbar-right">
-                    <div id="block_container" style="color:white; ">
+
+                    <ul id="navList" class="nav nav-pills pull-right">
+                    </ul>
+
+
+                    <!--<div id="block_container" style="color:white; ">
                         <div id="bloc1"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Beaverhead" style="color:white" target="_self">Beaverhead/Centennial</a></div> |
                         <div id="bloc8"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Big Hole" style="color:white"  target="_self">Big Hole</a></div> |
                         <div id="bloc3"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Boulder" style="color:white"  target="_self">Boulder</a></div> |
@@ -114,8 +120,8 @@
                         <div id="bloc4"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Upper Gallatin" style="color:white" target="_self">Gallatin-Upper</a></div> |
                         <div id="bloc6"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Madison" style="color:white"  target="_self">Madison</a></div> |
                         <div id="bloc7"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Ruby" style="color:white"  target="_self">Ruby</a></div>
-                        
-                    </div>
+                    </div>-->
+                </form>
             </div><!--/.navbar-collapse -->
         </div>
     </nav>
@@ -282,22 +288,23 @@
 
             app.pGage = new MH_GetGageData({}); // instantiate the class
 
-            var dteDateTime = new Date();
-            var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
-            var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
+            //var dteDateTime = new Date();
+            //var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
+            //var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
 
-            var dteDateTimeMinus3 = new Date();
-            dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
-            var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
-            var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
+            //var dteDateTimeMinus3 = new Date();
+            //dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
+            //var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
+            //var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
 
-            document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
+            //document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
 
-            app.pGage.Start(strDateTimeMinus3, strDateTime);
-       
-            });
+            //app.pGage.Start(strDateTimeMinus3, strDateTime);
+        });
     </script>
 
 </body>
 
 </html>
+
+

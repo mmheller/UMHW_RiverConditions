@@ -18,3 +18,8 @@ body {
     display:inline;
 }
 
+
+a:link,a:visited {
+    color: white;
+    padding: 5px 5px !important;
+} 
