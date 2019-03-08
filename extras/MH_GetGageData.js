@@ -84,6 +84,7 @@ function sortFunction(a, b) {
 define([
         "esri/tasks/QueryTask",
         "esri/tasks/query",
+        "esri/geometry/Polyline",
   "dojo/_base/declare",
   "dojo/_base/lang",
   "esri/request",
@@ -96,7 +97,7 @@ define([
   "dojo/on",
 
 ], function (
-           QueryTask, Query, declare, lang, esriRequest, all, All, request, dom, domClass, registry, on
+           QueryTask, Query, Polyline, declare, lang, esriRequest, all, All, request, dom, domClass, registry, on
 ) {
 
     return declare([], {
@@ -123,7 +124,8 @@ define([
                                             strTempCollected,
                                             strSiteID,
                                             strDailyStat_URL,
-                                            str3DayTMPTrend) {// Class to represent a row in the gage values grid
+                                            str3DayTMPTrend,
+                                            strDESCRIPTION, strLOCATION, strPRESSRELEASE, STRPUBLISHDATE, strTITLE) {// Class to represent a row in the gage values grid
             var self = this;
             self.SiteName = strSiteName;
             self.Hyperlink = strHyperlinkURL;
@@ -161,6 +163,11 @@ define([
             self.strSiteID = strSiteID;
             self.strDailyStat_URL = strDailyStat_URL;
             self.Day3TMPTrend = str3DayTMPTrend;
+            self.fwpDESCRIPTION = strDESCRIPTION;
+            self.fwpLOCATION = strLOCATION;
+            self.fwpPRESSRELEASE = strPRESSRELEASE;
+            self.fwpPUBLISHDATE = STRPUBLISHDATE;
+            self.fwpTITLE = strTITLE;
         },
         
         handleSectionGageResults: function (results) {
@@ -200,7 +207,12 @@ define([
                             itemSection.attributes.CFS_Note_NotOfficialClosure,
                                 strTempCollected,
                                 itemSection.attributes.OBJECTID,
-                                itemGage.attributes.DailyStat_URL
+                                itemGage.attributes.DailyStat_URL,
+                                "", //Placeholder for FWP ward description
+                                "", //Placeholder for FWP ward location
+                                "", //Placeholder for FWP ward Press Release
+                                "", //Placeholder for FWP ward Publish date
+                                "" //Placeholder for FWP ward Title
                             ]);
 
                             arrayDuplicateCheck.push(itemSection.attributes.StreamName + itemSection.attributes.SectionID);
@@ -216,17 +228,26 @@ define([
                     }
                     return a[0] > b[0] ? 1 : -1;
                 });
-            this.app.pGage.SectionsReceived(streamSectionArrray,"","","","");
+
+            var sectionGeometries = new Polyline(app.map.spatialReference);
+            for (var i = 0; i < items[0].features.length; i++) {
+                var paths = items[0].features[i].geometry.paths;
+                for (var j = 0; j < paths.length; j++) { //needed for multi part lines  
+                    sectionGeometries.addPath(paths[j]);
+                }
+            }
+
+            app.pGetWarn.Start(sectionGeometries, streamSectionArrray);
         },
 
         getArray2Process: function (strURL, strQuery) {// Class to represent a row in the gage values grid
             var siteNameArrray = [];
 
-            qt_Layer1 = new esri.tasks.QueryTask(strURL + "4");
+            qt_Layer1 = new esri.tasks.QueryTask(strURL + "4"); //sections layer
             q_Layer1 = new esri.tasks.Query();
             qt_Layer2 = new esri.tasks.QueryTask(strURL + "0");
             q_Layer2 = new esri.tasks.Query();
-            q_Layer1.returnGeometry = q_Layer2.returnGeometry = false;
+            q_Layer1.returnGeometry = q_Layer2.returnGeometry = true;
             q_Layer1.outFields = q_Layer2.outFields = ["*"];
 
             q_Layer1.where = strQuery;
@@ -533,7 +554,12 @@ define([
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][21],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][22],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][23],
-                                                                app.pGage.m_arrray_RiverSectionStatus[i][24]));
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][24],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][25],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][26],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][27],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][28],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][29]));
 
                 self.gageRecords = ko.observableArray(arrayKOTemp);
                 
@@ -713,6 +739,11 @@ define([
                         var dblLatestCFS = "";
                         var strSiteName = "";
                         var strID = "";
+                        var strDESCRIPTION = "";
+                        var strLOCATION = "";
+                        var strPRESSRELEASE = "";
+                        var strPUBLISHDATE = "";
+                        var strTITLE = "";
 
                         if (itemFound.length > 0) {
                             if (blnIsInitialPageLoad) {
@@ -742,6 +773,11 @@ define([
                                 strTempCollected = itemSectionRefined[14];
                                 iOID = itemSectionRefined[15];
                                 strDailyStat_URL = itemSectionRefined[16];
+                                strDESCRIPTION = itemSectionRefined[17];
+                                strLOCATION = itemSectionRefined[18];
+                                strPRESSRELEASE = itemSectionRefined[19];
+                                strPUBLISHDATE = itemSectionRefined[20];
+                                strTITLE = itemSectionRefined[21];
 
                                 var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
                                 var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
@@ -900,6 +936,7 @@ define([
                                 if (streamSectionDispalyName == "") {
                                     streamSectionDispalyName = strStreamName + " Section";
                                 }
+
                                 //add to array that populates the river sections summary div
                                 app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName, strHyperlinkURL,     
                                     dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
@@ -915,7 +952,13 @@ define([
                                     iTempClosureValue,
                                     strTempCollected,
                                     strSiteID,
-                                    strDailyStat_URL, str3DayCFSTrendTMP
+                                    strDailyStat_URL,
+                                    str3DayCFSTrendTMP,
+                                    strDESCRIPTION,
+                                    strLOCATION,
+                                    strPRESSRELEASE,
+                                    strPUBLISHDATE,
+                                    strTITLE
                                 ]);
                             }
                         //}

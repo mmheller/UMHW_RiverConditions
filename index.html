@@ -195,8 +195,12 @@
 
                 </div>
 
-                <div id="txt_xyCoords" style="position:relative; left:185px; bottom:65px; color:#404040; width:200px; font-size:11px">Latitude: -, Longitude: -</div>
-                <span id="scaleDiv" style="position:relative; left:185px; bottom:110px; width:250px; font-size:11px"></span>
+                <div style="position:relative; left:200px; bottom:95px;">
+                    <!--<span id="scaleDiv" style="position:relative; left:185px; bottom:110px; width:250px; font-size:11px"></span>-->
+                    <div id="txt_xyCoords" style="color:#404040; width:200px; font-size:11px">Latitude: -, Longitude: -</div>
+                    <div id="scaleDiv" style="width:250px; font-size:11px"></div>
+                    
+                </div>
 
                 <div class="row" id="toggleLayers" style="position:relative; bottom:60px; left:25px; font-size:12px">
                     <div class="col-md-12">
@@ -216,6 +220,18 @@
                         <div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
                         <div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
                         <div>Stream Section Description:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
+
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().fwpDESCRIPTION'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().fwpLOCATION'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().fwpPRESSRELEASE'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().fwpPUBLISHDATE'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().fwpTITLE'></span></div>
+
+
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
+                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
+
                                                 
                         <div>USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> (Note: Some gages may not provide year round current data)</div>
                         <div>USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a> (Note: Some gages may not provide year round historical data)</div>
@@ -234,10 +250,6 @@
                         <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp, attr: {title: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
                         <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
                         <div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>
-
-                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
-                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
-                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
                     </div>
                 </div>
 
@@ -256,12 +268,6 @@
             </div>
         </div>
 
-        <!-- Main jumbotron for a primary marketing message or call to action -->
-        <!--<div class="jumbotron" style="margin-bottom:-10px; padding-bottom:15px; padding-top:35px;">
-            <div id="divWatershedBasinInfoBottom" class="container" style="">
-            </div>
-        </div>-->
-
         <hr>
         <footer>
             <p>Developed for The Upper Missouri Headwaters Basin and Associated Watersheds by.. version:1.0</p>
@@ -274,32 +280,21 @@
         var pSrcFeatureLayer;
         var pFCol;
         var app = {};
-        require(["extras/MH_Setup", "extras/MH_GetGageData",
+        require(["extras/MH_Setup", "extras/MH_GetGageData", "extras/MH_GetWarningData",
             "application/bootstrapmap",
             "dojo/parser",
             "dojo/domReady!"],
 
-        function (MH_Setup, MH_GetGageData, BootstrapMap, parser) {
+        function (MH_Setup, MH_GetGageData, MH_GetWarningData, BootstrapMap, parser) {
             parser.parse();
             esriConfig.defaults.io.proxyUrl = "/proxy/";
 
             app.pSup = new MH_Setup({}); // instantiate the class
-            app.pSup.Phase1();
-
+            app.pGetWarn = new MH_GetWarningData({}); // instantiate the class
             app.pGage = new MH_GetGageData({}); // instantiate the class
 
-            //var dteDateTime = new Date();
-            //var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
-            //var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
 
-            //var dteDateTimeMinus3 = new Date();
-            //dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
-            //var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
-            //var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
-
-            //document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
-
-            //app.pGage.Start(strDateTimeMinus3, strDateTime);
+            app.pSup.Phase1();
         });
     </script>
 

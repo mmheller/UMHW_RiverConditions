@@ -211,7 +211,7 @@ define([
                                 ["Gallatin-Lower", "Lower Gallatin"], ["Jefferson", "Jefferson"], ["Broadwater", "Broadwater"],
                                 ["Boulder", "Boulder"], ["Big Hole", "Big Hole"], ["Beaverhead/Centennial", "Beaverhead"]
             ];
-            var strURLPrefix = "../index.html?H2O_ID=";
+            var strURLPrefix = "index.html?H2O_ID=";
             var strURLSuffix = "";
 
             app.H2O_ID = getTokens()['H2O_ID'];
@@ -330,6 +330,7 @@ define([
             templateSSection.setContent("<b>Watershed:</b> ${Watershed}<br><b>Stream:</b> ${StreamName}<br><b>CFS Prep for Conserv:</b> ${CFS_Prep4Conserv}<br><b>Prep for Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Conserv:</b> ${CFS_Conserv}<br><b>Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Un-Official Closure:</b> ${CFS_Conserv}<br><b>Un-Official Closure Desc:</b> ${CFS_Note_NotOfficialClosure}<br><b>Conservation Temp:</b> ${ConsvTemp}");
             pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSSection, "opacity": 0.9, outFields: ['*'] });
             pSectionsFeatureLayer.setDefinitionExpression(strQueryDef2);
+            app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
 
             pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
 
@@ -375,8 +376,17 @@ define([
             var templateFWP = new InfoTemplate();
             templateFWP.setTitle("<b>${TITLE}</b>");
             templateFWP.setContent("${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
-            pFWPFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0",
-                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'] });
+
+            app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
+            //strFWPURL = "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0";
+            var sfsFWP = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+              new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+              new Color([255, 0, 0]), 5), new Color([255, 0, 0, 0.25])
+            );
+            var rendererFWP = new SimpleRenderer(sfsFWP);
+            var pFWPFeatureLayer = new esri.layers.FeatureLayer(app.strFWPURL,
+                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'], visible: true });
+            pFWPFeatureLayer.setRenderer(rendererFWP);
 
             pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, outFields: ['*'] });
 
@@ -396,7 +406,7 @@ define([
               new Color([200, 200, 200]), 2), new Color([9, 60, 114, 0.25])
             );
             var rendererWatershedsMask = new SimpleRenderer(sfsMask);
-            pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: [strlabelField1] });
             pWatershedsMaskFeatureLayer.setDefinitionExpression(strQueryDef4);
             pWatershedsMaskFeatureLayer.setRenderer(rendererWatershedsMask);
 
@@ -405,7 +415,7 @@ define([
               new Color([200, 200, 200]), 0.1), new Color([26, 90, 158, 0.45])
             );
             var rendererBasinMask = new SimpleRenderer(sfsBasinMask);
-            pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: ['*'] });
+            pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.7, outFields: ['*'] });
             pBasinsMaskFeatureLayer.setDefinitionExpression("Basin IS NULL");
             pBasinsMaskFeatureLayer.setRenderer(rendererBasinMask);
 
@@ -456,11 +466,15 @@ define([
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
             legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locaitons' });
             legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
+            legendLayers.push({ layer: pFWPFeatureLayer, title: 'Test Condition Messaging' });
+            
+
 
             dojo.connect(app.map, 'onLayersAddResult', function (results) {
                 var legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
                 legend.startup();
             });
+
 
             var cbxLayers = [];
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
