@@ -19,7 +19,7 @@ body {
 }
 
 
-a:link,a:visited {
+a:link[role="presentation"],a:visited[role="presentation"] {
     color: white;
     padding: 5px 5px !important;
 } 

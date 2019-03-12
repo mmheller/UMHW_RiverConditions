@@ -97,12 +97,11 @@ define([
             for (var iii = 0; iii < arrayOIDsOrange.length; iii++) {
                 renderer.addValue(arrayOIDsOrange[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 18));
             }
-            for (var iiii = 0; i < arrayOIDsRed.length; iiii++) {
+            for (var iiii = 0; iiii < arrayOIDsRed.length; iiii++) {
                 renderer.addValue(arrayOIDsRed[iiii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18));
             }
 
             var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", {
-                infoTemplate: new InfoTemplate(" ", "${SUB_REGION}"),
                 mode: FeatureLayer.MODE_ONDEMAND,
                 outFields: ["OBJECTID "]
             });
@@ -215,6 +214,15 @@ define([
             var strURLSuffix = "";
 
             app.H2O_ID = getTokens()['H2O_ID'];
+
+            app.test = false;
+            var strTest = getTokens()['test'];
+            if (strTest != undefined) {
+                if (strTest.toUpperCase() == 'TRUE') {
+                    app.test = true;
+                }
+            }
+
             var strHeadertextArgument = getTokens()['UseAlternateHeader'];
             var blnUseAlternateHeader = false;
             if (strHeadertextArgument != undefined){
@@ -377,8 +385,13 @@ define([
             templateFWP.setTitle("<b>${TITLE}</b>");
             templateFWP.setContent("${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
 
-            app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
-            //strFWPURL = "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0";
+            if (app.test) {
+                app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
+            } else {
+                app.strFWPURL = "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0";
+            }
+            
+            
             var sfsFWP = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
               new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
               new Color([255, 0, 0]), 5), new Color([255, 0, 0, 0.25])
@@ -466,10 +479,14 @@ define([
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
             legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locaitons' });
             legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
-            legendLayers.push({ layer: pFWPFeatureLayer, title: 'Test Condition Messaging' });
+
+            if (app.test) {
+                legendLayers.push({ layer: pFWPFeatureLayer, title: 'Test Condition Messaging' });
+            }
+            else {
+                legendLayers.push({ layer: pFWPFeatureLayer, title: 'MT FWP River Closures' });
+            }
             
-
-
             dojo.connect(app.map, 'onLayersAddResult', function (results) {
                 var legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
                 legend.startup();

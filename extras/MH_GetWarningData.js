@@ -65,8 +65,14 @@ define([
             if (resultCount > 0) {
                 var pFeature = results.features[this.app.pGetWarn.m_StepThruCounter];
                 this.app.pGetWarn.FindSectionsOverlappingFWPWarnFeatures2(pFeature.geometry);
+
+                var x = document.getElementById("divFWPAlert");
+                if (x.style.visibility === "hidden") {
+                    x.style.visibility = 'visible';
+                }
             } else {
-                this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "");
+                this.app.pGage.SectionsReceived(app.pGetWarn.m_streamSectionArrray, "", "", "", "");  //if an error go continue with getting seciton detail and display
+                this.app.pGetWarn.ClearVars();
             }
         },
 
@@ -139,4 +145,5 @@ define([
     });
 }
 );
+
 

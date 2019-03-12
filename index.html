@@ -105,22 +105,8 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <form class="navbar-form navbar-right">
-
                     <ul id="navList" class="nav nav-pills pull-right">
                     </ul>
-
-
-                    <!--<div id="block_container" style="color:white; ">
-                        <div id="bloc1"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Beaverhead" style="color:white" target="_self">Beaverhead/Centennial</a></div> |
-                        <div id="bloc8"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Big Hole" style="color:white"  target="_self">Big Hole</a></div> |
-                        <div id="bloc3"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Boulder" style="color:white"  target="_self">Boulder</a></div> |
-                        <div id="bloc10"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Broadwater" style="color:white"  target="_self">Broadwater</a></div> |
-                        <div id="bloc2"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Jefferson" style="color:white"  target="_self">Jefferson</a></div> |
-                        <div id="bloc5"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Lower Gallatin" style="color:white"  target="_self">Gallatin-Lower</a></div> |
-                        <div id="bloc4"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Upper Gallatin" style="color:white" target="_self">Gallatin-Upper</a></div> |
-                        <div id="bloc6"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Madison" style="color:white"  target="_self">Madison</a></div> |
-                        <div id="bloc7"><a href="https://mmheller.github.io/UMHW_RiverConditions/index.html?H2O_ID=Ruby" style="color:white"  target="_self">Ruby</a></div>
-                    </div>-->
                 </form>
             </div><!--/.navbar-collapse -->
         </div>
@@ -131,6 +117,9 @@
         <div id="divWatershedBasinInfoTop" class="container" style="line-height: normal; padding:0px;">
         </div>
         <div id="divCustomAlert" class="container" style="line-height: normal; background-color: #fa021b;">
+        </div>
+        <div id="divFWPAlert" class="container" style="line-height: normal; background-color: #b30000; visibility:hidden; padding:2px;">
+            <span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/" style="color:white; font-weight:bold;" >here for official information...</a></span>
         </div>
     </div>
     
@@ -151,19 +140,16 @@
                                 <div>Stream Name</div>
                                 <div>Section #/Desc</div>
                                 <div>Discharge(cfs)</div>
-                                <div>Flow Status</div>
                                 <div>H2O Temp(F)</div>
-                                <div>Temp Status</div>
+                                <div>Status</div>
                             </td>
                             <td valign="top">
                                 <div>
                                     <div><span data-bind='text: StreamName'></span></div>
                                     <div><span data-bind='text: SectionID'></span> <span data-bind='text: SiteName'></span></div>
-                                    <!--<div><span data-bind='text: SectionID'></span> <a data-bind="text: SiteName, attr: {href: Hyperlink}" target="_blank"></a></div>-->
                                     <div><span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3CFSTrend}" />)</div>
-                                    <div><span data-bind='text: SiteFlowStatus'></span></div>
                                     <div><span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3TMPTrend}" />)</div>
-                                    <div><span data-bind='text: SiteTempStatus'></span></div>
+                                    <div><span data-bind='text: overallStatus'></span></div>
                                 </div>
                             </td>
                             <td class="htmlRowNotDisplayed">
@@ -179,6 +165,7 @@
                                 <div><span data-bind='text: strTempCollected'></span></div>
                                 <div><span data-bind='text: strSiteID'></span></div>
                                 <div><span data-bind='text: strDailyStat_URL'></span></div>
+                                <div><span data-bind='text: overallSymbol'></span></div>
                             </td>
                         </tr>
                     </tbody>
