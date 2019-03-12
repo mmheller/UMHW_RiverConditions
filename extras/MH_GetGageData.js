@@ -850,21 +850,21 @@ define([
                                         blnRealValues = false;
                                         var str3DayCFSTrendCFS = "images/blank.png";
                                         var str3DayCFSTrendTMP = "images/blank.png";
-                    }
+                        }
 
                         //determine if the JSON element is a temperature or discharge reading
                         var temperatureItem = "";
                         var CFSItem = "";
-                            for (var iv = 0; iv < itemFound.length; iv++) {
+                        for (var iv = 0; iv < itemFound.length; iv++) {
                                 if (itemFound[iv].variable.variableDescription == "Temperature, water, degrees Celsius") {
                                     temperatureItem = itemFound[iv];
-                            }
+                                }
                                 if (itemFound[iv].variable.variableDescription == "Discharge, cubic feet per second") {
                                     CFSItem = itemFound[iv];
-                            }
-                    }
+                                }
+                        }
 
-                            if (CFSItem != "") {
+                        if (CFSItem != "") {
                                 arrayJSONValues2 = CFSItem.values[0].value;
                                 jQuery.each(arrayJSONValues2, function (k, item2) {
                                     var dteDateTime = new Date(item2.dateTime);
@@ -889,30 +889,29 @@ define([
                                         obj["EPOCH"]= Date.parse(dteDateTime);
 
                                         arrray_Detail4InterpolationCFS.push(obj);  //populate the array that is used to determing the flow trent
-                                }
-                            });
+                                    }
+                                });
 
                                 if ((arrray_Detail4InterpolationCFS.length > 0) & (blnRealValues)) { //figure out if the flow trend is increasing or decreasing & the last known values
                                     arrray_Detail4InterpolationCFS.sort(function (a, b) {
                                         var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
                                         return dateA -dateB //sort by date ascending
                                 })
-                                    var iCFSArrayLength = (arrray_Detail4InterpolationCFS.length -1);
-                                    dteLatestDateTimeCFS = arrray_Detail4InterpolationCFS[iCFSArrayLength].gagedatetime;
-                                    dblLatestCFS = parseFloat(arrray_Detail4InterpolationCFS[iCFSArrayLength].cfs);
+                                var iCFSArrayLength = (arrray_Detail4InterpolationCFS.length -1);
+                                dteLatestDateTimeCFS = arrray_Detail4InterpolationCFS[iCFSArrayLength].gagedatetime;
+                                dblLatestCFS = parseFloat(arrray_Detail4InterpolationCFS[iCFSArrayLength].cfs);
 
-                                    str3DayCFSTrendCFS = ProcLinearRegression(arrray_Detail4InterpolationCFS, "cfs");
+                                str3DayCFSTrendCFS = ProcLinearRegression(arrray_Detail4InterpolationCFS, "cfs");
                             }
-                    }
+                        }
 
                         arrayJSONValues2 =[]; //clear out the array
 
-                            if (temperatureItem != "") {
+                        if (temperatureItem != "") {
                                 arrayJSONValues22 = temperatureItem.values[0].value;
                                 jQuery.each(arrayJSONValues22, function (k, item22) {
                                     var dteDateTime = new Date(item22.dateTime);
                                     var strNoData = "";
-
                                     if (item22.value != -999999) {
                                         blnRealValues = true;
                                         var obj = {
@@ -923,27 +922,25 @@ define([
                                     });
                                         obj["TMP"]= Math.round(parseFloat(item22.value) * 9 / 5 +32);
                                         obj["gagedatetime"]= dteDateTime;
-
                                         obj["TMPTarget1"]= iTMPTarget1;  //this are only used in single charting situations
                                         app.pGage.m_arrray_Detail4ChartTMP.push(obj);//populate the array that contains the data for charting
                                         obj["EPOCH"]= Date.parse(dteDateTime);
-
                                         arrray_Detail4InterpolationTMP.push(obj);  //populate the array that is used to determing the flow trent
-                                }
-                            });
+                                    }
+                                });
 
                                 if ((arrray_Detail4InterpolationTMP.length > 0) & (blnRealValues)) { //figure out if the flow trend is increasing or decreasing & the last known values
                                     arrray_Detail4InterpolationTMP.sort(function (a, b) {
-                                        var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
-                                        return dateA -dateB //sort by date ascending
-                                })
+                                            var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
+                                            return dateA -dateB //sort by date ascending
+                                        })
                                     var iTMPArrayLength = (arrray_Detail4InterpolationTMP.length -1);
                                     dteLatestDateTimeTMP = arrray_Detail4InterpolationTMP[iTMPArrayLength].gagedatetime;
-                                    dblLatestTMP = parseFloat(arrray_Detail4InterpolationTMP[iCFSArrayLength].TMP);
 
+                                    dblLatestTMP = parseFloat(arrray_Detail4InterpolationTMP[iTMPArrayLength].TMP);
                                     str3DayCFSTrendTMP = ProcLinearRegression(arrray_Detail4InterpolationTMP, "TMP");
-                            }
-                    }
+                                }
+                        }
 
                         arrayJSONValues22 =[]; //clear out the array
                         CFSItem = "";
