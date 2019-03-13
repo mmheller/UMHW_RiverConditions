@@ -75,10 +75,7 @@ define([
             }
 
         },
-
-
-
-
+        
         qry_Zoom2FeatureLayerByQuery: function (strURL, strQuery1) {
             var pQueryT1 = new esri.tasks.QueryTask(strURL);
             var pQuery1 = new esri.tasks.Query();

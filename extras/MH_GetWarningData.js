@@ -84,7 +84,7 @@ define([
         
         FindSectionsOverlappingFWPWarnFeatures2: function (pFeature) {
             var pQuery = new Query();
-            var queryTask = new QueryTask(app.strHFL_URL + "4");
+            var queryTask = new QueryTask(app.strHFL_URL + "5");
             pQuery.returnGeometry = false;
             pQuery.outFields = ["StreamName","SectionID"];
             pQuery.outSpatialReference = {"wkid": 102100};

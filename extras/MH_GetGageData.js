@@ -287,9 +287,9 @@ define([
         getArray2Process: function (strURL, strQuery) {// Class to represent a row in the gage values grid
             var siteNameArrray = [];
 
-            qt_Layer1 = new esri.tasks.QueryTask(strURL + "4"); //sections layer
+            qt_Layer1 = new esri.tasks.QueryTask(strURL + "5"); //sections layer
             q_Layer1 = new esri.tasks.Query();
-            qt_Layer2 = new esri.tasks.QueryTask(strURL + "0");
+            qt_Layer2 = new esri.tasks.QueryTask(strURL + "1"); //gage layer
             q_Layer2 = new esri.tasks.Query();
             q_Layer1.returnGeometry = q_Layer2.returnGeometry = true;
             q_Layer1.outFields = q_Layer2.outFields = ["*"];
@@ -776,6 +776,24 @@ define([
                     strSiteID = itemSectionRefined[1];  //since some sections do not have readings all the time setting this before finding data in the JSON
                     strStreamName = itemSectionRefined[0];  //since some sections do not have readings all the time setting this before finding data in the JSON
                     iSectionID = itemSectionRefined[2];  //since some sections do not have readings all the time setting this before finding data in the JSON
+
+                    iTempClosureValue = itemSectionRefined[6];
+                    strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
+                    strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
+                    iEarlyFlowDroughtManagementTarget = itemSectionRefined[9];
+                    strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[10];
+                    strLateFlowPref4ConsvValue = itemSectionRefined[11];
+                    strLateFlowConsvValue = itemSectionRefined[12];
+                    strLateFlowClosureValueFlow = itemSectionRefined[13];
+                    strTempCollected = itemSectionRefined[14];
+                    iOID = itemSectionRefined[15];
+                    strDailyStat_URL = itemSectionRefined[16];
+                    strDESCRIPTION = itemSectionRefined[17];
+                    strLOCATION = itemSectionRefined[18];
+                    strPRESSRELEASE = itemSectionRefined[19];
+                    strPUBLISHDATE = itemSectionRefined[20];
+                    strTITLE = itemSectionRefined[21];
+
                     var itemFound = arrayJSONValues.filter(function (itemArraySearch) {
                             return typeof itemArraySearch.name == 'string' && itemArraySearch.name.indexOf(strSiteID) > -1;
                 });
@@ -823,22 +841,22 @@ define([
                                         }
                                     }
 
-                                        iTempClosureValue = itemSectionRefined[6];
-                                        strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
-                                        strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
-                                        iEarlyFlowDroughtManagementTarget = itemSectionRefined[9];
-                                        strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[10];
-                                        strLateFlowPref4ConsvValue = itemSectionRefined[11];
-                                        strLateFlowConsvValue = itemSectionRefined[12];
-                                        strLateFlowClosureValueFlow = itemSectionRefined[13];
-                                        strTempCollected = itemSectionRefined[14];
-                                        iOID = itemSectionRefined[15];
-                                        strDailyStat_URL = itemSectionRefined[16];
-                                        strDESCRIPTION = itemSectionRefined[17];
-                                        strLOCATION = itemSectionRefined[18];
-                                        strPRESSRELEASE = itemSectionRefined[19];
-                                        strPUBLISHDATE = itemSectionRefined[20];
-                                        strTITLE = itemSectionRefined[21];
+                                        //iTempClosureValue = itemSectionRefined[6];
+                                        //strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
+                                        //strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
+                                        //iEarlyFlowDroughtManagementTarget = itemSectionRefined[9];
+                                        //strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[10];
+                                        //strLateFlowPref4ConsvValue = itemSectionRefined[11];
+                                        //strLateFlowConsvValue = itemSectionRefined[12];
+                                        //strLateFlowClosureValueFlow = itemSectionRefined[13];
+                                        //strTempCollected = itemSectionRefined[14];
+                                        //iOID = itemSectionRefined[15];
+                                        //strDailyStat_URL = itemSectionRefined[16];
+                                        //strDESCRIPTION = itemSectionRefined[17];
+                                        //strLOCATION = itemSectionRefined[18];
+                                        //strPRESSRELEASE = itemSectionRefined[19];
+                                        //strPUBLISHDATE = itemSectionRefined[20];
+                                        //strTITLE = itemSectionRefined[21];
 
                                         var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
                                         var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
@@ -1074,7 +1092,7 @@ define([
                         app.dblExpandNum = 1;
 
                         app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
-                        app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "4", "(StreamName = '" + strClickStreamName + "') and " + "(SectionID = '" +strClickSegmentID + "')");
+                        app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "5", "(StreamName = '" + strClickStreamName + "') and " + "(SectionID = '" +strClickSegmentID + "')");
                 });
 
                 var strTempText2 = (elements)[i].innerHTML;

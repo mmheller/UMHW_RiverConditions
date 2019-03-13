@@ -101,7 +101,7 @@ define([
                 renderer.addValue(arrayOIDsRed[iiii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18));
             }
 
-            var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", {
+            var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", {
                 mode: FeatureLayer.MODE_ONDEMAND,
                 outFields: ["OBJECTID "]
             });
@@ -247,7 +247,7 @@ define([
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
             
-            this.GetSetHeaderWarningContent(app.strHFL_URL + "9", app.H2O_ID, blnUseAlternateHeader);
+            this.GetSetHeaderWarningContent(app.strHFL_URL + "10", app.H2O_ID, blnUseAlternateHeader);
         },
 
         Phase2: function () {
@@ -307,12 +307,16 @@ define([
             var template = new InfoTemplate();
             template.setTitle("<b>${GageTitle}</b>");
             template.setContent("Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
-            pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
+            pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
             var templateEPOINT = new InfoTemplate();
             templateEPOINT.setTitle("<b>${Endpoint_Name}</b>");
             templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
-            pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateEPOINT, outFields: ['*'] });
+            pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, 
+                infoTemplate: templateEPOINT,
+                outFields: ['*'],
+                minScale: 1200000
+            });
 
             var strQueryDef1 = "1=1";
             var strQueryDef2 = "1=1";
@@ -336,11 +340,11 @@ define([
             var templateSSection = new InfoTemplate();
             templateSSection.setTitle("<b>Section:${SectionID}</b>");
             templateSSection.setContent("<b>Watershed:</b> ${Watershed}<br><b>Stream:</b> ${StreamName}<br><b>CFS Prep for Conserv:</b> ${CFS_Prep4Conserv}<br><b>Prep for Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Conserv:</b> ${CFS_Conserv}<br><b>Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Un-Official Closure:</b> ${CFS_Conserv}<br><b>Un-Official Closure Desc:</b> ${CFS_Note_NotOfficialClosure}<br><b>Conservation Temp:</b> ${ConsvTemp}");
-            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSSection, "opacity": 0.9, outFields: ['*'] });
+            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSSection, autoGeneralize: true, "opacity": 0.9, outFields: ['*'] });
             pSectionsFeatureLayer.setDefinitionExpression(strQueryDef2);
             app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
 
-            pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: ['*'] });
+            pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: ['*'] });
 
             var templateFAS = new InfoTemplate();
             templateFAS.setTitle("<b>${NAME} MT FAS (Fishing Access Site)</b>");
@@ -358,7 +362,7 @@ define([
             var templateBLM = new InfoTemplate();
             templateBLM.setTitle("<b>${Facility_Name} BLM Facility</b>");
             templateBLM.setContent("<a href=${URL} target='_blank'>Link to BLM Facility</a>");
-            pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1",
+            pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, outFields: ['*'], visible: false });
             var pLabelBLM = new TextSymbol().setColor(vDarkGreyColor);
             pLabelBLM.font.setSize("9pt");
@@ -372,7 +376,7 @@ define([
 
             var strSNOTELGraphURL = "https://wcc.sc.egov.usda.gov/nwcc/view?intervalType=+View+Current+&report=WYGRAPH&timeseries=Daily&format=plot&sitenum=${stationID}&interval=WATERYEAR";
             templateSNOTEL.setContent("<a href=${SitePageURL} target='_blank'>Link to SNOTEL Site Page</a>, <a href=" + strSNOTELGraphURL + " target='_blank'>Link to SWE Current/Historical Graphs</a> ");
-            pSNOTELFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8",
+            pSNOTELFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSNOTEL, outFields: ['*'], visible: false });
             var pLabelSNOTEL = new TextSymbol().setColor(vDarkGreyColor);
             pLabelSNOTEL.font.setSize("9pt");
@@ -401,7 +405,7 @@ define([
                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'], visible: true });
             pFWPFeatureLayer.setRenderer(rendererFWP);
 
-            pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, outFields: ['*'] });
+            pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
 
 
             var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
@@ -410,7 +414,7 @@ define([
             );
             var rendererWatersheds = new SimpleRenderer(sfs);
             var strlabelField1 = "Name";
-            pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, outFields: [strlabelField1] });
+            pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, autoGeneralize: true, outFields: [strlabelField1] });
             pWatershedsFeatureLayer.setDefinitionExpression(strQueryDef3);
             pWatershedsFeatureLayer.setRenderer(rendererWatersheds);
 
@@ -419,7 +423,7 @@ define([
               new Color([200, 200, 200]), 2), new Color([9, 60, 114, 0.25])
             );
             var rendererWatershedsMask = new SimpleRenderer(sfsMask);
-            pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, outFields: [strlabelField1] });
+            pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: [strlabelField1] });
             pWatershedsMaskFeatureLayer.setDefinitionExpression(strQueryDef4);
             pWatershedsMaskFeatureLayer.setRenderer(rendererWatershedsMask);
 
@@ -428,7 +432,7 @@ define([
               new Color([200, 200, 200]), 0.1), new Color([26, 90, 158, 0.45])
             );
             var rendererBasinMask = new SimpleRenderer(sfsBasinMask);
-            pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "7", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.7, outFields: ['*'] });
+            pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.7, autoGeneralize: true, outFields: ['*'] });
             pBasinsMaskFeatureLayer.setDefinitionExpression("Basin IS NULL");
             pBasinsMaskFeatureLayer.setRenderer(rendererBasinMask);
 
