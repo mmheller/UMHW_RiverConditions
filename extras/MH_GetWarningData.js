@@ -121,6 +121,7 @@ define([
                             app.pGetWarn.m_streamSectionArrray[is][19] = strPRESSRELEASE;
                             app.pGetWarn.m_streamSectionArrray[is][20] = strPUBLISHDATE;
                             app.pGetWarn.m_streamSectionArrray[is][21] = strTITLE;
+                            app.pGetWarn.m_streamSectionArrray[is][22] = "MT FWS Restriction(click for details)";
                         }
                     }
                 }

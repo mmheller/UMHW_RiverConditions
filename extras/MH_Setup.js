@@ -257,7 +257,7 @@ define([
                 var izoomVal = 10;
             } else {
                 var arrayCenterZoom = [-112.0163, 46.5857];
-                var izoomVal = 9;
+                var izoomVal = 11;
             }
                         
             esri.config.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
@@ -305,8 +305,8 @@ define([
             dojo.connect(app.map, "onUpdateEnd", hideLoading);
 
             var template = new InfoTemplate();
-            template.setTitle("<b>${GageTitle}</b>");
-            template.setContent("Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
+            template.setTitle("Stream Gage");
+            template.setContent("<b>${GageTitle}</b><br>Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
             pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
             var templateEPOINT = new InfoTemplate();
@@ -317,6 +317,18 @@ define([
                 outFields: ['*'],
                 minScale: 1200000
             });
+
+
+            var vMagentaColor = new Color("#E11AEE");              // create a text symbol to define the style of labels
+            var pLabelEndPoints = new TextSymbol().setColor(vMagentaColor);
+            pLabelEndPoints.font.setSize("9pt");
+            pLabelEndPoints.font.setFamily("arial");
+            var pLabelRendererEndPoints = new SimpleRenderer(pLabelEndPoints);
+            var pLabelsEndPoints = new LabelLayer({
+                id: "LabelsEndPoints",
+                minScale: 600000});
+            pLabelsEndPoints.addFeatureLayer(pEPointsFeatureLayer, pLabelRendererEndPoints, "{Start_End} of Section {Section_Name}");
+
 
             var strQueryDef1 = "1=1";
             var strQueryDef2 = "1=1";
@@ -347,8 +359,8 @@ define([
             pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: ['*'] });
 
             var templateFAS = new InfoTemplate();
-            templateFAS.setTitle("<b>${NAME} MT FAS (Fishing Access Site)</b>");
-            templateFAS.setContent("${BOAT_FAC}<br><a href=${WEB_PAGE} target='_blank'>Link to Fish Access Site</a>");
+            templateFAS.setTitle("MT FAS (Fishing Access Site)");
+            templateFAS.setContent("<b>${NAME}</b><br>${BOAT_FAC}<br><a href=${WEB_PAGE} target='_blank'>Link to Fish Access Site</a>");
             pFASFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFAS, "opacity": 0.5, outFields: ['*'], visible: false });
             var vDarkGreyColor = new Color("#3F3F40");              // create a text symbol to define the style of labels
@@ -360,8 +372,8 @@ define([
             pLabelsFAS.addFeatureLayer(pFASFeatureLayer, pLabelRendererFAS, "{NAME}");
             
             var templateBLM = new InfoTemplate();
-            templateBLM.setTitle("<b>${Facility_Name} BLM Facility</b>");
-            templateBLM.setContent("<a href=${URL} target='_blank'>Link to BLM Facility</a>");
+            templateBLM.setTitle("<b>BLM Facility</b>");
+            templateBLM.setContent("${Facility_Name}<br><a href=${URL} target='_blank'>Link to BLM Facility</a>");
             pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, outFields: ['*'], visible: false });
             var pLabelBLM = new TextSymbol().setColor(vDarkGreyColor);
@@ -371,9 +383,18 @@ define([
             var pLabelsBLM = new LabelLayer({ id: "LabelsBLM" });
             pLabelsBLM.addFeatureLayer(pBLMFeatureLayer, pLabelRendererBLM, "{Facility_Name}");
 
+
+            var templateFWPAISAccess = new InfoTemplate();
+            templateFWPAISAccess.setTitle("Montana AIS Watercraft Access");
+            templateFWPAISAccess.setContent("${SITENAME}</br>${ACCESSTYPE}</br>${WATERBODY}</br>${STATUS}</b>");
+            pFWPAISAccessFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FISH_AIS_WATERCRAFT_ACCESS/FeatureServer/0",
+                {
+                    mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWPAISAccess, outFields: ['*'],
+                    minScale: 5200000, visible: false });
+
+
             var templateSNOTEL = new InfoTemplate();
             templateSNOTEL.setTitle("<b>${Name} SNOTEL Site</b>");
-
             var strSNOTELGraphURL = "https://wcc.sc.egov.usda.gov/nwcc/view?intervalType=+View+Current+&report=WYGRAPH&timeseries=Daily&format=plot&sitenum=${stationID}&interval=WATERYEAR";
             templateSNOTEL.setContent("<a href=${SitePageURL} target='_blank'>Link to SNOTEL Site Page</a>, <a href=" + strSNOTELGraphURL + " target='_blank'>Link to SWE Current/Historical Graphs</a> ");
             pSNOTELFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3",
@@ -406,6 +427,7 @@ define([
             pFWPFeatureLayer.setRenderer(rendererFWP);
 
             pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
+            pCartoFeatureLayerPoly = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
 
 
             var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
@@ -453,9 +475,9 @@ define([
             plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
             plabels3.minScale = 1500000;
 
-            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer,
-                               pSectionsFeatureLayer,pSNOTELFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer,
-                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL]);
+            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
+                               pSectionsFeatureLayer, pSNOTELFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer,
+                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsEndPoints]);
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
@@ -478,6 +500,7 @@ define([
 
 
             var legendLayers = [];
+            legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'Montana AIS Watercraft Access' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
             legendLayers.push({ layer: pFASFeatureLayer, title: 'FWP Fish Access Sites' });
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
@@ -506,6 +529,8 @@ define([
             //cbxLayers.push({ layers: [pEPointsFeatureLayer, pEPointsFeatureLayer], title: 'Start/End Section Locaitons' });
             //cbxLayers.push({ layers: [pGageFeatureLayer, pGageFeatureLayer], title: 'Gages' });
             cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
+            cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'Montana AIS Watercraft Access' });
+            
 
             this.LayerCheckBoxSetup(cbxLayers);
             ko.bindingHandlers.googleBarChart = {
@@ -616,7 +641,7 @@ define([
                 app.dblExpandNum = 0.5;
                 app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer, "OBJECTID");
             } else {
-                app.dblExpandNum = 1;
+                app.dblExpandNum = 0.5;
                 app.pZoom.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer, "FID");
             }
 

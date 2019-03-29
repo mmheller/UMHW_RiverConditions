@@ -129,7 +129,7 @@ define([
                                             strSiteID,
                                             strDailyStat_URL,
                                             str3DayTMPTrend,
-                                            strDESCRIPTION, strLOCATION, strPRESSRELEASE, STRPUBLISHDATE, strTITLE,
+                                            strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE,
                                             strOverallStatus,
                                             strOverallSymbol) {// Class to represent a row in the gage values grid
             var self = this;
@@ -169,11 +169,11 @@ define([
             self.strSiteID = strSiteID;
             self.strDailyStat_URL = strDailyStat_URL;
             self.Day3TMPTrend = str3DayTMPTrend;
-            self.fwpDESCRIPTION = strDESCRIPTION;
-            self.fwpLOCATION = strLOCATION;
-            self.fwpPRESSRELEASE = strPRESSRELEASE;
-            self.fwpPUBLISHDATE = STRPUBLISHDATE;
-            self.fwpTITLE = strTITLE;
+            self.fwpDESCRIPTION = strFWPDESCRIPTION;
+            self.fwpLOCATION = strFWPLOCATION;
+            self.fwpPRESSRELEASE = strFWPPRESSRELEASE;
+            self.fwpPUBLISHDATE = strFWPPUBLISHDATE;
+            self.fwpTITLE = strFWPTITLE;
             self.overallStatus = strOverallStatus;
             self.overallSymbol = strOverallSymbol;
         },
@@ -257,7 +257,8 @@ define([
                         "", //Placeholder for FWP ward location
                         "", //Placeholder for FWP ward Press Release
                         "", //Placeholder for FWP ward Publish date
-                        "" //Placeholder for FWP ward Title
+                        "", //Placeholder for FWP ward Title,
+                        "" //Placeholder for FWP warning,
                     ]);
                 //}
 
@@ -574,7 +575,7 @@ define([
             if (typeof app.pGage.m_arrray_RiverSectionStatus !== "undefined") {//this feed then gageReadings: function 
                 var arrayKOTemp = [];
                 for (var i = 0; i < app.pGage.m_arrray_RiverSectionStatus.length; i++)
-                    arrayKOTemp.push(new app.pGage.gageReadings(app.pGage.m_arrray_RiverSectionStatus[i][0],   //is this necessary???????????????????????????
+                    arrayKOTemp.push(new app.pGage.gageReadings(app.pGage.m_arrray_RiverSectionStatus[i][0],   
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][1],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][2],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][3],
@@ -612,6 +613,29 @@ define([
                 self.CurrentDisplayGageRecord = ko.observable(self.gageRecords()[0]);
                 self.selectThing = function (item) {
                     document.getElementById("divSectionDetail").style.display = 'inline';
+
+                    if (item.strDailyStat_URL == null) {
+                        document.getElementById("detailSectionUSGSHistorical").style.display = 'none';
+                    } else {
+                        document.getElementById("detailSectionUSGSHistorical").style.display = 'inline';
+                    }
+
+                    if ((item.Hyperlink == null) | (item.Hyperlink == undefined)) {
+                        document.getElementById("detailSectionUSGSCurrent").style.display = 'none';
+                    } else {
+                        document.getElementById("detailSectionUSGSCurrent").style.display = 'inline';
+                    }
+
+                    if ((item.fwpTITLE == "") | (item.fwpTITLE == "") | (item.fwpTITLE == "")) {
+                        document.getElementById("detailSection2").style.display = 'none';
+                    } else {
+                        document.getElementById("detailSection2").style.display = 'inline';
+                        document.getElementById("detailSection2").style.color = "red";
+                        //document.getElementById("detailSection2").style.border = "1px solid black";
+                        
+                    }
+                    
+
                     self.CurrentDisplayGageRecord(item);
                 };
                 self.avgTemp = ko.computed(function () {
@@ -749,6 +773,7 @@ define([
             var strTempCollected = null;
             var iOID = null;
             var strDailyStat_URL = "";
+            var strFWPWarn = "";
             m_arrayOIDYellow =[];
             m_arrayOIDsGold =[];
             m_arrayOIDsOrange =[];
@@ -778,6 +803,7 @@ define([
                     iSectionID = itemSectionRefined[2];  //since some sections do not have readings all the time setting this before finding data in the JSON
 
                     iTempClosureValue = itemSectionRefined[6];
+
                     strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
                     strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
                     iEarlyFlowDroughtManagementTarget = itemSectionRefined[9];
@@ -788,11 +814,12 @@ define([
                     strTempCollected = itemSectionRefined[14];
                     iOID = itemSectionRefined[15];
                     strDailyStat_URL = itemSectionRefined[16];
-                    strDESCRIPTION = itemSectionRefined[17];
-                    strLOCATION = itemSectionRefined[18];
-                    strPRESSRELEASE = itemSectionRefined[19];
-                    strPUBLISHDATE = itemSectionRefined[20];
-                    strTITLE = itemSectionRefined[21];
+                    strFWPDESCRIPTION = itemSectionRefined[17];
+                    strFWPLOCATION = itemSectionRefined[18];
+                    strFWPPRESSRELEASE = itemSectionRefined[19];
+                    strFWPPUBLISHDATE = itemSectionRefined[20];
+                    strFWPTITLE = itemSectionRefined[21];
+                    strFWPWarn = itemSectionRefined[22];
 
                     var itemFound = arrayJSONValues.filter(function (itemArraySearch) {
                             return typeof itemArraySearch.name == 'string' && itemArraySearch.name.indexOf(strSiteID) > -1;
@@ -807,11 +834,11 @@ define([
                     var dblLatestCFS = "";
                     var strSiteName = "";
                     var strID = "";
-                    var strDESCRIPTION = "";
-                    var strLOCATION = "";
-                    var strPRESSRELEASE = "";
-                    var strPUBLISHDATE = "";
-                    var strTITLE = "";
+                    //var strFWPDESCRIPTION = "";
+                    //var strFWPLOCATION = "";
+                    //var strFWPPRESSRELEASE = "";
+                    //var strFWPPUBLISHDATE = "";
+                    //var strFWPTITLE = "";
 
                     if (itemFound.length > 0) {
                             iLateFlowPref4ConsvValue = itemSectionRefined[3];
@@ -1017,14 +1044,23 @@ define([
                     }
 
                     OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus,
-                                                                            strTITLE, strDESCRIPTION, strLOCATION, strPRESSRELEASE, strPUBLISHDATE);
+                                                strFWPTITLE, strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn);
                     var strOverallStatus = OverallStatusAndColor[0];
                     var strOverallSymbol = OverallStatusAndColor[1];
 
+                    
+                    document.getElementById("loadingImg2").style.display = "none";
+
                     //add to array that populates the river sections summary div
-                    app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName, strHyperlinkURL,
-                        dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
-                        dteLatestDateTimeCFS, dblLatestCFS.toString(), strSiteFlowStatus, strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
+                    app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName,
+                        strHyperlinkURL,
+                        dteLatestDateTimeTMP,
+                        dblLatestTMP.toString().replace("-999999", "Data Not Available"),
+                        strSiteTempStatus,
+                        dteLatestDateTimeCFS,
+                        dblLatestCFS.toString(),
+                        strSiteFlowStatus,
+                        strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
                         strMONTHDAYEarlyFlowFromDroughtManagementTarget,
                         strMONTHDAYEarlyFlowToDroughtManagementTarget,
                         iLateFlowPref4ConsvValue,
@@ -1038,11 +1074,11 @@ define([
                         strSiteID,
                         strDailyStat_URL,
                         str3DayCFSTrendTMP,
-                        strDESCRIPTION,
-                        strLOCATION,
-                        strPRESSRELEASE,
-                        strPUBLISHDATE,
-                        strTITLE,
+                        strFWPDESCRIPTION,
+                        strFWPLOCATION,
+                        strFWPPRESSRELEASE,
+                        strFWPPUBLISHDATE,
+                        strFWPTITLE,
                         strOverallStatus,
                         strOverallSymbol
                     ]);
@@ -1100,9 +1136,9 @@ define([
                 var str_overallSymbool = "";
                 str_overallSymbool = strTempText2.substring(0, strTempText2.indexOf("</span>"));
 
-                if (str_overallSymbool == "Red") {
-                    (elements)[i].style.color = 'white';
-                    (elements)[i].style.backgroundColor = "rgb(255, 0, 0)";
+                    if (str_overallSymbool == "Red") {
+                        (elements)[i].style.color = 'white';
+                        (elements)[i].style.backgroundColor = "rgb(255, 0, 0)";
                     }
                         if (str_overallSymbool == "Orange") {
                             (elements)[i].style.color = 'white';
@@ -1175,7 +1211,7 @@ define([
 
 
 
-        DivyUpStatusandColors: function (iOID, strSiteFlowStatus, strSiteTempStatus, strTITLE, strDESCRIPTION, strLOCATION, strPRESSRELEASE, strPUBLISHDATE) {
+        DivyUpStatusandColors: function (iOID, strSiteFlowStatus, strSiteTempStatus, strTITLE, strDESCRIPTION, strLOCATION, strPRESSRELEASE, strPUBLISHDATE, strFWPWarn) {
             //if ((elements)[i].innerHTML.indexOf("STATE") > -1) {
             //    (elements)[i].style.color = 'white';
             //    (elements)[i].style.backgroundColor = "rgb(255, 0, 0)";
@@ -1227,7 +1263,7 @@ define([
                 m_arrayOIDsOrange.push(iOID);
             }
 
-            if ((strTITLE != "") | (strDESCRIPTION != "")) {
+            if (strFWPWarn != "") {
                 strSiteFlowStatus = "MT FWS Restriction (click for details)";
                 strOverallSymbol = "Red";
                 m_arrayOIDsRed.push(iOID);
