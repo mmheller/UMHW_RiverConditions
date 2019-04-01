@@ -808,6 +808,7 @@ define([
                 app.pSup.addStreamConditionFeatureLayer(m_arrayOIDYellow, m_arrayOIDsGold, m_arrayOIDsOrange, m_arrayOIDsRed);
                 tableHighlightRow();
                 document.getElementById("loadingImg2").style.display = "none";
+                document.getElementById("divLoadingUSGS").style.display = "none";
             }  //if initial run through, post stream section detail for all the stream sections
 
 
@@ -878,6 +879,8 @@ define([
             m_arrayOIDsGold =[];
             m_arrayOIDsOrange =[];
             m_arrayOIDsRed = [];
+
+
 
             var strURLGagePrefix = "https://nwis.waterservices.usgs.gov/nwis/iv/";
             strURLGagePrefix += "?format=json&indent=on&siteStatus=all";
@@ -1237,7 +1240,8 @@ define([
 
                     .fail(function (jqxhr, textStatus, error) {
                         var err = textStatus + ", " + app.strURLGage + ", " + error;
-                        alert("Initial query for USGS gage data failed, trying again");
+                        //alert("Initial query for USGS gage data failed, trying again");
+                        document.getElementById("divLoadingUSGS").innerHTML = "Loading USGS Data, again";
                         console.log("Request Failed: " + err);
 
                         if (!blnQuery1AtaTime) {  //if the USGS api is erroring out try the refactored method
