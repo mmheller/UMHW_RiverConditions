@@ -732,6 +732,9 @@ define([
                     var streamSectionArrray = [];
                     streamSectionArrray.push([strStreamName, strSiteID, iSectionID]);
                     app.pGage.SectionsReceived(streamSectionArrray, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, false);
+
+                    app.map.enableMapNavigation();
+                    app.map.showZoomSlider();
                 })
                 .fail(function (jqxhr, textStatus, error) {
                     var err = textStatus + ", " + error;
@@ -773,7 +776,30 @@ define([
                         app.dblExpandNum = 1.5;
 
                         app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
-                        app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "5", "(StreamName = '" + strClickStreamName + "') and " + "(SectionID = '" + strClickSegmentID + "')");
+
+                        var blnZoom = true;
+                        var pGFeature = null;
+                        for (var iG = 0; iG < app.map.graphics.graphics.length; iG++) {
+                            pGFeature = app.map.graphics.graphics[iG];
+             
+                            if (pGFeature.attributes.streamsectionClicked != undefined){
+                                if (pGFeature.attributes.streamsectionClicked == true) {
+                                    blnZoom = false;
+                                    pGFeature.attributes.streamsectionClicked = false;
+
+                                } else if (pGFeature.attributes.streamsectionClicked != true) {
+                                    app.map.graphics.clear();                //remove all graphics on the maps graphics layer
+                                }
+                            } 
+                        }
+
+                        if (blnZoom) {
+                            app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "5", "(StreamName = '" + strClickStreamName + "') and " + "(SectionID = '" + strClickSegmentID + "')");
+
+                        }
+
+                        app.map.enableMapNavigation();
+                        app.map.showZoomSlider();
                     });
 
                     var strTempText2 = (elements)[i].innerHTML;
@@ -809,6 +835,9 @@ define([
                 tableHighlightRow();
                 document.getElementById("loadingImg2").style.display = "none";
                 document.getElementById("divLoadingUSGS").style.display = "none";
+
+                app.map.enableMapNavigation();
+                app.map.showZoomSlider();
             }  //if initial run through, post stream section detail for all the stream sections
 
 
@@ -845,6 +874,9 @@ define([
         },
 
         SectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime) {
+            app.map.disableMapNavigation();
+            app.map.hideZoomSlider();
+
             app.pGage.m_arrray_Detail4ChartCFS = [];
             app.pGage.m_arrray_Detail4ChartTMP = [];
             app.pGage.m_arrray_StationIDs = [];

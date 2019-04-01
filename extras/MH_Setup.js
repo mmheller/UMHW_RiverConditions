@@ -263,6 +263,9 @@ define([
             esri.config.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
             app.map = BootstrapMap.create("mapDiv", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false});// Get a reference to the ArcGIS Map class
             
+            app.map.disableMapNavigation();
+            app.map.hideZoomSlider();
+
             if (app.map.loaded) {
                 mapLoaded();
             } else {
@@ -310,8 +313,9 @@ define([
             pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
             var templateEPOINT = new InfoTemplate();
-            templateEPOINT.setTitle("<b>${Endpoint_Name}</b>");
-            templateEPOINT.setContent("Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
+            templateEPOINT.setTitle("<b>Section Endpoint</b>");
+            templateEPOINT.setContent("Placename: ${Endpoint_Name}<br>Section: ${Start_End} of ${Section_Name}<br>Stream: ${Stream_Name}<br>");
+            //templateEPOINT.setContent("${Endpoint_Name}<br>Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, 
                 infoTemplate: templateEPOINT,
                 outFields: ['*'],
@@ -673,7 +677,6 @@ define([
             }
             function executeQueryTask(pEvt) {
                 app.map.graphics.clear();                //remove all graphics on the maps graphics layer
-
                 var dblX = pEvt.mapPoint.x;
                 var dblY = pEvt.mapPoint.y;
                 var mSR = pEvt.mapPoint.spatialReference;
@@ -681,26 +684,14 @@ define([
                 var pxWidth = app.map.extent.getWidth() / app.map.width; // create an extent from the mapPoint that was clicked // this is used to return features within 3 pixels of the click point
                 var padding = 8 * pxWidth;
                 var qGeom = new esri.geometry.Extent({ "xmin": dblX - padding, "ymin": dblY - padding, "xmax": dblX + padding, "ymax": dblY + padding, "spatialReference": mSR });
-
                 query.geometry = qGeom;
-                //query.geometry = evt.mapPoint;
                 queryTask.execute(query, showResults);
             }
             function showResults(featureSet) {
                 //QueryTask returns a featureSet.  Loop through features in the featureSet and add them to the map.
-
                 dojo.forEach(featureSet.features, function (feature) {
-                    //var graphic = feature;
-                    //symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOT, new dojo.Color([255, 0, 0]), 2);
-                    //graphic.setSymbol(symbol);
-                    //app.map.graphics.add(graphic);
-
-
                     var strStreamName = feature.attributes.StreamName;
                     var strSectionID = feature.attributes.SectionID;
-                    
-
-
                     var elements = document.getElementsByTagName('tr');  //Sets the click event for the row
                     for (var i = 0; i < elements.length; i++) {
                         var strTempText = (elements)[i].innerHTML;  //parse the section summary text to set var's for charting and zooming
@@ -710,6 +701,12 @@ define([
                         var strClickSegmentID = strTempText.substring(0, strTempText.indexOf("</span>"));
                         
                         if ((strStreamName == strClickStreamName) & (strClickSegmentID == strSectionID)) {
+                            var graphic = feature;
+                            symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 255]), 1);
+                            graphic.setSymbol(symbol);
+                            graphic.attributes = { streamsectionClicked: true };
+                            app.map.graphics.add(graphic);
+
                             (elements)[i].click();
 
                             break;
