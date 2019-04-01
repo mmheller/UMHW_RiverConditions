@@ -57,6 +57,29 @@
             width: 40px;
         }
 
+        
+
+        .clsSectionDetailCFSTEMP_WARN {
+            background-color: lightpink;
+            color: red;
+            /*margin: 20px;*/
+            padding: 10px;
+        }
+
+        .clsSectionDetailCFSTEMP {
+            background-color: black;
+            color: white;
+            /*margin: 20px;*/
+            padding: 10px;
+        }
+
+        .clsSectionDetailCFSTEMP_Alt {
+            background-color: white;
+            color: black;
+            /*margin: 20px;*/
+            padding: 10px;
+        }
+
         .esriBasemapGalleryNode {
             width: 40px;
         }
@@ -205,16 +228,14 @@
                 <div id="divSectionDetail" style="display:none; position:relative; bottom:60px; left:25px;">
                     <h2>Section Detail</h2>
                     <div style="margin: 15px 0 0 0;">
-                        <div id="detailSection2">
-                            <b>
-                                Montana FWP Closure Information!  Click <a href="http://fwp.mt.gov/news/restrictions/" target="_blank">here</a> for official closure information.
-                                <br />
-                                <div>Description: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpDESCRIPTION'></span></div>
-                                <div>Location: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpLOCATION'></span></div>
-                                <div>Press Release: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpPRESSRELEASE'></span></div>
-                                <div>Publish Date: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpPUBLISHDATE'></span></div>
-                                <div>Title: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpTITLE'></span></div>
-                            </b>
+                        <div class="clsSectionDetailCFSTEMP_WARN" id="detailSection2">
+                            <h3>Montana FWP Closure Information!  Click <a href="http://fwp.mt.gov/news/restrictions/" target="_blank">here</a> for official closure information.</h3>
+                            <br />
+                            <div>Description: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpDESCRIPTION'></span></div>
+                            <div>Location: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpLOCATION'></span></div>
+                            <div>Press Release: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpPRESSRELEASE'></span></div>
+                            <div>Publish Date: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpPUBLISHDATE'></span></div>
+                            <div>Title: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpTITLE'></span></div>
                         </div>
 
                         <div id="detailSection1" style="border:1px solid black;">
@@ -226,10 +247,11 @@
                         </div>
                         <hr>
                         <div id="detailSection3" style="border:1px solid black;">
-                            Waterflow Data
+                            <div class="clsSectionDetailCFSTEMP_Alt"><h3>Waterflow Data</h3></div>
+                            <div class="clsSectionDetailCFSTEMP">Current Discharge (CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedDischargeDateTime'></span></div>
+                            <div id="divDay3CFSTrend" class="clsSectionDetailCFSTEMP_Alt">3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" /></div>
                             <div>Stream Status based on Discharge(CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
-                            <div>Current Discharge (CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge, attr: {title: $root.CurrentDisplayGageRecord().formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" />)</div>
-                            <div><u>Target Definitions for this Stream Section</u></div>
+                            <div><u>Waterflow target definitions for this stream section</u></div>
                             <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowPref4ConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowPref4ConsvValue'></span></div>
                             <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowConsvValue'></span></div>
                             <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></div>
@@ -238,11 +260,13 @@
                         <hr>
 
                         <div id="detailSection4" style="border:1px solid black;">
-                            Water Temperature Data
-                            <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp, attr: {title: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
+                            <div class="clsSectionDetailCFSTEMP_Alt"><h3>Water Temperature Data</h3></div>
+                            <div class="clsSectionDetailCFSTEMP">Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime'></span></div>
+                            <div id="divDay3TMPTrend"  class="clsSectionDetailCFSTEMP_Alt">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
+                            <div>Stream Status based on Temperature: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
+                            <div><u>Temperature target definition for this stream section</u></div>
                             <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
-                            <div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>
-                            <div><span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
+                            <!--<div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>-->
                         </div>
                         <div></div>
 

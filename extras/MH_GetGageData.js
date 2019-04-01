@@ -140,7 +140,7 @@ define([
             self.formattedDischargeDateTime = ko.computed(function () {
                 var strDateTimeCFS = (dteLatestDateTimeCFS.getMonth() + 1) + "/" + dteLatestDateTimeCFS.getDate() + "/" + dteLatestDateTimeCFS.getFullYear();
                 strDateTimeCFS += " " + dteLatestDateTimeCFS.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
-                return strDateTimeCFS ? "!!!!" + strDateTimeCFS : "None";
+                return strDateTimeCFS ? strDateTimeCFS : "None";
             });
             self.WaterTemp = dblLatestTemp;
             self.formattedWaterTempDateTime = ko.computed(function () {
@@ -148,7 +148,7 @@ define([
                     var strDateTimeWaterTemp = (dteLatestDateTimeTemp.getMonth() + 1) + "/" + dteLatestDateTimeTemp.getDate() + "/" + dteLatestDateTimeTemp.getFullYear();
                     strDateTimeWaterTemp += " " + dteLatestDateTimeTemp.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
                 }
-                return strDateTimeWaterTemp ? "!!!!" + strDateTimeWaterTemp : "Data No Available";
+                return strDateTimeWaterTemp ? strDateTimeWaterTemp : "Data No Available";
             });
 
             self.SiteTempStatus = strSiteTempStatus;
@@ -630,13 +630,22 @@ define([
                     if ((item.fwpTITLE == "") | (item.fwpTITLE == "") | (item.fwpTITLE == "")) {
                         document.getElementById("detailSection2").style.display = 'none';
                     } else {
-                        document.getElementById("detailSection2").style.display = 'inline';
-                        document.getElementById("detailSection2").style.color = "red";
-                        //document.getElementById("detailSection2").style.border = "1px solid black";
-                        
+                        $("#detailSection2").show();
                     }
                     
+                    if ((item.Day3CFSTrend == undefined) | (item.Day3CFSTrend == "images/blank.png")) {
+                        document.getElementById("divDay3CFSTrend").style.display = 'none';
+                    } else {
+                        $("#divDay3CFSTrend").show();
+                    }
 
+                    if ((item.Day3TMPTrend == undefined) | (item.Day3TMPTrend == "images/blank.png")) {
+                        document.getElementById("divDay3TMPTrend").style.display = 'none';
+                    } else {
+                        //document.getElementById("divDay3TMPTrend").style.display = 'inline';
+                        $("#divDay3TMPTrend").show();
+                    }
+                    
                     self.CurrentDisplayGageRecord(item);
                 };
                 self.avgTemp = ko.computed(function () {
@@ -782,15 +791,17 @@ define([
                         for (var iG = 0; iG < app.map.graphics.graphics.length; iG++) {
                             pGFeature = app.map.graphics.graphics[iG];
              
-                            if (pGFeature.attributes.streamsectionClicked != undefined){
-                                if (pGFeature.attributes.streamsectionClicked == true) {
-                                    blnZoom = false;
-                                    pGFeature.attributes.streamsectionClicked = false;
+                            if (pGFeature.attributes) {
+                                if (pGFeature.attributes.streamsectionClicked != undefined) {
+                                    if (pGFeature.attributes.streamsectionClicked == true) {
+                                        blnZoom = false;
+                                        pGFeature.attributes.streamsectionClicked = false;
 
-                                } else if (pGFeature.attributes.streamsectionClicked != true) {
-                                    app.map.graphics.clear();                //remove all graphics on the maps graphics layer
+                                    } else if (pGFeature.attributes.streamsectionClicked != true) {
+                                        app.map.graphics.clear();                //remove all graphics on the maps graphics layer
+                                    }
                                 }
-                            } 
+                            }
                         }
 
                         if (blnZoom) {
