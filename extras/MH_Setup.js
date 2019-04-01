@@ -349,10 +349,11 @@ define([
                         
             pEPointsFeatureLayer.setDefinitionExpression(strQueryDef1);
 
-            var templateSSection = new InfoTemplate();
-            templateSSection.setTitle("<b>Section:${SectionID}</b>");
-            templateSSection.setContent("<b>Watershed:</b> ${Watershed}<br><b>Stream:</b> ${StreamName}<br><b>CFS Prep for Conserv:</b> ${CFS_Prep4Conserv}<br><b>Prep for Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Conserv:</b> ${CFS_Conserv}<br><b>Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Un-Official Closure:</b> ${CFS_Conserv}<br><b>Un-Official Closure Desc:</b> ${CFS_Note_NotOfficialClosure}<br><b>Conservation Temp:</b> ${ConsvTemp}");
-            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSSection, autoGeneralize: true, "opacity": 0.9, outFields: ['*'] });
+            //var templateSSection = new InfoTemplate();
+            //templateSSection.setTitle("<b>Section:${SectionID}</b>");
+            //templateSSection.setContent("<b>Watershed:</b> ${Watershed}<br><b>Stream:</b> ${StreamName}<br><b>CFS Prep for Conserv:</b> ${CFS_Prep4Conserv}<br><b>Prep for Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Conserv:</b> ${CFS_Conserv}<br><b>Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Un-Official Closure:</b> ${CFS_Conserv}<br><b>Un-Official Closure Desc:</b> ${CFS_Note_NotOfficialClosure}<br><b>Conservation Temp:</b> ${ConsvTemp}");
+            //pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSSection, autoGeneralize: true, "opacity": 0.9, outFields: ['*'] });
+            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, autoGeneralize: true, "opacity": 0.9, outFields: ['*'] });
             pSectionsFeatureLayer.setDefinitionExpression(strQueryDef2);
             app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
 
@@ -531,8 +532,9 @@ define([
             cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
             cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'Montana AIS Watercraft Access' });
             
-
             this.LayerCheckBoxSetup(cbxLayers);
+            SetupStreamClick();
+
             ko.bindingHandlers.googleBarChart = {
                 init: function (element, valueAccessor, allBindingsAccesor, viewModel, bindingContext) {
                     var chart = new google.visualization.LineChart(element);
@@ -659,8 +661,63 @@ define([
                 dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + ", Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
             }
 
+            function SetupStreamClick() {
+                dojo.connect(app.map, "onClick", executeQueryTask);
 
-       
+                queryTask = new esri.tasks.QueryTask(app.strHFL_URL + "5");
+
+                query = new esri.tasks.Query();            //build query filter
+                query.returnGeometry = true;
+                query.outFields = ["StreamName", "SectionID"];
+
+            }
+            function executeQueryTask(pEvt) {
+                app.map.graphics.clear();                //remove all graphics on the maps graphics layer
+
+                var dblX = pEvt.mapPoint.x;
+                var dblY = pEvt.mapPoint.y;
+                var mSR = pEvt.mapPoint.spatialReference;
+                var pSP = pEvt.screenPoint;
+                var pxWidth = app.map.extent.getWidth() / app.map.width; // create an extent from the mapPoint that was clicked // this is used to return features within 3 pixels of the click point
+                var padding = 8 * pxWidth;
+                var qGeom = new esri.geometry.Extent({ "xmin": dblX - padding, "ymin": dblY - padding, "xmax": dblX + padding, "ymax": dblY + padding, "spatialReference": mSR });
+
+                query.geometry = qGeom;
+                //query.geometry = evt.mapPoint;
+                queryTask.execute(query, showResults);
+            }
+            function showResults(featureSet) {
+                //QueryTask returns a featureSet.  Loop through features in the featureSet and add them to the map.
+
+                dojo.forEach(featureSet.features, function (feature) {
+                    //var graphic = feature;
+                    //symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOT, new dojo.Color([255, 0, 0]), 2);
+                    //graphic.setSymbol(symbol);
+                    //app.map.graphics.add(graphic);
+
+
+                    var strStreamName = feature.attributes.StreamName;
+                    var strSectionID = feature.attributes.SectionID;
+                    
+
+
+                    var elements = document.getElementsByTagName('tr');  //Sets the click event for the row
+                    for (var i = 0; i < elements.length; i++) {
+                        var strTempText = (elements)[i].innerHTML;  //parse the section summary text to set var's for charting and zooming
+                        strTempText = strTempText.substring(strTempText.indexOf("StreamName") + ("StreamName".length + 2), strTempText.length);
+                        var strClickStreamName = strTempText.substring(0, strTempText.indexOf("</span>"));
+                        strTempText = strTempText.substring(strTempText.indexOf("SectionID") + ("SectionID".length + 2), strTempText.length);
+                        var strClickSegmentID = strTempText.substring(0, strTempText.indexOf("</span>"));
+                        
+                        if ((strStreamName == strClickStreamName) & (strClickSegmentID == strSectionID)) {
+                            (elements)[i].click();
+
+                            break;
+                        }
+
+                    }
+                });
+            }
         },
 
         err: function (err) {

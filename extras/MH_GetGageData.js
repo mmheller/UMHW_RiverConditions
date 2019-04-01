@@ -111,6 +111,7 @@ define([
         m_arrayOIDsGold: [],
         m_arrayOIDsOrange: [],
         m_arrayOIDsRed: [],
+        mIDXQuery1AtaTime: 0,
 
         gageReadings: function (strSiteName, strHyperlinkURL,
                                             dteLatestDateTimeTemp, dblLatestTemp, strSiteTempStatus,
@@ -730,7 +731,7 @@ define([
 
                     var streamSectionArrray = [];
                     streamSectionArrray.push([strStreamName, strSiteID, iSectionID]);
-                    app.pGage.SectionsReceived(streamSectionArrray, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1);
+                    app.pGage.SectionsReceived(streamSectionArrray, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, false);
                 })
                 .fail(function (jqxhr, textStatus, error) {
                     var err = textStatus + ", " + error;
@@ -738,20 +739,119 @@ define([
                 });
         },
 
-        SectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1) {
+        StreamSectionSummaryUIAdditions: function (blnIsInitialPageLoad) {
+            if (blnIsInitialPageLoad) {
+                var vm = new app.pGage.readingsViewModel();
+                ko.applyBindings(vm, document.getElementById("entriesCon_div"));
+                ko.applyBindings(vm, document.getElementById("divSectionDetail"));
+
+                var elements = document.getElementsByTagName('tr');  //Sets the click event for the row
+                var str_overallSymbool = "";
+                for (var i = 0; i < elements.length; i++) {
+                    (elements)[i].addEventListener("click", function () {
+                        var strTempText = this.innerHTML;  //parse the section summary text to set var's for charting and zooming
+                        strTempText = strTempText.substring(strTempText.indexOf("StreamName") + ("StreamName".length + 2), strTempText.length);
+                        var strClickStreamName = strTempText.substring(0, strTempText.indexOf("</span>"));
+                        strTempText = strTempText.substring(strTempText.indexOf("SectionID") + ("SectionID".length + 2), strTempText.length);
+                        var strClickSegmentID = strTempText.substring(0, strTempText.indexOf("</span>"));
+                        strTempText = strTempText.substring(strTempText.indexOf("iLateFlowPref4ConsvValue") + ("iLateFlowPref4ConsvValue".length + 2), strTempText.length);
+                        var iCFSTarget1 = strTempText.substring(0, strTempText.indexOf("</span>"));
+                        strTempText = strTempText.substring(strTempText.indexOf("iLateFlowConsvValue") + ("iLateFlowConsvValue".length + 2), strTempText.length);
+                        var iCFSTarget2 = strTempText.substring(0, strTempText.indexOf("</span>"));
+                        strTempText = strTempText.substring(strTempText.indexOf("iLateFlowClosureValueFlow") + ("iLateFlowClosureValueFlow".length + 2), strTempText.length);
+                        var iCFSTarget3 = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+                        strTempText = strTempText.substring(strTempText.indexOf("iTempClosureValue") + ("iTempClosureValue".length + 2), strTempText.length);
+                        var iTempCloseValue = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+                        strTempText = strTempText.substring(strTempText.indexOf("strSiteID") + ("strSiteID".length + 2), strTempText.length);
+                        var strClickSiteID = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+                        strTempText = strTempText.substring(strTempText.indexOf("strDailyStat_URL") + ("strDailyStat_URL".length + 2), strTempText.length);
+                        var strDailyStat_URL = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+                        app.dblExpandNum = 1.5;
+
+                        app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
+                        app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "5", "(StreamName = '" + strClickStreamName + "') and " + "(SectionID = '" + strClickSegmentID + "')");
+                    });
+
+                    var strTempText2 = (elements)[i].innerHTML;
+                    strTempText2 = strTempText2.substring(strTempText2.indexOf("overallSymbol") + ("overallSymbol".length + 2), strTempText2.length);
+                    var str_overallSymbool = "";
+                    str_overallSymbool = strTempText2.substring(0, strTempText2.indexOf("</span>"));
+
+                    if (str_overallSymbool == "Red") {
+                        (elements)[i].style.color = 'white';
+                        (elements)[i].style.backgroundColor = "rgb(255, 0, 0)";
+                    }
+                    if (str_overallSymbool == "Orange") {
+                        (elements)[i].style.color = 'white';
+                        (elements)[i].style.backgroundColor = "rgb(253, 106, 2)";
+                    }
+                    if (str_overallSymbool == "Gold") {
+                        (elements)[i].style.color = 'white';
+                        (elements)[i].style.backgroundColor = "rgb(249, 166, 2)";
+                    }
+                    if (str_overallSymbool == "Yellow") {
+                        (elements)[i].style.color = 'black';
+                        (elements)[i].style.backgroundColor = "rgb(255, 255, 0)";
+                    }
+                    if (str_overallSymbool == "Grey") {
+                        (elements)[i].style.color = "rgb(128, 128, 128)";
+                    }
+                    if (str_overallSymbool == "White") {
+                        (elements)[i].style.color = 'black';
+                    }
+                }
+
+                app.pSup.addStreamConditionFeatureLayer(m_arrayOIDYellow, m_arrayOIDsGold, m_arrayOIDsOrange, m_arrayOIDsRed);
+                tableHighlightRow();
+                document.getElementById("loadingImg2").style.display = "none";
+            }  //if initial run through, post stream section detail for all the stream sections
+
+
+            app.pGage.m_arrray_Detail4ChartCFS.sort(function (a, b) {
+                var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
+                return dateA - dateB //sort by date ascending
+            })
+            app.pGage.m_arrray_Detail4ChartTMP.sort(function (a, b) {
+                var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
+                return dateA - dateB //sort by date ascending
+            })
+            var ViewModel2CFS_model = new app.pGage.ViewModel2CFS();
+            var elementCFS = $('#ViewModel2CFSBinding_div')[0];
+            var ViewModel2TMP_model = new app.pGage.ViewModel2TMP();
+            var elementTMP = $('#ViewModel2TMPBinding_div')[0];
+
+
+            if (!(blnIsInitialPageLoad)) {
+                ko.cleanNode(elementCFS);
+                ko.cleanNode(elementTMP);
+            }
+
+            ko.applyBindings(ViewModel2CFS_model, document.getElementById("ViewModel2CFSBinding_div"));
+            $(window).resize(function () { //this is necessary to call for responsivness since google charts are sized are not changeable, must re-create
+                ko.cleanNode(elementCFS);
+                ko.applyBindings(ViewModel2CFS_model, document.getElementById("ViewModel2CFSBinding_div"));
+            });
+
+            ko.applyBindings(ViewModel2TMP_model, document.getElementById("ViewModel2TMPBinding_div"));
+            $(window).resize(function () { //this is necessary to call for responsivness since google charts are sized are not changeable, must re-create
+                ko.cleanNode(elementTMP);
+                ko.applyBindings(ViewModel2TMP_model, document.getElementById("ViewModel2TMPBinding_div"));
+            });
+        },
+
+        SectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime) {
             app.pGage.m_arrray_Detail4ChartCFS = [];
             app.pGage.m_arrray_Detail4ChartTMP = [];
             app.pGage.m_arrray_StationIDs = [];
+
             var EntiretrHTML = "";
             var iCounterTemperature = 0;
 
-            var arraySiteIDs = [];
-            for (var ii in arrayProc) {
-                if (arrayProc[ii][1] != null) {
-                    arraySiteIDs.push(arrayProc[ii][1]);
-                 }
-            }
-            var strSiteIDs = arraySiteIDs.join(",");
+            var strSiteIDs = "";
             var iProcIndex = null;;
             var arraySiteIDInfo = null;;
             var strStreamName = null;
@@ -785,65 +885,140 @@ define([
             strURLGagePrefix += "&endDT=" +this.dteEndDay2Check;      //end date
             strURLGagePrefix += "&parameterCd=" + "00010,00060";
 
-            app.strURLGage = strURLGagePrefix + "&sites=" +strSiteIDs;        //siteID
+            var arrayProc2 = [];
+
+            if (blnQuery1AtaTime) {   //due to intermittent errors with the USGS gage api when quering on mulitple sites at the same time, added this work around as an option if ERROR occurs
+                strSiteIDs = arrayProc[app.pGage.mIDXQuery1AtaTime][1];
+                arrayProc2 = [arrayProc[app.pGage.mIDXQuery1AtaTime]];
+            } else {
+                var arraySiteIDs = [];
+                for (var ii in arrayProc) {
+                    if (arrayProc[ii][1] != null) {
+                        arraySiteIDs.push(arrayProc[ii][1]);
+                    }
+                }
+                strSiteIDs = arraySiteIDs.join(",");
+                arrayProc2 = arrayProc;
+            }
+            app.strURLGage = strURLGagePrefix + "&sites=" + strSiteIDs;
 
             var blnIsInitialPageLoad = false;
             if (arrayProc[0].length > 3) {
                 blnIsInitialPageLoad = true
             }
 
-            $.getJSON(app.strURLGage)   //http://api.jquery.com/jquery.getjson/
-                .done(function (jsonResult) {
-                    arrayJSONValues = jsonResult.value.timeSeries;
-                //run through the elements in the section array to pick out the relevant JSON elements
-                dom.map(arrayProc, function (itemSectionRefined) {  //loop through the sections
-                    //if inital load then do full run through of code
-                    strSiteID = itemSectionRefined[1];  //since some sections do not have readings all the time setting this before finding data in the JSON
-                    strStreamName = itemSectionRefined[0];  //since some sections do not have readings all the time setting this before finding data in the JSON
-                    iSectionID = itemSectionRefined[2];  //since some sections do not have readings all the time setting this before finding data in the JSON
 
-                    iTempClosureValue = itemSectionRefined[6];
+            if ((blnQuery1AtaTime) & (strSiteIDs == null)) {   //due to intermittent errors with the USGS gage api when quering on mulitple sites at the same time, added this work around as an option if ERROR occurs
+                strSiteID = arrayProc2[0][1];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                strStreamName = arrayProc2[0][0];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                iSectionID = arrayProc2[0][2];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                iTempClosureValue = arrayProc2[0][6];
 
-                    strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
-                    strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
-                    iEarlyFlowDroughtManagementTarget = itemSectionRefined[9];
-                    strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[10];
-                    strLateFlowPref4ConsvValue = itemSectionRefined[11];
-                    strLateFlowConsvValue = itemSectionRefined[12];
-                    strLateFlowClosureValueFlow = itemSectionRefined[13];
-                    strTempCollected = itemSectionRefined[14];
-                    iOID = itemSectionRefined[15];
-                    strDailyStat_URL = itemSectionRefined[16];
-                    strFWPDESCRIPTION = itemSectionRefined[17];
-                    strFWPLOCATION = itemSectionRefined[18];
-                    strFWPPRESSRELEASE = itemSectionRefined[19];
-                    strFWPPUBLISHDATE = itemSectionRefined[20];
-                    strFWPTITLE = itemSectionRefined[21];
-                    strFWPWarn = itemSectionRefined[22];
+                strMONTHDAYEarlyFlowFromDroughtManagementTarget = arrayProc2[0][7];
+                strMONTHDAYEarlyFlowToDroughtManagementTarget = arrayProc2[0][8];
+                iEarlyFlowDroughtManagementTarget = arrayProc2[0][9];
+                strEarlyFlowDroughtManagementTargetMessage = arrayProc2[0][10];
+                strLateFlowPref4ConsvValue = arrayProc2[0][11];
+                strLateFlowConsvValue = arrayProc2[0][12];
+                strLateFlowClosureValueFlow = arrayProc2[0][13];
+                strTempCollected = arrayProc2[0][14];
+                iOID = arrayProc2[0][15];
+                strDailyStat_URL = arrayProc2[0][16];
+                strFWPDESCRIPTION = arrayProc2[0][17];
+                strFWPLOCATION = arrayProc2[0][18];
+                strFWPPRESSRELEASE = arrayProc2[0][19];
+                strFWPPUBLISHDATE = arrayProc2[0][20];
+                strFWPTITLE = arrayProc2[0][21];
+                strFWPWarn = arrayProc2[0][22];
+                iLateFlowPref4ConsvValue = arrayProc2[0][3];
+                iLateFlowConsvValue = arrayProc2[0][4];
+                iLateFlowClosureValueFlow = arrayProc2[0][5];
+                dblLatestTMP = "No Gage Exists";
+                dblLatestCFS = "No Gage Exists";
 
-                    var itemFound = arrayJSONValues.filter(function (itemArraySearch) {
-                            return typeof itemArraySearch.name == 'string' && itemArraySearch.name.indexOf(strSiteID) > -1;
-                });
+                var dteLatestDateTimeTMP = "";
+                var dteLatestDateTimeCFS = "";
+                var dblLatestTMP = "";
+                var strID = "";
+                var streamSectionDispalyName = strStreamName + " Section";
+                var strSiteTempStatus = "OPEN";
+                var strSiteFlowStatus = "OPEN";
+                var str3DayCFSTrendCFS = "images/blank.png";
+                var str3DayCFSTrendTMP = "images/blank.png";
 
-                var arrray_Detail4InterpolationCFS =[];
-                var arrray_Detail4InterpolationTMP =[];
-                    var arrayTempsAbove =[];
-                    var dteLatestDateTimeTMP = "";
-                    var dteLatestDateTimeCFS = "";
-                    var dblLatestTMP = "";
-                    var dblLatestCFS = "";
-                    var strSiteName = "";
-                    var strID = "";
-                    //var strFWPDESCRIPTION = "";
-                    //var strFWPLOCATION = "";
-                    //var strFWPPRESSRELEASE = "";
-                    //var strFWPPUBLISHDATE = "";
-                    //var strFWPTITLE = "";
+                strNoDataLabel4Charting = " (No Data)";
+                dteLatestDateTimeCFS = new Date();
+                dteLatestDateTimeTMP = new Date();
 
-                    if (itemFound.length > 0) {
-                            iLateFlowPref4ConsvValue = itemSectionRefined[3];
-                            iLateFlowConsvValue = itemSectionRefined[4];
-                            iLateFlowClosureValueFlow = itemSectionRefined[5];
+                OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus, strFWPTITLE, strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn);
+                var strOverallStatus = OverallStatusAndColor[0];
+                var strOverallSymbol = OverallStatusAndColor[1];
+
+                app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName,                    //add to array that populates the river sections summary div
+                    strHyperlinkURL, dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
+                    dteLatestDateTimeCFS, dblLatestCFS.toString(), strSiteFlowStatus, strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
+                    strMONTHDAYEarlyFlowFromDroughtManagementTarget, strMONTHDAYEarlyFlowToDroughtManagementTarget, iLateFlowPref4ConsvValue,
+                    iLateFlowConsvValue, iLateFlowClosureValueFlow, strLateFlowPref4ConsvValue, strLateFlowConsvValue,
+                    strLateFlowClosureValueFlow, iTempClosureValue, strTempCollected, strSiteID,
+                    strDailyStat_URL, str3DayCFSTrendTMP, strFWPDESCRIPTION, strFWPLOCATION,
+                    strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE, strOverallStatus,
+                    strOverallSymbol]);
+
+                app.pGage.mIDXQuery1AtaTime += 1;
+                if ((blnQuery1AtaTime) & (app.pGage.mIDXQuery1AtaTime < arrayProc.length)) {
+                    app.pGage.SectionsReceived(arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime)
+                } else {
+                    app.pGage.StreamSectionSummaryUIAdditions(blnIsInitialPageLoad);
+                    app.pGage.mIDXQuery1AtaTime = 0;
+                }
+
+            } else {
+                $.getJSON(app.strURLGage)   //http://api.jquery.com/jquery.getjson/
+                    .done(function (jsonResult) {
+                        arrayJSONValues = jsonResult.value.timeSeries;
+                
+                        dom.map(arrayProc2, function (itemSectionRefined) {  //loop through the sections  //run through the elements in the section array to pick out the relevant JSON elements
+                            //if inital load then do full run through of code
+                            strSiteID = itemSectionRefined[1];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                            strStreamName = itemSectionRefined[0];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                            iSectionID = itemSectionRefined[2];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                            iTempClosureValue = itemSectionRefined[6];
+
+                            strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
+                            strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
+                            iEarlyFlowDroughtManagementTarget = itemSectionRefined[9];
+                            strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[10];
+                            strLateFlowPref4ConsvValue = itemSectionRefined[11];
+                            strLateFlowConsvValue = itemSectionRefined[12];
+                            strLateFlowClosureValueFlow = itemSectionRefined[13];
+                            strTempCollected = itemSectionRefined[14];
+                            iOID = itemSectionRefined[15];
+                            strDailyStat_URL = itemSectionRefined[16];
+                            strFWPDESCRIPTION = itemSectionRefined[17];
+                            strFWPLOCATION = itemSectionRefined[18];
+                            strFWPPRESSRELEASE = itemSectionRefined[19];
+                            strFWPPUBLISHDATE = itemSectionRefined[20];
+                            strFWPTITLE = itemSectionRefined[21];
+                            strFWPWarn = itemSectionRefined[22];
+
+                            var itemFound = arrayJSONValues.filter(function (itemArraySearch) {
+                                    return typeof itemArraySearch.name == 'string' && itemArraySearch.name.indexOf(strSiteID) > -1;
+                            });
+
+                            var arrray_Detail4InterpolationCFS =[];
+                            var arrray_Detail4InterpolationTMP =[];
+                            var arrayTempsAbove =[];
+                            var dteLatestDateTimeTMP = "";
+                            var dteLatestDateTimeCFS = "";
+                            var dblLatestTMP = "";
+                            var dblLatestCFS = "";
+                            var strSiteName = "";
+                            var strID = "";
+
+                            if (itemFound.length > 0) {
+                                    iLateFlowPref4ConsvValue = itemSectionRefined[3];
+                                    iLateFlowConsvValue = itemSectionRefined[4];
+                                    iLateFlowClosureValueFlow = itemSectionRefined[5];
 
                                     if (blnIsInitialPageLoad) {
                                         if (app.test) {
@@ -868,48 +1043,31 @@ define([
                                         }
                                     }
 
-                                        //iTempClosureValue = itemSectionRefined[6];
-                                        //strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
-                                        //strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
-                                        //iEarlyFlowDroughtManagementTarget = itemSectionRefined[9];
-                                        //strEarlyFlowDroughtManagementTargetMessage = itemSectionRefined[10];
-                                        //strLateFlowPref4ConsvValue = itemSectionRefined[11];
-                                        //strLateFlowConsvValue = itemSectionRefined[12];
-                                        //strLateFlowClosureValueFlow = itemSectionRefined[13];
-                                        //strTempCollected = itemSectionRefined[14];
-                                        //iOID = itemSectionRefined[15];
-                                        //strDailyStat_URL = itemSectionRefined[16];
-                                        //strDESCRIPTION = itemSectionRefined[17];
-                                        //strLOCATION = itemSectionRefined[18];
-                                        //strPRESSRELEASE = itemSectionRefined[19];
-                                        //strPUBLISHDATE = itemSectionRefined[20];
-                                        //strTITLE = itemSectionRefined[21];
+                                    var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
+                                    var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
+                                    iTempClosureValueCelsius = (iTempClosureValue -32) * (5 / 9);
 
-                                        var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
-                                        var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
-                                        iTempClosureValueCelsius = (iTempClosureValue -32) * (5 / 9);
+                                    var strHyperlinkURL = strURLGagePrefix + "&sites=" +strSiteID;        //siteID
+                                    strHyperlinkURL = returnURL4GSgage(strHyperlinkURL);
 
-                                        var strHyperlinkURL = strURLGagePrefix + "&sites=" +strSiteID;        //siteID
-                                        strHyperlinkURL = returnURL4GSgage(strHyperlinkURL);
+                                    blnRealValues = false;
+                                    var str3DayCFSTrendCFS = "images/blank.png";
+                                    var str3DayCFSTrendTMP = "images/blank.png";
+                            }
 
-                                        blnRealValues = false;
-                                        var str3DayCFSTrendCFS = "images/blank.png";
-                                        var str3DayCFSTrendTMP = "images/blank.png";
-                        }
+                            //determine if the JSON element is a temperature or discharge reading
+                            var temperatureItem = "";
+                            var CFSItem = "";
+                            for (var iv = 0; iv < itemFound.length; iv++) {
+                                    if (itemFound[iv].variable.variableDescription == "Temperature, water, degrees Celsius") {
+                                        temperatureItem = itemFound[iv];
+                                    }
+                                    if (itemFound[iv].variable.variableDescription == "Discharge, cubic feet per second") {
+                                        CFSItem = itemFound[iv];
+                                    }
+                            }
 
-                        //determine if the JSON element is a temperature or discharge reading
-                        var temperatureItem = "";
-                        var CFSItem = "";
-                        for (var iv = 0; iv < itemFound.length; iv++) {
-                                if (itemFound[iv].variable.variableDescription == "Temperature, water, degrees Celsius") {
-                                    temperatureItem = itemFound[iv];
-                                }
-                                if (itemFound[iv].variable.variableDescription == "Discharge, cubic feet per second") {
-                                    CFSItem = itemFound[iv];
-                                }
-                        }
-
-                        if (CFSItem != "") {
+                            if (CFSItem != "") {
                                 arrayJSONValues2 = CFSItem.values[0].value;
                                 jQuery.each(arrayJSONValues2, function (k, item2) {
                                     var dteDateTime = new Date(item2.dateTime);
@@ -917,12 +1075,10 @@ define([
 
                                     if (item2.value != -999999) {
                                         blnRealValues = true;
-                                        var obj = {
-                                    };
+                                        var obj = {};
                                         obj["id"]= strStreamName + "," +iSectionID;
                                         obj["date"] = dteDateTime.getFullYear() + "-" +("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" +("0" +dteDateTime.getDate()).slice(-2);
-                                        obj["time"]= dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false
-                                    });
+                                        obj["time"]= dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false});
                                         obj["cfs"]= parseFloat(item2.value);
                                         obj["gagedatetime"]= dteDateTime;
 
@@ -941,272 +1097,154 @@ define([
                                     arrray_Detail4InterpolationCFS.sort(function (a, b) {
                                         var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
                                         return dateA -dateB //sort by date ascending
-                                })
-                                var iCFSArrayLength = (arrray_Detail4InterpolationCFS.length -1);
-                                dteLatestDateTimeCFS = arrray_Detail4InterpolationCFS[iCFSArrayLength].gagedatetime;
-                                dblLatestCFS = parseFloat(arrray_Detail4InterpolationCFS[iCFSArrayLength].cfs);
+                                    })
+                                    var iCFSArrayLength = (arrray_Detail4InterpolationCFS.length -1);
+                                    dteLatestDateTimeCFS = arrray_Detail4InterpolationCFS[iCFSArrayLength].gagedatetime;
+                                    dblLatestCFS = parseFloat(arrray_Detail4InterpolationCFS[iCFSArrayLength].cfs);
 
-                                str3DayCFSTrendCFS = ProcLinearRegression(arrray_Detail4InterpolationCFS, "cfs");
-                            }
-                        }
-
-                        arrayJSONValues2 =[]; //clear out the array
-
-                        if (temperatureItem != "") {
-                                arrayJSONValues22 = temperatureItem.values[0].value;
-                                jQuery.each(arrayJSONValues22, function (k, item22) {
-                                    var dteDateTime = new Date(item22.dateTime);
-                                    var strNoData = "";
-                                    if (item22.value != -999999) {
-                                        blnRealValues = true;
-                                        var obj = {
-                                    };
-                                        obj["id"]= strStreamName + "," +iSectionID;
-                                        obj["date"] = dteDateTime.getFullYear() + "-" +("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" +("0" +dteDateTime.getDate()).slice(-2);
-                                        obj["time"]= dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false
-                                    });
-                                        obj["TMP"]= Math.round(parseFloat(item22.value) * 9 / 5 +32);
-                                        obj["gagedatetime"]= dteDateTime;
-                                        obj["TMPTarget1"]= iTMPTarget1;  //this are only used in single charting situations
-                                        app.pGage.m_arrray_Detail4ChartTMP.push(obj);//populate the array that contains the data for charting
-                                        obj["EPOCH"]= Date.parse(dteDateTime);
-                                        arrray_Detail4InterpolationTMP.push(obj);  //populate the array that is used to determing the flow trent
-                                    }
-                                });
-
-                                if ((arrray_Detail4InterpolationTMP.length > 0) & (blnRealValues)) { //figure out if the flow trend is increasing or decreasing & the last known values
-                                    arrray_Detail4InterpolationTMP.sort(function (a, b) {
-                                            var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
-                                            return dateA -dateB //sort by date ascending
-                                        })
-                                    var iTMPArrayLength = (arrray_Detail4InterpolationTMP.length -1);
-                                    dteLatestDateTimeTMP = arrray_Detail4InterpolationTMP[iTMPArrayLength].gagedatetime;
-
-                                    dblLatestTMP = parseFloat(arrray_Detail4InterpolationTMP[iTMPArrayLength].TMP);
-                                    str3DayCFSTrendTMP = ProcLinearRegression(arrray_Detail4InterpolationTMP, "TMP");
+                                    str3DayCFSTrendCFS = ProcLinearRegression(arrray_Detail4InterpolationCFS, "cfs");
                                 }
+                            }
+
+                            arrayJSONValues2 =[]; //clear out the array
+
+                            if (temperatureItem != "") {
+                                    arrayJSONValues22 = temperatureItem.values[0].value;
+                                    jQuery.each(arrayJSONValues22, function (k, item22) {
+                                        var dteDateTime = new Date(item22.dateTime);
+                                        var strNoData = "";
+                                        if (item22.value != -999999) {
+                                            blnRealValues = true;
+                                            var obj = {};
+                                            obj["id"]= strStreamName + "," +iSectionID;
+                                            obj["date"] = dteDateTime.getFullYear() + "-" +("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" +("0" +dteDateTime.getDate()).slice(-2);
+                                            obj["time"]= dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false});
+                                            obj["TMP"]= Math.round(parseFloat(item22.value) * 9 / 5 +32);
+                                            obj["gagedatetime"]= dteDateTime;
+                                            obj["TMPTarget1"]= iTMPTarget1;  //this are only used in single charting situations
+                                            app.pGage.m_arrray_Detail4ChartTMP.push(obj);//populate the array that contains the data for charting
+                                            obj["EPOCH"]= Date.parse(dteDateTime);
+                                            arrray_Detail4InterpolationTMP.push(obj);  //populate the array that is used to determing the flow trent
+                                        }
+                                    });
+
+                                    if ((arrray_Detail4InterpolationTMP.length > 0) & (blnRealValues)) { //figure out if the flow trend is increasing or decreasing & the last known values
+                                        arrray_Detail4InterpolationTMP.sort(function (a, b) {
+                                                var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)  //sort
+                                                return dateA -dateB //sort by date ascending
+                                            })
+                                        var iTMPArrayLength = (arrray_Detail4InterpolationTMP.length -1);
+                                        dteLatestDateTimeTMP = arrray_Detail4InterpolationTMP[iTMPArrayLength].gagedatetime;
+
+                                        dblLatestTMP = parseFloat(arrray_Detail4InterpolationTMP[iTMPArrayLength].TMP);
+                                        str3DayCFSTrendTMP = ProcLinearRegression(arrray_Detail4InterpolationTMP, "TMP");
+                                    }
+                            }
+
+                            arrayJSONValues22 =[]; //clear out the array
+                            CFSItem = "";
+                            temperatureItem = "";
                         }
 
-                        arrayJSONValues22 =[]; //clear out the array
-                        CFSItem = "";
-                        temperatureItem = "";
-                }
+                            if (itemFound.length > 0) {
+                            var item = itemFound[0];
+                                    strSiteName = item.sourceInfo.siteName;
+                            }
+                            var strNoDataLabel4Charting = "";
+                            if (dblLatestCFS == -999999) {
+                                dblLatestCFS = "Not Available"
+                                dteLatestDateTimeCFS = new Date();
+                                strNoDataLabel4Charting = " (No Data)";
+                            } else if (dblLatestCFS == "") {
+                                dblLatestCFS = "Not Collected"
+                                strNoDataLabel4Charting = " (No Data)";
+                                dteLatestDateTimeCFS = new Date();
+                            } else {//determine the site's status based on discharge
+                                if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) {
+                                    strSiteFlowStatus = "PREPARE FOR CONSERVATION";
+                                }
+                                if ((dblLatestCFS <= iLateFlowConsvValue) & (dblLatestCFS > iLateFlowClosureValueFlow)) {
+                                        strSiteFlowStatus = "CONSERVATION";
+                                }
+                                if (dblLatestCFS <= iLateFlowClosureValueFlow) {
+                                        strSiteFlowStatus = "UNOFFICIAL RIVER CLOSURE";
+                                }
+                            }
 
-                if (itemFound.length > 0) {
-                    var item = itemFound[0];
-                            strSiteName = item.sourceInfo.siteName;
-                    }
-                    var strNoDataLabel4Charting = "";
-                    if (dblLatestCFS == -999999) {
-                        dblLatestCFS = "Not Available"
-                        dteLatestDateTimeCFS = new Date();
-                        strNoDataLabel4Charting = " (No Data)";
-                    } else if (dblLatestCFS == "") {
-                        dblLatestCFS = "Not Collected"
-                        strNoDataLabel4Charting = " (No Data)";
-                        dteLatestDateTimeCFS = new Date();
-                    } else {//determine the site's status based on discharge
-                        if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) {
-                            strSiteFlowStatus = "PREPARE FOR CONSERVATION";
-                    }
-                        if ((dblLatestCFS <= iLateFlowConsvValue) & (dblLatestCFS > iLateFlowClosureValueFlow)) {
-                            strSiteFlowStatus = "CONSERVATION";
-                    }
-                        if (dblLatestCFS <= iLateFlowClosureValueFlow) {
-                            strSiteFlowStatus = "UNOFFICIAL RIVER CLOSURE";
-                    }
-                }
+                            if (dblLatestTMP == - 999999) {
+                                dblLatestTMP = "Not Available"
+                                dteLatestDateTimeTMP = new Date();
+                            } else if (dblLatestTMP == "") {
+                                dblLatestTMP = "Not Collected"
+                                dteLatestDateTimeTMP = new Date();
+                            } else if (dblLatestTMP > iTempClosureValue) {
+                                strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE";
+                            }
 
-                if (dblLatestTMP == - 999999) {
-                    dblLatestTMP = "Not Available"
-                    dteLatestDateTimeTMP = new Date();
-                } else if (dblLatestTMP == "") {
-                    dblLatestTMP = "Not Collected"
-                    dteLatestDateTimeTMP = new Date();
-                } else if (dblLatestTMP > iTempClosureValue) {
-                    strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE";
-                }
+                            if (itemSectionRefined[1]== null) {  //if no gage id then hardcode 
+                                dblLatestTMP = "No Gage Exists";
+                                dblLatestCFS = "No Gage Exists";
+                            }
 
-                if (itemSectionRefined[1]== null) {  //if no gage id then hardcode 
-                    dblLatestTMP = "No Gage Exists";
-                    dblLatestCFS = "No Gage Exists";
-                }
+                            app.pGage.m_arrray_StationIDs.push(strStreamName + "," +iSectionID +strNoDataLabel4Charting);  // using this array of station id's to pivot the table for charting
 
-                app.pGage.m_arrray_StationIDs.push(strStreamName + "," +iSectionID +strNoDataLabel4Charting);  // using this array of station id's to pivot the table for charting
+                            if (blnIsInitialPageLoad) {
+                                var streamSectionDispalyName = strSiteName.replace(", MT", "").replace(" MT", "").replace(strStreamName, "").replace("Big Hole R", "");
+                                streamSectionDispalyName = streamSectionDispalyName.replace("Red Rock Cr ", "");
+                                streamSectionDispalyName = streamSectionDispalyName.replace("E Gallatin R ", "");
 
-                if (blnIsInitialPageLoad) {
-                    var streamSectionDispalyName = strSiteName.replace(", MT", "").replace(" MT", "").replace(strStreamName, "").replace("Big Hole R", "");
-                    streamSectionDispalyName = streamSectionDispalyName.replace("Red Rock Cr ", "");
-                    streamSectionDispalyName = streamSectionDispalyName.replace("E Gallatin R ", "");
+                                if (streamSectionDispalyName == "") {
+                                    streamSectionDispalyName = strStreamName + " Section";
+                                }
 
-                    if (streamSectionDispalyName == "") {
-                        streamSectionDispalyName = strStreamName + " Section";
-                    }
+                                OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus, strFWPTITLE, strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn);
+                                var strOverallStatus = OverallStatusAndColor[0];
+                                var strOverallSymbol = OverallStatusAndColor[1];
 
-                    OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus,
-                                                strFWPTITLE, strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn);
-                    var strOverallStatus = OverallStatusAndColor[0];
-                    var strOverallSymbol = OverallStatusAndColor[1];
+                                app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName,                    //add to array that populates the river sections summary div
+                                    strHyperlinkURL, dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
+                                    dteLatestDateTimeCFS, dblLatestCFS.toString(), strSiteFlowStatus, strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
+                                    strMONTHDAYEarlyFlowFromDroughtManagementTarget, strMONTHDAYEarlyFlowToDroughtManagementTarget, iLateFlowPref4ConsvValue,
+                                    iLateFlowConsvValue, iLateFlowClosureValueFlow, strLateFlowPref4ConsvValue, strLateFlowConsvValue,
+                                    strLateFlowClosureValueFlow, iTempClosureValue, strTempCollected, strSiteID,
+                                    strDailyStat_URL, str3DayCFSTrendTMP, strFWPDESCRIPTION, strFWPLOCATION,
+                                    strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE, strOverallStatus,
+                                    strOverallSymbol ]);
 
-                    
-                    document.getElementById("loadingImg2").style.display = "none";
+                            }
 
-                    //add to array that populates the river sections summary div
-                    app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName,
-                        strHyperlinkURL,
-                        dteLatestDateTimeTMP,
-                        dblLatestTMP.toString().replace("-999999", "Data Not Available"),
-                        strSiteTempStatus,
-                        dteLatestDateTimeCFS,
-                        dblLatestCFS.toString(),
-                        strSiteFlowStatus,
-                        strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
-                        strMONTHDAYEarlyFlowFromDroughtManagementTarget,
-                        strMONTHDAYEarlyFlowToDroughtManagementTarget,
-                        iLateFlowPref4ConsvValue,
-                        iLateFlowConsvValue,
-                        iLateFlowClosureValueFlow,
-                        strLateFlowPref4ConsvValue,
-                        strLateFlowConsvValue,
-                        strLateFlowClosureValueFlow,
-                        iTempClosureValue,
-                        strTempCollected,
-                        strSiteID,
-                        strDailyStat_URL,
-                        str3DayCFSTrendTMP,
-                        strFWPDESCRIPTION,
-                        strFWPLOCATION,
-                        strFWPPRESSRELEASE,
-                        strFWPPUBLISHDATE,
-                        strFWPTITLE,
-                        strOverallStatus,
-                        strOverallSymbol
-                    ]);
+                            var blnAddNew = false;
+                            dteLatestDateTimeTMP = "";
+                            dteLatestDateTimeCFS = "";
+                            dblLatestTemp = "";
+                            dblLatestCFS = "";
+                            arrayTempsAbove =[];
+                            strSiteName = "";
+                        })
 
-                }
+                        arrayJSONValues = [];
 
-                var blnAddNew = false;
-                dteLatestDateTimeTMP = "";
-                dteLatestDateTimeCFS = "";
-                dblLatestTemp = "";
-                dblLatestCFS = "";
-                arrayTempsAbove =[];
-                strSiteName = "";
-            })
+                        app.pGage.mIDXQuery1AtaTime += 1;
 
-            if (blnIsInitialPageLoad) {
-                var vm = new app.pGage.readingsViewModel();
-                ko.applyBindings(vm, document.getElementById("entriesCon_div"));
-                ko.applyBindings(vm, document.getElementById("divSectionDetail"));
+                        if ((blnQuery1AtaTime) & (app.pGage.mIDXQuery1AtaTime < arrayProc.length)) {
+                            app.pGage.SectionsReceived(arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime)
+                        } else {
+                            app.pGage.StreamSectionSummaryUIAdditions(blnIsInitialPageLoad);
+                            app.pGage.mIDXQuery1AtaTime = 0;
+                        }
 
-                var elements = document.getElementsByTagName('tr');  //Sets the click event for the row
-                var str_overallSymbool = "";
-                for (var i = 0; i < elements.length; i++) {
-                    (elements)[i].addEventListener("click", function () {
-                        var strTempText = this.innerHTML;  //parse the section summary text to set var's for charting and zooming
-                        strTempText = strTempText.substring(strTempText.indexOf("StreamName") +("StreamName".length +2), strTempText.length);
-                        var strClickStreamName = strTempText.substring(0, strTempText.indexOf("</span>"));
-                        strTempText = strTempText.substring(strTempText.indexOf("SectionID") +("SectionID".length +2), strTempText.length);
-                        var strClickSegmentID = strTempText.substring(0, strTempText.indexOf("</span>"));
-                        strTempText = strTempText.substring(strTempText.indexOf("iLateFlowPref4ConsvValue") +("iLateFlowPref4ConsvValue".length +2), strTempText.length);
-                        var iCFSTarget1 = strTempText.substring(0, strTempText.indexOf("</span>"));
-                        strTempText = strTempText.substring(strTempText.indexOf("iLateFlowConsvValue") +("iLateFlowConsvValue".length +2), strTempText.length);
-                        var iCFSTarget2 = strTempText.substring(0, strTempText.indexOf("</span>"));
-                        strTempText = strTempText.substring(strTempText.indexOf("iLateFlowClosureValueFlow") +("iLateFlowClosureValueFlow".length +2), strTempText.length);
-                        var iCFSTarget3 = strTempText.substring(0, strTempText.indexOf("</span>"));
-
-                        strTempText = strTempText.substring(strTempText.indexOf("iTempClosureValue") + ("iTempClosureValue".length +2), strTempText.length);
-                        var iTempCloseValue = strTempText.substring(0, strTempText.indexOf("</span>"));
-
-
-                        strTempText = strTempText.substring(strTempText.indexOf("strSiteID") +("strSiteID".length +2), strTempText.length);
-                        var strClickSiteID = strTempText.substring(0, strTempText.indexOf("</span>"));
-
-                        strTempText = strTempText.substring(strTempText.indexOf("strDailyStat_URL") + ("strDailyStat_URL".length +2), strTempText.length);
-                        var strDailyStat_URL = strTempText.substring(0, strTempText.indexOf("</span>"));
-
-                        app.dblExpandNum = 1;
-
-                        app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
-                        app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "5", "(StreamName = '" + strClickStreamName + "') and " + "(SectionID = '" +strClickSegmentID + "')");
-                });
-
-                var strTempText2 = (elements)[i].innerHTML;
-                strTempText2 = strTempText2.substring(strTempText2.indexOf("overallSymbol") + ("overallSymbol".length +2), strTempText2.length);
-                var str_overallSymbool = "";
-                str_overallSymbool = strTempText2.substring(0, strTempText2.indexOf("</span>"));
-
-                    if (str_overallSymbool == "Red") {
-                        (elements)[i].style.color = 'white';
-                        (elements)[i].style.backgroundColor = "rgb(255, 0, 0)";
-                    }
-                        if (str_overallSymbool == "Orange") {
-                            (elements)[i].style.color = 'white';
-                            (elements)[i].style.backgroundColor = "rgb(253, 106, 2)";
-                    }
-                        if (str_overallSymbool == "Gold") {
-                            (elements)[i].style.color = 'white';
-                            (elements)[i].style.backgroundColor = "rgb(249, 166, 2)";
-                    }
-                        if (str_overallSymbool == "Yellow") {
-                            (elements)[i].style.color = 'black';
-                            (elements)[i].style.backgroundColor = "rgb(255, 255, 0)";
-                    }
-                        if (str_overallSymbool == "Grey") {
-                            (elements)[i].style.color = "rgb(128, 128, 128)";
-                    }
-                        if (str_overallSymbool == "White") {
-                            (elements)[i].style.color = 'black';
-                    }
-                }
-
-                app.pSup.addStreamConditionFeatureLayer(m_arrayOIDYellow, m_arrayOIDsGold, m_arrayOIDsOrange, m_arrayOIDsRed);
-                    tableHighlightRow();
-
-            }  //if initial run through, post stream section detail for all the stream sections
-
-                    app.pGage.m_arrray_Detail4ChartCFS.sort(function (a, b) {
-                        var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
-                        return dateA -dateB //sort by date ascending
-                    })
-                    app.pGage.m_arrray_Detail4ChartTMP.sort(function (a, b) {
-                        var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
-                        return dateA -dateB //sort by date ascending
                     })
 
-                    var ViewModel2CFS_model = new app.pGage.ViewModel2CFS();
-                    var elementCFS = $('#ViewModel2CFSBinding_div')[0];
+                    .fail(function (jqxhr, textStatus, error) {
+                        var err = textStatus + ", " + app.strURLGage + ", " + error;
+                        alert("Initial query for USGS gage data failed, trying again");
+                        console.log("Request Failed: " + err);
 
-                    var ViewModel2TMP_model = new app.pGage.ViewModel2TMP();
-                    var elementTMP = $('#ViewModel2TMPBinding_div')[0];
-
-
-                    if (!(blnIsInitialPageLoad)) {
-                        ko.cleanNode(elementCFS);
-                        ko.cleanNode(elementTMP);
-                    }
-
-                    ko.applyBindings(ViewModel2CFS_model, document.getElementById("ViewModel2CFSBinding_div"));
-                    $(window).resize(function () { //this is necessary to call for responsivness since google charts are sized are not changeable, must re-create
-                        ko.cleanNode(elementCFS);
-                        ko.applyBindings(ViewModel2CFS_model, document.getElementById("ViewModel2CFSBinding_div"));
-            });
-
-
-            ko.applyBindings(ViewModel2TMP_model, document.getElementById("ViewModel2TMPBinding_div"));
-            $(window).resize(function () { //this is necessary to call for responsivness since google charts are sized are not changeable, must re-create
-                ko.cleanNode(elementTMP);
-                ko.applyBindings(ViewModel2TMP_model, document.getElementById("ViewModel2TMPBinding_div"));
-            });
-
-
-                    arrayJSONValues =[];
-              })
-              .fail(function (jqxhr, textStatus, error) {
-                  var err = textStatus + ", " +error;
-                  console.log("Request Failed: " +err);
-              });
-
+                        if (!blnQuery1AtaTime) {  //if the USGS api is erroring out try the refactored method
+                            app.pGage.SectionsReceived(arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, true)
+                        }
+                    });
+            }
         },
 
 

@@ -71,14 +71,14 @@ define([
                     x.style.visibility = 'visible';
                 }
             } else {
-                this.app.pGage.SectionsReceived(app.pGetWarn.m_streamSectionArrray, "", "", "", "");  //if an error go continue with getting seciton detail and display
+                this.app.pGage.SectionsReceived(app.pGetWarn.m_streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
                 this.app.pGetWarn.ClearVars();
             }
         },
 
         GetFWPWarnResultsError1: function (results) {
-            alert("Error with query on FWS warn layer");
-            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "");  //if an error go continue with getting seciton detail and display
+            alert("Error with query on FWS warn layer1");
+            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
             this.app.pGetWarn.ClearVars();
         },  
         
@@ -129,7 +129,7 @@ define([
             this.app.pGetWarn.m_StepThruCounter += 1;
 
             if (this.app.pGetWarn.m_StepThruCounter == this.m_FWPWarnFeatures.length) {
-                this.app.pGage.SectionsReceived(app.pGetWarn.m_streamSectionArrray, "", "", "", "");  //if an error go continue with getting seciton detail and display
+                this.app.pGage.SectionsReceived(app.pGetWarn.m_streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
                 this.app.pGetWarn.ClearVars();
             } else {
                 var pNextFWPFeature = this.m_FWPWarnFeatures[this.app.pGetWarn.m_StepThruCounter];
@@ -139,8 +139,8 @@ define([
 
         GetFWPWarnResultsError2: function (results) {
             console.log("Failed to get results from Sections Layer when querying by FWP Warn polygon due to an error: ", err);
-            alert("Error with query on FWS warn layer");
-            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "");  //if an error go continue with getting seciton detail and display
+            alert("Error with query on FWS warn layer2");
+            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
             this.app.pGetWarn.ClearVars();
         }
     });
