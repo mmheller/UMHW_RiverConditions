@@ -105,7 +105,8 @@ define([
         m_arrray_Detail4ChartCFS: [],
         m_arrray_Detail4ChartTMP: [],
         m_arrray_Detail4ChartHistoryCFS: [],
-        m_arrray_StationIDs: [],
+        m_arrray_StationIDsCFS: [],
+        m_arrray_StationIDsTMP: [],
         m_ProcessingIndex: 0,
         m_arrayOIDYellow: [],
         m_arrayOIDsGold: [],
@@ -317,7 +318,7 @@ define([
                 var arrayPrelimData_3 = [];
 
                 var uniqueSiteIDs = [];  //Remove duplicates from the siteid array
-                $.each(app.pGage.m_arrray_StationIDs, function (i, el) {
+                $.each(app.pGage.m_arrray_StationIDsTMP, function (i, el) {
                     if ($.inArray(el, uniqueSiteIDs) === -1) uniqueSiteIDs.push(el);
                 });
 
@@ -326,11 +327,15 @@ define([
                 if (app.pGage.m_arrray_Detail4ChartTMP.length > 0) {//get the 1st gagedate form comparrison 
                     var dteDateTimeTemp = app.pGage.m_arrray_Detail4ChartTMP[0].gagedatetime;
 
-                    if (app.pGage.m_arrray_StationIDs.length == 1) {
+                    if (app.pGage.m_arrray_StationIDsTMP.length == 1) {
                         blnSingleCharting = true;
                         var iTMPTarget1 = app.pGage.m_arrray_Detail4ChartTMP[0].TMPTarget1;
-                        if (!(isNaN(iTMPTarget1))) { iTMPTarget1 = Number(iTMPTarget1) }
-                        iChart_TMP_ColumnNames = [iTMPTarget1.toString() + "Consv. Target"];
+                        if (!(isNaN(iTMPTarget1))) {
+                            iTMPTarget1 = Number(iTMPTarget1)
+                            if (iTMPTarget1 != 0) {
+                                iChart_TMP_ColumnNames.push(iTMPTarget1.toString() + "Consv. Target");
+                            }
+                        }
                     }
                 }
                 //else if (app.pGage.m_arrray_Detail4ChartHistoryTMP.length > 0) {  //if historical data AND NO CURRNET DATA, only gathered for single sections, then add the the datatable
@@ -371,9 +376,9 @@ define([
                             arrayPrelimData_2.push(iVal2Chart);
 
                             if (blnSingleCharting) {
-                                arrayPrelimData_2.push(iTMPTarget1);
-                                //arrayPrelimData_2.push(iTMPTarget2);
-                                //arrayPrelimData_2.push(iTMPTarget3);
+                                if (iTMPTarget1 != 0) {
+                                    arrayPrelimData_2.push(iTMPTarget1); 
+                                }
                             }
                         }
 
@@ -448,7 +453,7 @@ define([
                 var arrayPrelimData_3 = [];
 
                 var uniqueSiteIDs = [];  //Remove duplicates from the siteid array
-                $.each(app.pGage.m_arrray_StationIDs, function (i, el) {
+                $.each(app.pGage.m_arrray_StationIDsCFS, function (i, el) {
                     if ($.inArray(el, uniqueSiteIDs) === -1) uniqueSiteIDs.push(el);
                 });
 
@@ -457,15 +462,30 @@ define([
                 if (app.pGage.m_arrray_Detail4ChartCFS.length > 0) {//get the 1st gagedate form comparrison 
                     var dteDateTimeTemp = app.pGage.m_arrray_Detail4ChartCFS[0].gagedatetime;
 
-                    if (app.pGage.m_arrray_StationIDs.length == 1) {
+                    if (app.pGage.m_arrray_StationIDsCFS.length == 1) {
                         blnSingleCharting = true;
                         var icfsTarget1 = app.pGage.m_arrray_Detail4ChartCFS[0].cfsTarget1;
-                        if (!(isNaN(icfsTarget1))) { icfsTarget1 = Number(icfsTarget1) }
+                        if (!(isNaN(icfsTarget1))) {
+                            icfsTarget1 = Number(icfsTarget1)
+                            if (icfsTarget1 != 0) {
+                                iChart_CFS_ColumnNames.push(icfsTarget1.toString() + "Consv. Target");
+                            }
+                        }
                         var icfsTarget2 = app.pGage.m_arrray_Detail4ChartCFS[0].cfsTarget2;
-                        if (!(isNaN(icfsTarget2))) { icfsTarget2 = Number(icfsTarget2) }
+                        if (!(isNaN(icfsTarget2))) {
+                            icfsTarget2 = Number(icfsTarget2)
+                            if (icfsTarget2 != 0) {
+                                iChart_CFS_ColumnNames.push(icfsTarget2.toString() + "Consv. Target");
+                            }
+                        }
                         var icfsTarget3 = app.pGage.m_arrray_Detail4ChartCFS[0].cfsTarget3;
-                        if (!(isNaN(icfsTarget3))) { icfsTarget3 = Number(icfsTarget3) }
-                        iChart_CFS_ColumnNames = [icfsTarget1.toString() + "Consv. Target", icfsTarget2.toString() + "Consv. Target", icfsTarget3.toString() + "Consv. Target"];
+                        if (!(isNaN(icfsTarget3))) {
+                            icfsTarget3 = Number(icfsTarget3)
+                            if (icfsTarget3 != 0) {
+                                iChart_CFS_ColumnNames.push(icfsTarget3.toString() + "Consv. Target");
+                            }
+                        }
+                        //iChart_CFS_ColumnNames = [icfsTarget1.toString() + "Consv. Target", icfsTarget2.toString() + "Consv. Target", icfsTarget3.toString() + "Consv. Target"];
                     }
                 } else if (app.pGage.m_arrray_Detail4ChartHistoryCFS.length > 0) {  //if historical data AND NO CURRNET DATA, only gathered for single sections, then add the the datatable
                     for (var ih = 0; ih < app.pGage.m_arrray_Detail4ChartHistoryCFS.length; ih++) {
@@ -505,9 +525,15 @@ define([
                             arrayPrelimData_2.push(iVal2Chart);
 
                             if (blnSingleCharting) {
+                                if (icfsTarget1 != 0) {
                                     arrayPrelimData_2.push(icfsTarget1);
+                                }
+                                if (icfsTarget2 != 0) {
                                     arrayPrelimData_2.push(icfsTarget2);
+                                }
+                                if (icfsTarget3 != 0) {
                                     arrayPrelimData_2.push(icfsTarget3);
+                                }
                             }
                         }
 
@@ -615,7 +641,7 @@ define([
                 self.selectThing = function (item) {
                     document.getElementById("divSectionDetail").style.display = 'inline';
 
-                    if (item.strDailyStat_URL == null) {
+                    if ((item.strDailyStat_URL == null) | (item.strDailyStat_URL == "")) {
                         document.getElementById("detailSectionUSGSHistorical").style.display = 'none';
                     } else {
                         document.getElementById("detailSectionUSGSHistorical").style.display = 'inline';
@@ -676,6 +702,13 @@ define([
         },
 
         GraphSingleSEction: function (strStreamName, iSectionID, strSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTMPTarget1) {
+            app.pGage.m_arrray_StationIDsTMP = [];
+            app.pGage.m_arrray_StationIDsCFS = [];
+            app.pGage.m_arrray_Detail4ChartTMP = [];
+            app.pGage.m_arrray_Detail4ChartHistoryTMP = [];
+            app.pGage.m_arrray_Detail4ChartCFS = [];
+            app.pGage.m_arrray_Detail4ChartHistoryCFS = [];
+
             var dteDateTimeMinus0 = new Date();
             dteDateTimeMinus0.setDate(dteDateTimeMinus0.getDate() - 0);
             var dteDateTimeMinus1 = new Date();
@@ -696,7 +729,7 @@ define([
                                     [(dteDateTimeMinus1.getMonth() + 1).toString(), dteDateTimeMinus1.getDate().toString()],
                                     [(dteDateTimeMinus0.getMonth() + 1).toString(), dteDateTimeMinus0.getDate().toString()]];
             var iMean = 0;
-            app.pGage.m_arrray_Detail4ChartHistoryCFS = [];
+            
 
             //get the summary output USGS daily mean data, unfortunately this is not available in JSON format
             //var strURL = "https://nwis.waterdata.usgs.gov/nwis/dvstat?&site_no=" + strSiteID + "&agency_cd=USGS&por_" + strSiteID + "_80655=64907,00060,80655,1950-10-01,2017-10-29&stat_cds=mean_va&referred_module=sw&format=rdb";
@@ -890,7 +923,6 @@ define([
 
             app.pGage.m_arrray_Detail4ChartCFS = [];
             app.pGage.m_arrray_Detail4ChartTMP = [];
-            app.pGage.m_arrray_StationIDs = [];
 
             var EntiretrHTML = "";
             var iCounterTemperature = 0;
@@ -979,8 +1011,8 @@ define([
                 iLateFlowPref4ConsvValue = arrayProc2[0][3];
                 iLateFlowConsvValue = arrayProc2[0][4];
                 iLateFlowClosureValueFlow = arrayProc2[0][5];
-                dblLatestTMP = "No Gage Exists";
-                dblLatestCFS = "No Gage Exists";
+                dblLatestTMP = "No gage exists";
+                dblLatestCFS = "No gage exists";
 
                 var dteLatestDateTimeTMP = "";
                 var dteLatestDateTimeCFS = "";
@@ -1001,7 +1033,7 @@ define([
                 var strOverallSymbol = OverallStatusAndColor[1];
 
                 app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName,                    //add to array that populates the river sections summary div
-                    strHyperlinkURL, dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
+                    strHyperlinkURL, dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data not available"), strSiteTempStatus,
                     dteLatestDateTimeCFS, dblLatestCFS.toString(), strSiteFlowStatus, strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
                     strMONTHDAYEarlyFlowFromDroughtManagementTarget, strMONTHDAYEarlyFlowToDroughtManagementTarget, iLateFlowPref4ConsvValue,
                     iLateFlowConsvValue, iLateFlowClosureValueFlow, strLateFlowPref4ConsvValue, strLateFlowConsvValue,
@@ -1196,14 +1228,14 @@ define([
                             var item = itemFound[0];
                                     strSiteName = item.sourceInfo.siteName;
                             }
-                            var strNoDataLabel4Charting = "";
+                            var strNoDataLabel4ChartingCFS = "";
                             if (dblLatestCFS == -999999) {
                                 dblLatestCFS = "Not Available"
                                 dteLatestDateTimeCFS = new Date();
-                                strNoDataLabel4Charting = " (No Data)";
+                                strNoDataLabel4ChartingCFS = " (No Data)";
                             } else if (dblLatestCFS == "") {
-                                dblLatestCFS = "Not Collected"
-                                strNoDataLabel4Charting = " (No Data)";
+                                dblLatestCFS = "Not collected"
+                                strNoDataLabel4ChartingCFS = " (No Data)";
                                 dteLatestDateTimeCFS = new Date();
                             } else {//determine the site's status based on discharge
                                 if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) {
@@ -1217,22 +1249,26 @@ define([
                                 }
                             }
 
+                            var strNoDataLabel4ChartingTMP = "";
                             if (dblLatestTMP == - 999999) {
                                 dblLatestTMP = "Not Available"
+                                strNoDataLabel4ChartingTMP = " (No Data)";
                                 dteLatestDateTimeTMP = new Date();
                             } else if (dblLatestTMP == "") {
-                                dblLatestTMP = "Not Collected"
+                                dblLatestTMP = "Not collected"
+                                strNoDataLabel4ChartingTMP = " (No Data)";
                                 dteLatestDateTimeTMP = new Date();
                             } else if (dblLatestTMP > iTempClosureValue) {
                                 strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE";
                             }
 
                             if (itemSectionRefined[1]== null) {  //if no gage id then hardcode 
-                                dblLatestTMP = "No Gage Exists";
-                                dblLatestCFS = "No Gage Exists";
+                                dblLatestTMP = "No gage exists";
+                                dblLatestCFS = "No gage exists";
                             }
 
-                            app.pGage.m_arrray_StationIDs.push(strStreamName + "," +iSectionID +strNoDataLabel4Charting);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsTMP.push(strStreamName + "," + iSectionID + strNoDataLabel4ChartingTMP);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsCFS.push(strStreamName + "," + iSectionID + strNoDataLabel4ChartingCFS);  // using this array of station id's to pivot the table for charting
 
                             if (blnIsInitialPageLoad) {
                                 var streamSectionDispalyName = strSiteName.replace(", MT", "").replace(" MT", "").replace(strStreamName, "").replace("Big Hole R", "");
@@ -1248,7 +1284,7 @@ define([
                                 var strOverallSymbol = OverallStatusAndColor[1];
 
                                 app.pGage.m_arrray_RiverSectionStatus.push([streamSectionDispalyName,                    //add to array that populates the river sections summary div
-                                    strHyperlinkURL, dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data Not Available"), strSiteTempStatus,
+                                    strHyperlinkURL, dteLatestDateTimeTMP, dblLatestTMP.toString().replace("-999999", "Data not available"), strSiteTempStatus,
                                     dteLatestDateTimeCFS, dblLatestCFS.toString(), strSiteFlowStatus, strID, strStreamName, iSectionID, str3DayCFSTrendCFS,
                                     strMONTHDAYEarlyFlowFromDroughtManagementTarget, strMONTHDAYEarlyFlowToDroughtManagementTarget, iLateFlowPref4ConsvValue,
                                     iLateFlowConsvValue, iLateFlowClosureValueFlow, strLateFlowPref4ConsvValue, strLateFlowConsvValue,
@@ -1289,6 +1325,17 @@ define([
 
                         if (!blnQuery1AtaTime) {  //if the USGS api is erroring out try the refactored method
                             app.pGage.SectionsReceived(arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, true)
+                        }
+                    })
+                    .always(function () {
+                        if ((!(blnIsInitialPageLoad)) & (app.pGage.m_arrray_StationIDsCFS.length == 0)) {  // in the case of no gage station do the following for the graphing
+                            dom.map(arrayProc2, function (itemSectionRefined) {  //loop through the sections  //run through the elements in the section array to pick out the relevant JSON elements
+                                iSectionID = itemSectionRefined[2];  
+                                strStreamName = itemSectionRefined[0];
+                                app.pGage.m_arrray_StationIDsTMP.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
+                                app.pGage.m_arrray_StationIDsCFS.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
+                                app.pGage.StreamSectionSummaryUIAdditions(blnIsInitialPageLoad);
+                            })
                         }
                     });
             }

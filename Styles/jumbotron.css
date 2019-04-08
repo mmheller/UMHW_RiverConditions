@@ -19,7 +19,100 @@ body {
 }
 
 
+h3 {
+    padding: 5px !important;
+    margin: 5px !important;
+}
+
 a:link[role="presentation"],a:visited[role="presentation"] {
     color: white;
     padding: 5px 5px !important;
-} 
+}
+
+.nav > li > a:focus, .nav > li > a:hover {
+    color: #004876 !important;
+}
+
+.navbar-inverse {
+    background-color: #004876 !important;
+    border-color: #004876 !important;
+}
+
+.navbar-brand {
+    color: white !important;
+}
+
+    .navbar-brand:hover {
+        color: #004876 !important;
+        background: #eee !important;
+    }
+
+#mapDiv { /* Set the responsive map size here */
+    min-height: 80px !important;
+    max-height: 600px !important;
+}
+
+.esriScalebarLabel {
+    font-size: 11px !important;
+    font-style: normal !important;
+    color: #404040 !important;
+}
+
+.esriBasemapGalleryThumbnail {
+    height: 40px !important;
+    width: 40px !important;
+}
+
+
+.clsSectionDetailCFSTEMP_WARN {
+    background-color: lightpink;
+    color: red;
+    /*margin: 20px;*/
+    padding: 10px;
+}
+
+.clsSectionDetailCFSTEMP {
+    background-color: #004876;
+    color: white;
+    /*margin: 20px;*/
+    padding: 10px;
+}
+
+.clsSectionDetailCFSTEMP_Alt {
+    background-color: white;
+    color: black;
+    /*margin: 20px;*/
+    padding: 10px;
+}
+
+.esriBasemapGalleryNode {
+    width: 40px !important;
+}
+
+.esriLegendService { /*between GIS layers*/
+    padding-bottom: 5px !important;
+}
+
+.esriLegendServiceLabel {
+    font-weight: bold !important;
+}
+
+.esriLegendLayerLabel {
+    padding-top: 15px !important;
+}
+
+.esriLegendLayer tr { /*the div with all the symbols*/
+    float: left !important;
+    white-space: nowrap !important;
+    border: none !important;
+    border-width: 0px 0 !important;
+}
+
+.esriLegendLayer {
+    background-color: #BBD1E8 !important;
+}
+
+    .esriLegendLayer tbody { /*the table with all the symbols for a GIS layer*/
+        height: 80% !important;
+        overflow: hidden !important;
+    }

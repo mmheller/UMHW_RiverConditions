@@ -41,75 +41,57 @@
     <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.13/esri/css/esri.css">
     <link rel="stylesheet" type="text/css" href="https://esri.github.io/bootstrap-map-js/src/css/bootstrapmap.css">
     <style>
-        #mapDiv { /* Set the responsive map size here */
-            min-height: 80px;
-            max-height: 600px;
-        }
 
-        .esriScalebarLabel {
-            font-size: 11px;
-            font-style: normal;
-            color:#404040;
-        }
-
-        .esriBasemapGalleryThumbnail {
-            height: 40px;
-            width: 40px;
+        body {
+            padding-top: 35px;
         }
 
         
+        @media (max-width: 1200px) {  /*This collapses thead watershed list at a narrow browser window width*/ 
+            .navbar-header {
+                float: none;
+            }
 
-        .clsSectionDetailCFSTEMP_WARN {
-            background-color: lightpink;
-            color: red;
-            /*margin: 20px;*/
-            padding: 10px;
-        }
+            .navbar-left, .navbar-right {
+                float: none !important;
+            }
 
-        .clsSectionDetailCFSTEMP {
-            background-color: black;
-            color: white;
-            /*margin: 20px;*/
-            padding: 10px;
-        }
+            .navbar-toggle {
+                display: block;
+            }
 
-        .clsSectionDetailCFSTEMP_Alt {
-            background-color: white;
-            color: black;
-            /*margin: 20px;*/
-            padding: 10px;
-        }
+            .navbar-collapse {
+                border-top: 1px solid transparent;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+            }
 
-        .esriBasemapGalleryNode {
-            width: 40px;
-        }
-        
-        .esriLegendService {    /*between GIS layers*/
-	        padding-bottom: 5px;
-        }
-        .esriLegendServiceLabel {
-	        font-weight:bold;
-        }
-        .esriLegendLayerLabel {
-	        padding-top: 15px;
-        }
-        
-        .esriLegendLayer tr{   /*the row with all the symbols*/
-            float:left;
-            white-space: nowrap;
-            border: none;
-            border-width: 0px 0;
-        }
+            .navbar-fixed-top {
+                top: 0;
+                border-width: 0 0 1px;
+            }
 
-        .esriLegendLayer {
-            background-color: #BBD1E8;
-        }
+            .navbar-collapse.collapse {
+                display: none !important;
+            }
 
-        .esriLegendLayer   tbody {   /*the table with all the symbols for a GIS layer*/
-            height: 80%;
-            overflow: hidden;
-        }
+            .navbar-nav {
+                float: none !important;
+                margin-top: 7.5px;
+            }
 
+                .navbar-nav > li {
+                    float: none;
+                }
+
+                    .navbar-nav > li > a {
+                        padding-top: 10px;
+                        padding-bottom: 10px;
+                    }
+
+            .collapse.in {
+                display: block !important;
+            }
+        }
 
     </style>
 </head>
@@ -136,12 +118,12 @@
     </nav>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron" style="margin-bottom:-10px; padding-bottom:0px; padding-top:35px;">
-        <div id="divWatershedBasinInfoTop" class="container" style="line-height: normal; padding:0px;">
+    <div class="jumbotron" style="margin-bottom:-10px; margin-top:0px; padding-bottom:0px; padding-top:5px; padding-left:10px; padding-right:10px;">
+        <div id="divWatershedBasinInfoTop" style="line-height: normal; padding:0px;">
         </div>
-        <div id="divCustomAlert" class="container" style="line-height: normal; background-color: #fa021b;">
+        <div id="divCustomAlert" style="line-height: normal; background-color: #fa021b;">
         </div>
-        <div id="divFWPAlert" class="container" style="line-height: normal; background-color: #b30000; visibility:hidden; padding:2px;">
+        <div id="divFWPAlert" style="line-height: normal; background-color: #b30000; visibility:hidden; padding:2px;">
             <span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/" style="color:white; font-weight:bold;" >here for official information...</a></span>
         </div>
     </div>
@@ -161,10 +143,10 @@
                     <tbody data-bind="foreach: {data: gageRecords}" style="font-size: 13px;">
                         <tr style="cursor:pointer;" data-bind="click: $root.selectThing ">
                             <td width="95" valign="top">
-                                <div>Stream Name</div>
-                                <div>Section #/Desc</div>
-                                <div>Discharge(cfs)</div>
-                                <div>H2O Temp(F)</div>
+                                <div>Stream</div>
+                                <div>Section</div>
+                                <div>Discharge (cfs)</div>
+                                <div>H2O Temp (F)</div>
                                 <div>Status</div>
                             </td>
                             <td valign="top">
@@ -213,7 +195,7 @@
                     
                 </div>
 
-                <div class="row" id="toggleLayers" style="position:relative; bottom:60px; left:25px; font-size:12px">
+                <div id="toggleLayers" style="position:relative; bottom:60px; left:25px; font-size:12px">
                     <div class="col-md-12">
                     </div>
                 </div>
@@ -238,15 +220,15 @@
                             <div>Title: <span data-bind='text: $root.CurrentDisplayGageRecord().fwpTITLE'></span></div>
                         </div>
 
-                        <div id="detailSection1" style="border:1px solid black;">
+                        <div id="detailSection1">
                             <div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
                             <div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
                             <div>Stream Section Description:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
                             <div>Section Start</div>
                             <div>Section End</div>
                         </div>
-                        <hr>
-                        <div id="detailSection3" style="border:1px solid black;">
+                        <hr style="margin-top:5px; margin-bottom:5px;">
+                        <div id="detailSection3">
                             <div class="clsSectionDetailCFSTEMP_Alt"><h3>Waterflow Data</h3></div>
                             <div class="clsSectionDetailCFSTEMP">Current Discharge (CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedDischargeDateTime'></span></div>
                             <div id="divDay3CFSTrend" class="clsSectionDetailCFSTEMP_Alt">3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" /></div>
@@ -256,13 +238,11 @@
                             <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowConsvValue'></span></div>
                             <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></div>
                         </div>
-
-                        <hr>
-
-                        <div id="detailSection4" style="border:1px solid black;">
+                        <hr style="margin-top:5px; margin-bottom:5px;">
+                        <div id="detailSection4">
                             <div class="clsSectionDetailCFSTEMP_Alt"><h3>Water Temperature Data</h3></div>
                             <div class="clsSectionDetailCFSTEMP">Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime'></span></div>
-                            <div id="divDay3TMPTrend"  class="clsSectionDetailCFSTEMP_Alt">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
+                            <div id="divDay3TMPTrend" class="clsSectionDetailCFSTEMP_Alt">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
                             <div>Stream Status based on Temperature: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
                             <div><u>Temperature target definition for this stream section</u></div>
                             <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
@@ -273,11 +253,11 @@
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
                         <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
 
-                        <hr>
+                        <hr style="margin-top:5px; margin-bottom:5px;">
 
-                        <div id="detailSectionUSGSCurrent">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> (Note: Some gages may not provide year round current data)</div>
+                        <div id="detailSectionUSGSCurrent">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
                         <br />
-                        <div id="detailSectionUSGSHistorical">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a> (Note: Some gages may not provide year round historical data)</div>
+                        <div id="detailSectionUSGSHistorical">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round historical data)</div>
                     </div>
 
                     </div>

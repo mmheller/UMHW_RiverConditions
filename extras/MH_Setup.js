@@ -206,10 +206,20 @@ define([
         },
 
         Phase1: function () {
-            var arrayNavList = [["Ruby", "Ruby"], ["Madison", "Madison"], ["Upper-Gallatin", "Upper Gallatin"],
-                                ["Gallatin-Lower", "Lower Gallatin"], ["Jefferson", "Jefferson"], ["Broadwater", "Broadwater"],
-                                ["Boulder", "Boulder"], ["Big Hole", "Big Hole"], ["Beaverhead/Centennial", "Beaverhead"]
+            var arrayNavList = [["Beaverhead/Centennial", "Beaverhead"], ["Big Hole", "Big Hole"],
+                ["Boulder", "Boulder"], ["Broadwater", "Broadwater"], 
+                ["Gallatin-Lower", "Lower Gallatin"], ["Gallatin-Upper", "Upper Gallatin"], ["Jefferson", "Jefferson"],
+                ["Madison", "Madison"], ["Ruby", "Ruby"]
             ];
+
+            //var arrayNavList = [
+            //    ["Ruby", "Ruby"], ["Madison", "Madison"], ["Gallatin-Upper", "Upper Gallatin"],
+            //    ["Gallatin-Lower", "Lower Gallatin"], ["Jefferson", "Jefferson"],
+            //    ["Broadwater", "Broadwater"], ["Boulder", "Boulder"],
+            //    ["Big Hole", "Big Hole"], ["Beaverhead/Centennial", "Beaverhead"]
+            //];
+
+
             var strURLPrefix = "index.html?H2O_ID=";
             var strURLSuffix = "";
 
@@ -313,7 +323,7 @@ define([
             pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
             var templateEPOINT = new InfoTemplate();
-            templateEPOINT.setTitle("<b>Section Endpoint</b>");
+            templateEPOINT.setTitle("<b>Start/End Section Locations</b>");
             templateEPOINT.setContent("Placename: ${Endpoint_Name}<br>Section: ${Start_End} of ${Section_Name}<br>Stream: ${Stream_Name}<br>");
             //templateEPOINT.setContent("${Endpoint_Name}<br>Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, 
@@ -436,12 +446,16 @@ define([
 
 
             var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-              new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
-              new Color([255, 0, 0]), 2), new Color([255, 255, 255, 0.25])
+                new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+              new Color([0, 72, 118]), 2), new Color([255, 255, 255, 0.10])
             );
+            //var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+            //    new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+            //        new Color([255, 0, 0]), 2), new Color([255, 255, 255, 0.25])
+            //);
             var rendererWatersheds = new SimpleRenderer(sfs);
             var strlabelField1 = "Name";
-            pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.6, autoGeneralize: true, outFields: [strlabelField1] });
+            pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: [strlabelField1] });
             pWatershedsFeatureLayer.setDefinitionExpression(strQueryDef3);
             pWatershedsFeatureLayer.setRenderer(rendererWatersheds);
 
@@ -481,7 +495,7 @@ define([
             plabels3.minScale = 1500000;
 
             app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
-                               pSectionsFeatureLayer, pSNOTELFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pEPointsFeatureLayer, pGageFeatureLayer,
+                pSectionsFeatureLayer, pSNOTELFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
                                plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsEndPoints]);
             app.map.infoWindow.resize(300, 65);
 
@@ -501,15 +515,13 @@ define([
 
             document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
             app.pGage.Start(strDateTimeMinus3, strDateTime);
-
-
-
+                       
             var legendLayers = [];
-            legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'Montana AIS Watercraft Access' });
+            legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
             legendLayers.push({ layer: pFASFeatureLayer, title: 'FWP Fish Access Sites' });
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
-            legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locaitons' });
+            legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locations' });
             legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
 
             if (app.test) {
@@ -524,17 +536,11 @@ define([
                 legend.startup();
             });
 
-
             var cbxLayers = [];
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
-            //cbxLayers.push({ layers: [pWatershedsFeatureLayer, plabels1], title: 'Watersheds' });
-            //cbxLayers.push({ layers: [pSectionsFeatureLayer, plabels3], title: 'Sections' });
-            //cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Closures' });
             cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
-            //cbxLayers.push({ layers: [pEPointsFeatureLayer, pEPointsFeatureLayer], title: 'Start/End Section Locaitons' });
-            //cbxLayers.push({ layers: [pGageFeatureLayer, pGageFeatureLayer], title: 'Gages' });
             cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
-            cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'Montana AIS Watercraft Access' });
+            cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'MT AIS Watercraft Access' });
             
             this.LayerCheckBoxSetup(cbxLayers);
             SetupStreamClick();
@@ -577,7 +583,7 @@ define([
                               textStyle: {fontSize: 10 }
                           },
                           "title": strTitle,
-                          width: '100%',
+                          //width: '100%',
                           height: 400,
                           chartArea: {
                               left: "5%", top: "5%"
@@ -612,6 +618,51 @@ define([
                         options.series = optionsSeries;
                         options.colors = optionsSeriesColors;
                     } else if (value.getColumnLabel(0) == "DatetimeCFSSingle") {
+                        var optionsSeries = null;
+                        var optionsSeriesColors = null;
+
+                        if (value.getNumberOfColumns() == 6) {
+                            optionsSeries = {
+                                0: { lineWidth: 3 }, //blue
+                                1: { lineWidth: 10, lineDashStyle: [1, 1] },  //light grey
+                                2: { lineWidth: 10, lineDashStyle: [1, 1] },  //medium grey
+                                3: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
+                                4: { lineWidth: 8 }  //dark orange
+                            };
+                            optionsSeriesColors = ['#3385ff', //blue
+                                '#ccced0',  //light grey
+                                '#919191',  //medium grey
+                                '#61605f', //dark grey
+                                '#df7206'];  //dark orange
+                        } else if (value.getNumberOfColumns() == 5) {
+                            optionsSeries = {
+                                0: { lineWidth: 3 }, //blue
+                                1: { lineWidth: 10, lineDashStyle: [1, 1] },  //medium grey
+                                2: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
+                                3: { lineWidth: 8 }  //dark orange
+                            };
+                            optionsSeriesColors = ['#3385ff', //blue
+                                '#919191',  //medium grey
+                                '#61605f', //dark grey
+                                '#df7206'];  //dark orange
+                        } else if (value.getNumberOfColumns() == 4) {
+                            optionsSeries = {
+                                0: { lineWidth: 3 }, //blue
+                                1: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
+                                2: { lineWidth: 8 }  //dark orange
+                            };
+                            optionsSeriesColors = ['#3385ff', //blue
+                                '#61605f', //dark grey
+                                '#df7206'];  //dark orange
+                        } else if (value.getNumberOfColumns() == 3) {
+                            optionsSeries = {
+                                0: { lineWidth: 3 }, //blue
+                                1: { lineWidth: 8 }  //dark orange
+                            };
+                            optionsSeriesColors = ['#3385ff', //blue
+                                '#df7206'];  //dark orange
+                        }
+
                         var options4ChartAreaTrendlines = {
                             0: {
                                 labelInLegend: 'CFS Trend Line',
@@ -619,19 +670,6 @@ define([
                             }
                         };
                         options.trendlines = options4ChartAreaTrendlines;
-
-                        var optionsSeries = {
-                            0: { lineWidth: 3 }, //blue
-                            1: { lineWidth: 10, lineDashStyle: [1, 1] },  //light grey
-                            2: { lineWidth: 10, lineDashStyle: [1, 1] },  //medium grey
-                            3: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
-                            4: { lineWidth: 8 }  //dark orange
-                        };
-                        var optionsSeriesColors = ['#3385ff', //blue
-                                                    '#ccced0',  //light grey
-                                                    '#919191',  //medium grey
-                                                    '#61605f', //dark grey
-                                                    '#df7206'];  //dark orange
                         options.series = optionsSeries;
                         options.colors = optionsSeriesColors;
                     }
