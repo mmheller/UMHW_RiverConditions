@@ -133,7 +133,9 @@ define([
                                             str3DayTMPTrend,
                                             strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE,
                                             strOverallStatus,
-                                            strOverallSymbol) {// Class to represent a row in the gage values grid
+                                            strOverallSymbol,
+                                            strStartEndpoint,
+                                            strEndEndpoint) {// Class to represent a row in the gage values grid
             var self = this;
             self.SiteName = strSiteName;
             self.Hyperlink = strHyperlinkURL;
@@ -178,9 +180,12 @@ define([
             self.fwpTITLE = strFWPTITLE;
             self.overallStatus = strOverallStatus;
             self.overallSymbol = strOverallSymbol;
+            self.StartEndpoint = strStartEndpoint;
+            self.EndEndpoint = strEndEndpoint;
         },
         
         handleSectionGageResults: function (results) {
+
             var items = dom.map(results, function (result) {
                 return result;
             });
@@ -202,6 +207,8 @@ define([
             var iCFS_Note_Conserv = 99999;
             var iCFS_Note_NotOfficialClosure = 99999;
             var iOID = "";
+            var strStartEndpoint = "";
+            var strEndEndpoint = "";
 
             dom.map(items[0].features, function (itemSection) {
                 var strGageID_Source = null;
@@ -222,6 +229,10 @@ define([
                 iCFS_Note_Conserv = 99999;
                 iCFS_Note_NotOfficialClosure = 99999;
                 iOID = "";
+                strStartEndpoint = "";
+                strEndEndpoint = "";
+
+                
 
                 strStreamName = itemSection.attributes.StreamName;
                 strSectionID = itemSection.attributes.SectionID;
@@ -249,6 +260,22 @@ define([
                     }
                 })
 
+                dom.map(items[2].features, function (itemEndpoint) {                //query by     Watershed , StreamName, Section_ID 
+                    if ((itemEndpoint.attributes.Watershed_Name === itemSection.attributes.Watershed) &
+                        (itemEndpoint.attributes.Stream_Name === itemSection.attributes.StreamName) &
+                        ((itemEndpoint.attributes.Section_ID === itemSection.attributes.SectionID) | (itemEndpoint.attributes.Section_Name === itemSection.attributes.SectionID) | (itemEndpoint.attributes.Section_Name === itemSection.attributes.SectionName)) &
+                        (itemEndpoint.attributes.Start_End === "Start")) {
+                            strStartEndpoint = itemEndpoint.attributes.Endpoint_Name;
+                    }
+                    if ((itemEndpoint.attributes.Watershed_Name === itemSection.attributes.Watershed) &
+                        (itemEndpoint.attributes.Stream_Name === itemSection.attributes.StreamName) &
+                        ((itemEndpoint.attributes.Section_ID === itemSection.attributes.SectionID) | (itemEndpoint.attributes.Section_Name === itemSection.attributes.SectionID) | (itemEndpoint.attributes.Section_Name === itemSection.attributes.SectionName)) &
+                        (itemEndpoint.attributes.Start_End === "End")) {
+                            strEndEndpoint = itemEndpoint.attributes.Endpoint_Name;
+                    }
+                })
+
+
                 //if (strGageID_Source != null) {
                     streamSectionArrray.push([strStreamName, strGageID_Source,
                         strSectionID, strCFS_Prep4Conserv, strCFS_Conserv, strCFS_NotOfficialClosure, iConsvTemp,
@@ -260,7 +287,9 @@ define([
                         "", //Placeholder for FWP ward Press Release
                         "", //Placeholder for FWP ward Publish date
                         "", //Placeholder for FWP ward Title,
-                        "" //Placeholder for FWP warning,
+                        "", //Placeholder for FWP warning,
+                        strStartEndpoint,
+                        strEndEndpoint
                     ]);
                 //}
 
@@ -294,16 +323,23 @@ define([
             q_Layer1 = new esri.tasks.Query();
             qt_Layer2 = new esri.tasks.QueryTask(strURL + "1"); //gage layer
             q_Layer2 = new esri.tasks.Query();
+            qt_Layer3 = new esri.tasks.QueryTask(strURL + "0"); //gage layer
+            q_Layer3 = new esri.tasks.Query();
             q_Layer1.returnGeometry = q_Layer2.returnGeometry = true;
             q_Layer1.outFields = q_Layer2.outFields = ["*"];
+            //q_Layer3.outFields = ["Watershed_Name", "WatershedName_Alt1", "WatershedName_Alt2", "Endpoint_Name", "Stream_Name", "Section_ID", "Start_End"];
+            q_Layer3.outFields = ["*"];
 
             q_Layer1.where = strQuery;
             q_Layer2.where = strQuery;
+            q_Layer3.where = strQuery.replace("Watershed =", "Watershed_Name =");
 
-            var pLayer1, pLayer2, pPromises;
+            var pLayer1, pLayer2, pLayer3, pPromises;
             pLayer1 = qt_Layer1.execute(q_Layer1);
             pLayer2 = qt_Layer2.execute(q_Layer2);
-            pPromises = new All([pLayer1, pLayer2]);
+            pLayer3 = qt_Layer3.execute(q_Layer3);
+            pPromises = new All([pLayer1, pLayer2, pLayer3]);
+            //pPromises = new All([pLayer1, pLayer2]);
             pPromises.then(this.handleSectionGageResults, this.err);
         },
         
@@ -633,7 +669,9 @@ define([
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][28],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][29],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][30],
-                                                                app.pGage.m_arrray_RiverSectionStatus[i][31]));
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][31],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][32],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][33]));
 
                 self.gageRecords = ko.observableArray(arrayKOTemp);
                 
@@ -950,13 +988,13 @@ define([
             var iOID = null;
             var strDailyStat_URL = "";
             var strFWPWarn = "";
+            var strStartEndpoint = "";
+            var strEndEndpoint = "";
             m_arrayOIDYellow =[];
             m_arrayOIDsGold =[];
             m_arrayOIDsOrange =[];
             m_arrayOIDsRed = [];
-
-
-
+            
             var strURLGagePrefix = "https://nwis.waterservices.usgs.gov/nwis/iv/";
             strURLGagePrefix += "?format=json&indent=on&siteStatus=all";
             strURLGagePrefix += "&startDT=" +this.dteStartDay2Check;    //start date
@@ -1008,6 +1046,9 @@ define([
                 strFWPPUBLISHDATE = arrayProc2[0][20];
                 strFWPTITLE = arrayProc2[0][21];
                 strFWPWarn = arrayProc2[0][22];
+                strStartEndpoint = arrayProc2[0][23];
+                strEndEndpoint = arrayProc2[0][24];
+
                 iLateFlowPref4ConsvValue = arrayProc2[0][3];
                 iLateFlowConsvValue = arrayProc2[0][4];
                 iLateFlowClosureValueFlow = arrayProc2[0][5];
@@ -1040,7 +1081,7 @@ define([
                     strLateFlowClosureValueFlow, iTempClosureValue, strTempCollected, strSiteID,
                     strDailyStat_URL, str3DayCFSTrendTMP, strFWPDESCRIPTION, strFWPLOCATION,
                     strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE, strOverallStatus,
-                    strOverallSymbol]);
+                    strOverallSymbol, strStartEndpoint, strEndEndpoint]);
 
                 app.pGage.mIDXQuery1AtaTime += 1;
                 if ((blnQuery1AtaTime) & (app.pGage.mIDXQuery1AtaTime < arrayProc.length)) {
@@ -1078,6 +1119,8 @@ define([
                             strFWPPUBLISHDATE = itemSectionRefined[20];
                             strFWPTITLE = itemSectionRefined[21];
                             strFWPWarn = itemSectionRefined[22];
+                            strStartEndpoint = itemSectionRefined[23];
+                            strEndEndpoint = itemSectionRefined[24];
 
                             var itemFound = arrayJSONValues.filter(function (itemArraySearch) {
                                     return typeof itemArraySearch.name == 'string' && itemArraySearch.name.indexOf(strSiteID) > -1;
@@ -1291,7 +1334,7 @@ define([
                                     strLateFlowClosureValueFlow, iTempClosureValue, strTempCollected, strSiteID,
                                     strDailyStat_URL, str3DayCFSTrendTMP, strFWPDESCRIPTION, strFWPLOCATION,
                                     strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE, strOverallStatus,
-                                    strOverallSymbol ]);
+                                    strOverallSymbol, strStartEndpoint, strEndEndpoint]);
 
                             }
 

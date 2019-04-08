@@ -180,15 +180,16 @@
                 <input id="btn_query_QS" type="button" value="Run Search/Filter" style="visibility: hidden;" />
             </div>
             <div class="col-md-9" style="padding-top:20px; padding-right: 1px" >
-                <div id="mapDiv"></div>
+                <div id="mapDiv" style="z-index:5"></div>
                 <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
 
-                <div id="block_container" style="position:relative; right:5px; bottom:50px; width:300px; z-Index:999; text-align:left">
+                <div id="block_container" style="position:relative; right:5px; bottom:50px; width:300px; z-Index:2; text-align:left">
+                    asdfafsd
                     <div id="basemapGallery"></div>
 
                 </div>
 
-                <div style="position:relative; left:200px; bottom:95px;">
+                <div style="position:relative; left:200px; bottom:95px; z-index:1;">
                     <!--<span id="scaleDiv" style="position:relative; left:185px; bottom:110px; width:250px; font-size:11px"></span>-->
                     <div id="txt_xyCoords" style="color:#404040; width:200px; font-size:11px">Latitude: -, Longitude: -</div>
                     <div id="scaleDiv" style="width:250px; font-size:11px"></div>
@@ -224,8 +225,8 @@
                             <div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
                             <div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
                             <div>Stream Section Description:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
-                            <div>Section Start</div>
-                            <div>Section End</div>
+                            <div>Section Start:  <span data-bind='text: $root.CurrentDisplayGageRecord().StartEndpoint'></span></div>
+                            <div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>
                         </div>
                         <hr style="margin-top:5px; margin-bottom:5px;">
                         <div id="detailSection3">

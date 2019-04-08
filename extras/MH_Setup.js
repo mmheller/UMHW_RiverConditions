@@ -257,7 +257,7 @@ define([
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
             
-            this.GetSetHeaderWarningContent(app.strHFL_URL + "10", app.H2O_ID, blnUseAlternateHeader);
+            this.GetSetHeaderWarningContent(app.strHFL_URL + "11", app.H2O_ID, blnUseAlternateHeader);
         },
 
         Phase2: function () {
@@ -494,15 +494,18 @@ define([
             plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
             plabels3.minScale = 1500000;
 
-            app.map.addLayers([pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
+
+            pRiverSymbolsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "10",
+                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND,  visible: true });
+
+
+            app.map.addLayers([pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
                 pSectionsFeatureLayer, pSNOTELFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
                                plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsEndPoints]);
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 0.5;
-
-
 
 
             var dteDateTime = new Date();
@@ -523,6 +526,7 @@ define([
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
             legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locations' });
             legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
+            legendLayers.push({ layer: pRiverSymbolsFeatureLayer, title: 'River Status' });
 
             if (app.test) {
                 legendLayers.push({ layer: pFWPFeatureLayer, title: 'Test Condition Messaging' });

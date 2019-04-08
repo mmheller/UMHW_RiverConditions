@@ -36,8 +36,8 @@
 
     #block_container
     {
-        text-align:left;
-        vertical-align:bottom;
+        text-align:left !important;
+        vertical-align:bottom !important;
         /*position:relative;
         right:5px; 
         bottom:50px; 
