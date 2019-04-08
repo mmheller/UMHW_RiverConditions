@@ -29,6 +29,7 @@ define([
     "esri/symbols/Font",
     "extras/MH_Zoom2FeatureLayers",
     "esri/dijit/BasemapGallery",
+    "esri/layers/CSVLayer",
     "esri/renderers/UniqueValueRenderer",
     "esri/geometry/webMercatorUtils",
     "dojo/_base/declare",
@@ -47,7 +48,7 @@ define([
     "esri/SnappingManager",
     "esri/layers/FeatureLayer",
     "esri/renderers/SimpleRenderer",
-    "esri/symbols/PictureMarkerSymbol",
+    "esri/symbols/SimpleMarkerSymbol",
     "esri/symbols/SimpleFillSymbol",
     "esri/symbols/SimpleLineSymbol",
     "dijit/form/CheckBox",
@@ -69,9 +70,9 @@ define([
         "dojo/dom-construct","application/bootstrapmap",
         "dojo/domReady!"
 ], function (
-            Font, MH_Zoom2FeatureLayers, BasemapGallery, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, QueryTask, Query, All,
+            Font, MH_Zoom2FeatureLayers, BasemapGallery, CSVLayer, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, QueryTask, Query, All,
             Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
-        SimpleRenderer, PictureMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
+        SimpleRenderer, SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
         CheckBox, Legend, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
           InfoWindowLite,
           InfoTemplate,
@@ -371,12 +372,12 @@ define([
             pSectionsFeatureLayer.setDefinitionExpression(strQueryDef2);
             app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
 
-            pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: ['*'] });
+            var pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: ['*'] });
 
             var templateFAS = new InfoTemplate();
             templateFAS.setTitle("MT FAS (Fishing Access Site)");
             templateFAS.setContent("<b>${NAME}</b><br>${BOAT_FAC}<br><a href=${WEB_PAGE} target='_blank'>Link to Fish Access Site</a>");
-            pFASFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
+            var pFASFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFAS, "opacity": 0.5, outFields: ['*'], visible: false });
             var vDarkGreyColor = new Color("#3F3F40");              // create a text symbol to define the style of labels
             var pLabelFAS = new TextSymbol().setColor(vDarkGreyColor);
@@ -389,7 +390,7 @@ define([
             var templateBLM = new InfoTemplate();
             templateBLM.setTitle("<b>BLM Facility</b>");
             templateBLM.setContent("${Facility_Name}<br><a href=${URL} target='_blank'>Link to BLM Facility</a>");
-            pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2",
+            var pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, outFields: ['*'], visible: false });
             var pLabelBLM = new TextSymbol().setColor(vDarkGreyColor);
             pLabelBLM.font.setSize("9pt");
@@ -402,7 +403,7 @@ define([
             var templateFWPAISAccess = new InfoTemplate();
             templateFWPAISAccess.setTitle("Montana AIS Watercraft Access");
             templateFWPAISAccess.setContent("${SITENAME}</br>${ACCESSTYPE}</br>${WATERBODY}</br>${STATUS}</b>");
-            pFWPAISAccessFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FISH_AIS_WATERCRAFT_ACCESS/FeatureServer/0",
+            var pFWPAISAccessFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FISH_AIS_WATERCRAFT_ACCESS/FeatureServer/0",
                 {
                     mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWPAISAccess, outFields: ['*'],
                     minScale: 5200000, visible: false });
@@ -412,7 +413,7 @@ define([
             templateSNOTEL.setTitle("<b>${Name} SNOTEL Site</b>");
             var strSNOTELGraphURL = "https://wcc.sc.egov.usda.gov/nwcc/view?intervalType=+View+Current+&report=WYGRAPH&timeseries=Daily&format=plot&sitenum=${stationID}&interval=WATERYEAR";
             templateSNOTEL.setContent("<a href=${SitePageURL} target='_blank'>Link to SNOTEL Site Page</a>, <a href=" + strSNOTELGraphURL + " target='_blank'>Link to SWE Current/Historical Graphs</a> ");
-            pSNOTELFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3",
+            var pSNOTELFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSNOTEL, outFields: ['*'], visible: false });
             var pLabelSNOTEL = new TextSymbol().setColor(vDarkGreyColor);
             pLabelSNOTEL.font.setSize("9pt");
@@ -441,21 +442,18 @@ define([
                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'], visible: true });
             pFWPFeatureLayer.setRenderer(rendererFWP);
 
-            pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
-            pCartoFeatureLayerPoly = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
+            var pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
+            var pCartoFeatureLayerPoly = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
 
 
             var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
                 new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
               new Color([0, 72, 118]), 2), new Color([255, 255, 255, 0.10])
             );
-            //var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-            //    new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
-            //        new Color([255, 0, 0]), 2), new Color([255, 255, 255, 0.25])
-            //);
+
             var rendererWatersheds = new SimpleRenderer(sfs);
             var strlabelField1 = "Name";
-            pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: [strlabelField1] });
+            var pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: [strlabelField1] });
             pWatershedsFeatureLayer.setDefinitionExpression(strQueryDef3);
             pWatershedsFeatureLayer.setRenderer(rendererWatersheds);
 
@@ -464,7 +462,7 @@ define([
               new Color([200, 200, 200]), 2), new Color([9, 60, 114, 0.25])
             );
             var rendererWatershedsMask = new SimpleRenderer(sfsMask);
-            pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: [strlabelField1] });
+            var pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: [strlabelField1] });
             pWatershedsMaskFeatureLayer.setDefinitionExpression(strQueryDef4);
             pWatershedsMaskFeatureLayer.setRenderer(rendererWatershedsMask);
 
@@ -473,7 +471,7 @@ define([
               new Color([200, 200, 200]), 0.1), new Color([26, 90, 158, 0.45])
             );
             var rendererBasinMask = new SimpleRenderer(sfsBasinMask);
-            pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.7, autoGeneralize: true, outFields: ['*'] });
+            var pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.7, autoGeneralize: true, outFields: ['*'] });
             pBasinsMaskFeatureLayer.setDefinitionExpression("Basin IS NULL");
             pBasinsMaskFeatureLayer.setRenderer(rendererBasinMask);
 
@@ -493,15 +491,27 @@ define([
             var plabels3 = new LabelLayer({ id: "labels3" });
             plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
             plabels3.minScale = 1500000;
-
-
-            pRiverSymbolsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "10",
+            
+            var pRiverSymbolsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "10",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND,  visible: true });
+            // Use CORS
+            esriConfig.defaults.io.corsEnabledServers.push("docs.google.com"); // supports CORS
 
+            var pMonitoringCSVLayer = new CSVLayer("https://docs.google.com/spreadsheets/d/e/2PACX-1vTw0rCwCLxDg2jCLLCscILrMDMGBbInS1KmwH76CPyqVYqFolKdOfw0J4DIaJhWoPDPkwVNQI_Y7OeX/pub?output=csv", {
+                visible:false
+            });
+            var orangeRed = new Color([238, 69, 0, 0.5]); // hex is #ff4500
+            var marker = new SimpleMarkerSymbol("solid", 15, null, orangeRed);
+            var renderer = new SimpleRenderer(marker);
+            pMonitoringCSVLayer.setRenderer(renderer);
+            var pCSVTemplate = new InfoTemplate();
+            pCSVTemplate.setTitle("<b>Monitoring Sites</b>");
+            pCSVTemplate.setContent("Station Name: ${STATION_NAME}<br>Drainage Name: ${Drainage_Name}<br><a href=${URL} target='_blank'> Link monitoring data</a>");
+            pMonitoringCSVLayer.setInfoTemplate(pCSVTemplate);
 
             app.map.addLayers([pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
                 pSectionsFeatureLayer, pSNOTELFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
-                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsEndPoints]);
+                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsEndPoints, pMonitoringCSVLayer]);
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
@@ -520,6 +530,7 @@ define([
             app.pGage.Start(strDateTimeMinus3, strDateTime);
                        
             var legendLayers = [];
+            legendLayers.push({ layer: pMonitoringCSVLayer, title: 'Monitoring Locations' });
             legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
             legendLayers.push({ layer: pFASFeatureLayer, title: 'FWP Fish Access Sites' });
@@ -545,6 +556,7 @@ define([
             cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
             cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
             cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'MT AIS Watercraft Access' });
+            cbxLayers.push({ layers: [pMonitoringCSVLayer, pMonitoringCSVLayer], title: 'Monitoring Locations' });
             
             this.LayerCheckBoxSetup(cbxLayers);
             SetupStreamClick();
