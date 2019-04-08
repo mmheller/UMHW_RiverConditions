@@ -679,6 +679,15 @@ define([
                 self.selectThing = function (item) {
                     document.getElementById("divSectionDetail").style.display = 'inline';
 
+
+                    if (((item.iLateFlowPref4ConsvValue == null) | (item.iLateFlowPref4ConsvValue == 0)) &
+                        ((item.iLateFlowConsvValue == null) | (item.iLateFlowConsvValue == 0)) &
+                        ((item.iLateFlowClosureValueFlow == null) | (item.iLateFlowClosureValueFlow == 0))) {
+                        document.getElementById("divCFSTargetDefinitions").style.display = 'none';
+                    } else {
+                        document.getElementById("divCFSTargetDefinitions").style.display = 'inline';
+                    }
+                    
                     if ((item.strDailyStat_URL == null) | (item.strDailyStat_URL == "")) {
                         document.getElementById("detailSectionUSGSHistorical").style.display = 'none';
                     } else {

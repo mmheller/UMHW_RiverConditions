@@ -71,6 +71,8 @@ a:link[role="presentation"],a:visited[role="presentation"] {
     padding: 10px;
 }
 
+.tab { margin-left: 40px; }
+
 .clsSectionDetailCFSTEMP {
     background-color: #004876;
     color: white;

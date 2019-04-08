@@ -229,20 +229,30 @@
                         <hr style="margin-top:5px; margin-bottom:5px;">
                         <div id="detailSection3">
                             <div class="clsSectionDetailCFSTEMP_Alt"><h3>Waterflow Data</h3></div>
-                            <div class="clsSectionDetailCFSTEMP">Current Discharge (CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedDischargeDateTime'></span></div>
+                            <div class="clsSectionDetailCFSTEMP">Current Discharge (cfs):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedDischargeDateTime'></span></div>
                             <div id="divDay3CFSTrend" class="clsSectionDetailCFSTEMP_Alt">3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" /></div>
-                            <div>Stream Status based on Discharge(CFS):  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
-                            <div><u>Waterflow target definitions for this stream section</u></div>
-                            <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowPref4ConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowPref4ConsvValue'></span></div>
-                            <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowConsvValue'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowConsvValue'></span></div>
-                            <div><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span>:<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></div>
+                           
+                            <div id="divCFSTargetDefinitions">
+                                <div>Stream status based on waterflow (cfs) targets:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
+                                <br />
+                                <div>Waterflow target definitions for this stream section:</div>
+                                <div class="tab">
+                                    <table>
+                                        <tr><td>PREPARE FOR CONSERVATION:</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowPref4ConsvValue'></span> (cfs):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowPref4ConsvValue'></span></td></tr>
+                                        <tr><td>CONSERVATION:</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowConsvValue'></span> (cfs):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowConsvValue'></span></td></tr>
+                                        <tr><td>PREPARE FOR RIVER CLOSURE (CLOSED TO FISHING)</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowClosureValueFlow'></span> (cfs):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowClosureValueFlow'></span></td></tr>
+                                    </table>
+                                </div>
+                            </div>
+
+
                         </div>
                         <hr style="margin-top:5px; margin-bottom:5px;">
                         <div id="detailSection4">
                             <div class="clsSectionDetailCFSTEMP_Alt"><h3>Water Temperature Data</h3></div>
                             <div class="clsSectionDetailCFSTEMP">Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime'></span></div>
                             <div id="divDay3TMPTrend" class="clsSectionDetailCFSTEMP_Alt">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
-                            <div>Stream Status based on Temperature: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
+                            <div>Stream status based on temperature target: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
                             <div><u>Temperature target definition for this stream section</u></div>
                             <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
                             <!--<div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>-->
