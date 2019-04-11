@@ -119,12 +119,14 @@
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron" style="margin-bottom:-10px; margin-top:0px; padding-bottom:0px; padding-top:5px; padding-left:10px; padding-right:10px;">
-        <div id="divWatershedBasinInfoTop" style="line-height: normal; padding:0px;">
-        </div>
-        <div id="divCustomAlert" style="line-height: normal; background-color: #fa021b;">
-        </div>
-        <div id="divFWPAlert" style="line-height: normal; background-color: #b30000; visibility:hidden; padding:2px;">
-            <span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/" style="color:white; font-weight:bold;" >here for official information...</a></span>
+        <div class="container" style="">
+            <div id="divWatershedBasinInfoTop" style="line-height: normal; padding:0px;">
+            </div>
+            <div id="divCustomAlert" style="line-height: normal; background-color: #fa021b;">
+            </div>
+            <div id="divFWPAlert" style="line-height: normal; background-color: #b30000; visibility:hidden; padding:2px;">
+                <span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/" style="color:white; font-weight:bold;">here for official information...</a></span>
+            </div>
         </div>
     </div>
     
@@ -180,33 +182,50 @@
                 <input id="btn_query_QS" type="button" value="Run Search/Filter" style="visibility: hidden;" />
             </div>
             <div class="col-md-9" style="padding-top:20px; padding-right: 1px" >
-                <div id="mapDiv" style="z-index:5"></div>
-                <img id="loadingImg" src="images/loading.gif" style="position:fixed; right:40%; top:50%; z-index:100;" />
-
-                <div id="block_container" style="position:relative; right:5px; bottom:50px; width:300px; z-Index:2; text-align:left">
+                <div id="mapDiv" style="z-index:5">
+                    <img id="loadingImg" src="images/loading.gif" style="position:absolute; right:50%; top:50%; z-index:100;" />
+                </div>
+                
+                
+                <!--<div id="block_container" style="position:relative; right:5px; bottom:90px; width:300px; z-Index:2; padding-bottom:0px; margin-bottom:0px; text-align:left">
+                    <div id="scaleDiv" style="position:relative; width:250px; font-size:11px; margin-left:10px;z-index:101"></div>
+                    <br />
+                    <br />
                     <div id="basemapGallery"></div>
-                </div>
+                </div>-->
 
-                <div style="position:relative; left:200px; bottom:95px; z-index:1;">
-                    <!--<span id="scaleDiv" style="position:relative; left:185px; bottom:110px; width:250px; font-size:11px"></span>-->
-                    <div id="txt_xyCoords" style="color:#404040; width:200px; font-size:11px">Latitude: -, Longitude: -</div>
-                    <div id="scaleDiv" style="width:250px; font-size:11px"></div>
-                    
-                </div>
-
-                <div id="toggleLayers" style="position:relative; bottom:60px; left:25px; font-size:12px">
-                    <div class="col-md-12">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div id="basemapGallery"></div>
+                        </div>
+                        <div class="col-xs-3">
+                            <p><div id="txt_xyCoords" style="color:#404040; width:200px; font-size:11px">Latitude: -<br>Longitude: -</div></p>
+                        </div>
+                        <div class="col-xs-1">
+                            <p><div id="scaleDiv" style="width:100px; font-size:11px;"></div></p>
+                        </div>
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; bottom:55px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>
-                <div id="demo" class="collapse  in"  style="position:relative; left:25px; bottom:55px;">
+                <!--<div id="toggleLayers" style="position:relative; bottom:60px; left:25px; font-size:12px">-->
+                <div id="toggleLayers" style="font-size:10px">
+                </div>
+
+                <!--<button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; bottom:55px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>-->
+                <button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>
+                <!--<div id="demo" class="collapse  in"  style="position:relative; left:25px; bottom:55px;">
                     <h2>Map Legend</h2>
                     <div id="legendDiv" style="width:100%; padding: 2px 2px;"></div>
+                </div>-->
+
+                <div id="demo" class="collapse  in">
+                    <h2>Map Legend</h2>
+                    <div id="legendDiv"></div>
                 </div>
 
 
-                <div id="divSectionDetail" style="display:none; position:relative; bottom:60px; left:25px;">
+                <div id="divSectionDetail" style="display:none;">
                     <h2>Section Detail</h2>
                     <div style="margin: 15px 0 0 0;">
                         <div class="clsSectionDetailCFSTEMP_WARN" id="detailSection2">
@@ -271,7 +290,8 @@
 
                     </div>
 
-                <h2  style="position:relative; bottom:30px; left:25px;">Flow and Temperature Charts</h2>
+                <!--<h2 style="position:relative; bottom:30px; left:25px;">Flow and Temperature Charts</h2>-->
+                <h2>Flow and Temperature Charts</h2>
                 <div id="ViewModel2CFSBinding_div">
                     <div id="ViewModel2CFS_line_div" data-bind="googleBarChart: new ViewModel2CFS_LineData, chartOptions: {interpolateNulls: true,
                              legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
@@ -288,7 +308,7 @@
 
         <hr>
         <footer>
-            <p>Web Tool Hosted by Upper Missouri Headwaters Basin version.  Developed for The Upper Missouri Headwaters Basin and Associated Watersheds by...  :1.0</p>
+            <p>Hosted by Upper Missouri Headwaters Basin.  Developed by the USFWS Region 6 Science Applications in cooperation with Upper Missouri Headwaters Basin and Associated Watersheds by...  :1.0</p>
         </footer>
     </div> <!-- /container -->
 

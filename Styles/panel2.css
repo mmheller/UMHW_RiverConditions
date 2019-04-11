@@ -38,11 +38,6 @@
     {
         text-align:left !important;
         vertical-align:bottom !important;
-        /*position:relative;
-        right:5px; 
-        bottom:50px; 
-        width:250px; 
-        z-Index:999;*/
     }
     /*#basemapGallery, #toggleLayers
     {
@@ -103,6 +98,14 @@
        margin-right:5px;
        /*font-family: 'Tahoma', cursive;*/
     }    
+
+
+    .selectClass {
+       font-size: 12px;
+       font-family: 'Tahoma', 'cursive';
+       width: 95%;
+    }​
+
      .file-upload-status {
     	vertical-align: middle;
     	padding: 5px 11px;
@@ -110,11 +113,7 @@
     	font-size: 12px;
     	}
  
-    .selectClass {
-       font-size: 12px;
-       font-family: 'Tahoma', cursive;
-       width: 95%;
-    }​
+
   
      /*.esriScalebar
      {

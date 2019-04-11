@@ -1,18 +1,14 @@
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
-  padding-top: 5px;
+  padding-top: 350px;
   padding-bottom: 5px;
 }
+
 
     text[fill="rgb(127, 82, 83)"]{  
       text-shadow: 1px 1px #DCE1E3;  
     }  
 
-
-/*#block_container
-{
-    text-align:center;
-}*/
 #bloc1, #bloc2, #bloc3, #bloc4, #bloc5, #bloc6, #bloc7, #bloc8, #bloc9, #bloc10
 {
     display:inline;
@@ -86,6 +82,17 @@ a:link[role="presentation"],a:visited[role="presentation"] {
     /*margin: 20px;*/
     padding: 10px;
 }
+
+
+
+/*.esriBasemapGalleryThumbnail {
+    height: 40px;
+    width: 40px;
+}*/
+
+/*.esriBasemapGalleryNode {
+    width: 40px;
+}*/
 
 .esriBasemapGalleryNode {
     width: 40px !important;
