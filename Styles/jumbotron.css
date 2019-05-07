@@ -67,7 +67,10 @@ a:link[role="presentation"],a:visited[role="presentation"] {
     padding: 10px;
 }
 
-.tab { margin-left: 40px; }
+.tab { margin-left: 30px; 
+       margin-right: 30px;
+       padding:5px;
+}
 
 .clsSectionDetailCFSTEMP {
     background-color: #004876;
@@ -115,6 +118,7 @@ a:link[role="presentation"],a:visited[role="presentation"] {
     white-space: nowrap !important;
     border: none !important;
     border-width: 0px 0 !important;
+    padding-right: 10px;
 }
 
 .esriLegendLayer {

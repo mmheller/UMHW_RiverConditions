@@ -677,7 +677,8 @@ define([
                 
                 self.CurrentDisplayGageRecord = ko.observable(self.gageRecords()[0]);
                 self.selectThing = function (item) {
-                    document.getElementById("divSectionDetail").style.display = 'inline';
+                    document.getElementById("divSectionDetail_A").style.display = 'inline';
+                    document.getElementById("divSectionDetail_B").style.display = 'inline';
 
 
                     if (((item.iLateFlowPref4ConsvValue == null) | (item.iLateFlowPref4ConsvValue == 0)) &
@@ -835,7 +836,8 @@ define([
             if (blnIsInitialPageLoad) {
                 var vm = new app.pGage.readingsViewModel();
                 ko.applyBindings(vm, document.getElementById("entriesCon_div"));
-                ko.applyBindings(vm, document.getElementById("divSectionDetail"));
+                ko.applyBindings(vm, document.getElementById("divSectionDetail_A"));
+                ko.applyBindings(vm, document.getElementById("divSectionDetail_B"));
 
                 var elements = document.getElementsByTagName('tr');  //Sets the click event for the row
                 var str_overallSymbool = "";

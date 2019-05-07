@@ -45,7 +45,6 @@
         body {
             padding-top: 35px;
         }
-
         
         @media (max-width: 1200px) {  /*This collapses thead watershed list at a narrow browser window width*/ 
             .navbar-header {
@@ -125,7 +124,7 @@
             <div id="divCustomAlert" style="line-height: normal; background-color: #fa021b;">
             </div>
             <div id="divFWPAlert" style="line-height: normal; background-color: #b30000; visibility:hidden; padding:2px;">
-                <span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/" style="color:white; font-weight:bold;">here for official information...</a></span>
+                <span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/"  target="_blank" style="color:white; font-weight:bold;">here for official information...</a></span>
             </div>
         </div>
     </div>
@@ -147,7 +146,7 @@
                             <td width="95" valign="top">
                                 <div>Stream</div>
                                 <div>Section</div>
-                                <div>Discharge (cfs)</div>
+                                <div>Streamflow (cfs)</div>
                                 <div>H2O Temp (F)</div>
                                 <div>Status</div>
                             </td>
@@ -213,7 +212,7 @@
                 </div>
 
                 <!--<button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; bottom:55px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>-->
-                <button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>
+                <button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>
                 <!--<div id="demo" class="collapse  in"  style="position:relative; left:25px; bottom:55px;">
                     <h2>Map Legend</h2>
                     <div id="legendDiv" style="width:100%; padding: 2px 2px;"></div>
@@ -225,8 +224,9 @@
                 </div>
 
 
-                <div id="divSectionDetail" style="display:none;">
-                    <h2>Section Detail</h2>
+                <div id="divSectionDetail_A" style="display:none; margin-bottom:0px;">
+                    <!--<h2>Stream Section Detail</h2>-->
+                    <div class="clsSectionDetailCFSTEMP"><h3>Stream Section Detail</h3></div>
                     <div style="margin: 15px 0 0 0;">
                         <div class="clsSectionDetailCFSTEMP_WARN" id="detailSection2">
                             <h3>Montana FWP Closure Information!  Click <a href="http://fwp.mt.gov/news/restrictions/" target="_blank">here</a> for official closure information.</h3>
@@ -244,17 +244,24 @@
                             <div>Stream Section Description:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
                             <div>Section Start:  <span data-bind='text: $root.CurrentDisplayGageRecord().StartEndpoint'></span></div>
                             <div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>
+                            <hr style="margin-top:5px; margin-bottom:5px;">
+                            <div id="detailSectionUSGSCurrent">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
+                            <br />
+                            <div id="detailSectionUSGSHistorical">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round historical data)</div>
                         </div>
-                        <hr style="margin-top:5px; margin-bottom:5px;">
-                        <div id="detailSection3">
-                            <div class="clsSectionDetailCFSTEMP_Alt"><h3>Waterflow Data</h3></div>
-                            <div class="clsSectionDetailCFSTEMP">Current Discharge (cfs):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedDischargeDateTime'></span></div>
-                            <div id="divDay3CFSTrend" class="clsSectionDetailCFSTEMP_Alt">3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" /></div>
-                           
-                            <div id="divCFSTargetDefinitions">
-                                <div>Stream status based on waterflow (cfs) targets:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
+                        <div id="detailSection3" style="background-color:#eee !important; margin-bottom:0;">
+                            <div><h3>Streamflow Data</h3></div>
+
+                            <div style="margin-left:10px; margin-bottom:0px;">
+                                <div>Current Discharge (cfs):  <span data-bind='text: $root.CurrentDisplayGageRecord().Discharge'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedDischargeDateTime'></span></div>
+                                <div id="divDay3CFSTrend">3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3CFSTrend}" /></div>
+                            </div>
+         
+                            <div id="divCFSTargetDefinitions" style="display:none;background-color:#eee !important; margin-top:0;margin-bottom:0;">
+
+                                <div style="margin:10px;">Stream status based on waterflow (cfs) targets:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
                                 <br />
-                                <div>Waterflow target definitions for this stream section:</div>
+                                <div style="margin-left:30px">Waterflow target definitions for this stream section:</div>
                                 <div class="tab">
                                     <table>
                                         <tr><td>PREPARE FOR CONSERVATION:</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowPref4ConsvValue'></span> (cfs):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowPref4ConsvValue'></span></td></tr>
@@ -263,42 +270,36 @@
                                     </table>
                                 </div>
                             </div>
-
-
                         </div>
-                        <hr style="margin-top:5px; margin-bottom:5px;">
-                        <div id="detailSection4">
-                            <div class="clsSectionDetailCFSTEMP_Alt"><h3>Water Temperature Data</h3></div>
-                            <div class="clsSectionDetailCFSTEMP">Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime'></span></div>
-                            <div id="divDay3TMPTrend" class="clsSectionDetailCFSTEMP_Alt">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
+                    </div>
+                </div>
+
+                <div id="ViewModel2CFSBinding_div" style="background-color:#eee; padding:10px; margin-top:0px; margin-bottom:0px;">
+                    <div id="ViewModel2CFS_line_div" data-bind="googleBarChart: new ViewModel2CFS_LineData, chartOptions: {interpolateNulls: true,
+                            legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
+                    </div>
+                </div>
+
+                <div id="divSectionDetail_B" style="display:none; margin-bottom:0;">
+                    <div id="detailSection4" style="background-color:#eee !important;">
+
+                        <div style="margin-left:10px;">
+                            <div><h3>Water Temperature Data</h3></div>
+                            <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime'></span></div>
+
+
+                            <div id="divDay3TMPTrend">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
                             <div>Stream status based on temperature target: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
                             <div><u>Temperature target definition for this stream section</u></div>
                             <div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
                             <!--<div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>-->
+                            <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
+                            <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
                         </div>
-                        <div></div>
-
-                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
-                        <div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
-
-                        <hr style="margin-top:5px; margin-bottom:5px;">
-
-                        <div id="detailSectionUSGSCurrent">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
-                        <br />
-                        <div id="detailSectionUSGSHistorical">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round historical data)</div>
-                    </div>
-
-                    </div>
-
-                <!--<h2 style="position:relative; bottom:30px; left:25px;">Flow and Temperature Charts</h2>-->
-                <h2>Flow and Temperature Charts</h2>
-                <div id="ViewModel2CFSBinding_div">
-                    <div id="ViewModel2CFS_line_div" data-bind="googleBarChart: new ViewModel2CFS_LineData, chartOptions: {interpolateNulls: true,
-                             legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
                     </div>
                 </div>
 
-                <div id="ViewModel2TMPBinding_div">
+                <div id="ViewModel2TMPBinding_div" style="background-color:#eee; padding:10px; margin-top:0;">
                     <div id="ViewModel2TMP_line_div" data-bind="googleBarChart: new ViewModel2TMP_LineData, chartOptions: {interpolateNulls: true,
                              legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
                     </div>
@@ -308,7 +309,7 @@
 
         <hr>
         <footer>
-            <p>Hosted by Upper Missouri Headwaters Basin.  Developed by the USFWS Region 6 Science Applications in cooperation with Upper Missouri Headwaters Basin and Associated Watersheds by...  :1.0</p>
+            <p>Hosted by the <a href="http://dnrc.mt.gov/divisions/water/management/regional-river-basin-information/upper-missouri-river-basin" target="_blank"> Upper Missouri Headwaters Basin</a>.  Developed by the USFWS Region 6 Science Applications in cooperation with Upper Missouri Headwaters Basin and associated watersheds.  Version: Draft 1.5</p>
         </footer>
     </div> <!-- /container -->
 

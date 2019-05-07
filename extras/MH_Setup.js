@@ -213,14 +213,6 @@ define([
                 ["Madison", "Madison"], ["Ruby", "Ruby"]
             ];
 
-            //var arrayNavList = [
-            //    ["Ruby", "Ruby"], ["Madison", "Madison"], ["Gallatin-Upper", "Upper Gallatin"],
-            //    ["Gallatin-Lower", "Lower Gallatin"], ["Jefferson", "Jefferson"],
-            //    ["Broadwater", "Broadwater"], ["Boulder", "Boulder"],
-            //    ["Big Hole", "Big Hole"], ["Beaverhead/Centennial", "Beaverhead"]
-            //];
-
-
             var strURLPrefix = "index.html?H2O_ID=";
             var strURLSuffix = "";
 
@@ -326,7 +318,6 @@ define([
             var templateEPOINT = new InfoTemplate();
             templateEPOINT.setTitle("<b>Start/End Section Locations</b>");
             templateEPOINT.setContent("Placename: ${Endpoint_Name}<br>Section: ${Start_End} of ${Section_Name}<br>Stream: ${Stream_Name}<br>");
-            //templateEPOINT.setContent("${Endpoint_Name}<br>Start or End:${Start_End}<br>Stream: ${Stream_Name}<br>Section: ${Section_Name}</a>");
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, 
                 infoTemplate: templateEPOINT,
                 outFields: ['*'],
@@ -364,10 +355,6 @@ define([
                         
             pEPointsFeatureLayer.setDefinitionExpression(strQueryDef1);
 
-            //var templateSSection = new InfoTemplate();
-            //templateSSection.setTitle("<b>Section:${SectionID}</b>");
-            //templateSSection.setContent("<b>Watershed:</b> ${Watershed}<br><b>Stream:</b> ${StreamName}<br><b>CFS Prep for Conserv:</b> ${CFS_Prep4Conserv}<br><b>Prep for Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Conserv:</b> ${CFS_Conserv}<br><b>Conserv Desc:</b> ${CFS_Note_Prep4Conserv}<br><b>CFS Un-Official Closure:</b> ${CFS_Conserv}<br><b>Un-Official Closure Desc:</b> ${CFS_Note_NotOfficialClosure}<br><b>Conservation Temp:</b> ${ConsvTemp}");
-            //pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSSection, autoGeneralize: true, "opacity": 0.9, outFields: ['*'] });
             pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, autoGeneralize: true, "opacity": 0.9, outFields: ['*'] });
             pSectionsFeatureLayer.setDefinitionExpression(strQueryDef2);
             app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
@@ -421,6 +408,18 @@ define([
             var pLabelRendererSNOTEL = new SimpleRenderer(pLabelSNOTEL);
             var pLabelsSNOTEL = new LabelLayer({ id: "LabelsSNOTEL" });
             pLabelsSNOTEL.addFeatureLayer(pSNOTELFeatureLayer, pLabelRendererSNOTEL, "{Name}");
+
+            var templateNOAA = new InfoTemplate();
+            templateNOAA.setTitle("<b>Weather Station</b>");
+            templateNOAA.setContent("<b>${STNNAME}</b>(${OWNER})<br><a href=${URL} target='_blank'>More info...</a>");
+            var pNOAAFeatureLayer = new esri.layers.FeatureLayer("https://nowcoast.noaa.gov/arcgis/rest/services/nowcoast/obs_meteoceanhydro_insitu_pts_geolinks/MapServer/1",
+                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateNOAA, outFields: ['*'], visible: false });
+            var pLabelNOAA = new TextSymbol().setColor(vDarkGreyColor);
+            pLabelNOAA.font.setSize("9pt");
+            pLabelNOAA.font.setFamily("arial");
+            var pLabelRendererNOAA = new SimpleRenderer(pLabelNOAA);
+            var pLabelsNOAA = new LabelLayer({ id: "LabelsNOAA" });
+            pLabelsNOAA.addFeatureLayer(pNOAAFeatureLayer, pLabelRendererNOAA, "{STNNAME}");
            
             var templateFWP = new InfoTemplate();
             templateFWP.setTitle("<b>${TITLE}</b>");
@@ -510,8 +509,8 @@ define([
             pMonitoringCSVLayer.setInfoTemplate(pCSVTemplate);
 
             app.map.addLayers([pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
-                pSectionsFeatureLayer, pSNOTELFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
-                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsEndPoints, pMonitoringCSVLayer]);
+                pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
+                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsNOAA, pLabelsEndPoints, pMonitoringCSVLayer]);
             app.map.infoWindow.resize(300, 65);
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
@@ -533,6 +532,7 @@ define([
             legendLayers.push({ layer: pMonitoringCSVLayer, title: 'Monitoring Locations' });
             legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
+            legendLayers.push({ layer: pNOAAFeatureLayer, title: 'Weather Stations' });
             legendLayers.push({ layer: pFASFeatureLayer, title: 'FWP Fish Access Sites' });
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
             legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locations' });
@@ -554,7 +554,8 @@ define([
             var cbxLayers = [];
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
             cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
-            cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
+            cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites'});
+            cbxLayers.push({ layers: [pNOAAFeatureLayer, pLabelsNOAA], title: 'Weather Stations'});
             cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'MT AIS Watercraft Access' });
             cbxLayers.push({ layers: [pMonitoringCSVLayer, pMonitoringCSVLayer], title: 'Monitoring Locations' });
             
