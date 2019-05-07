@@ -282,12 +282,9 @@
 
                 <div id="divSectionDetail_B" style="display:none; margin-bottom:0;">
                     <div id="detailSection4" style="background-color:#eee !important;">
-
+                        <div><h3>Water Temperature Data</h3></div>
                         <div style="margin-left:10px;">
-                            <div><h3>Water Temperature Data</h3></div>
                             <div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime'></span></div>
-
-
                             <div id="divDay3TMPTrend">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
                             <div>Stream status based on temperature target: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
                             <div><u>Temperature target definition for this stream section</u></div>
