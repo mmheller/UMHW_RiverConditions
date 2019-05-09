@@ -112,13 +112,13 @@
                     <ul id="navList" class="nav nav-pills pull-right">
                     </ul>
                 </form>
-            </div><!--/.navbar-collapse -->
+            </div>
         </div>
     </nav>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron" style="margin-bottom:-10px; margin-top:0px; padding-bottom:0px; padding-top:5px; padding-left:10px; padding-right:10px;">
-        <div class="container" style="">
+    <div class="jumbotron" style="margin-bottom:-10px; margin-top:0px; padding-bottom:0px; padding-top:5px; padding-left:0px; padding-right:10px;">
+        <div class="container" style="padding:5px;">
             <div id="divWatershedBasinInfoTop" style="line-height: normal; padding:0px;">
             </div>
             <div id="divCustomAlert" style="line-height: normal; background-color: #fa021b;">
@@ -132,12 +132,14 @@
     <div class="container">
         <!-- Example row of columns -->
         <div class="row">
+
             <div class="col-md-3" style="padding-left: 1px; padding-right: 1px" id="entriesCon_div">
                 <h2>Unofficial: Summary of Conditions</h2>
                 <p><i>Click section listed below or on Map for detail display below the Map Legend</i></p>
-                <!--<p id="txtProcMessage">Blank</p>-->
+                
                 <p id="txtFromToDate"></p>
-                <img id="loadingImg2" src="images/loading.gif"/> <div id="divLoadingUSGS"><i>Loading USGS Data...</i></div>
+                <img id="loadingImg2" src="images/loading.gif" /> 
+                <div id="divLoadingUSGS"><i>Loading USGS Data...</i></div>
                 <table class="TableListJS" id="entries">
                     <thead>
                     </thead>
@@ -177,23 +179,14 @@
                         </tr>
                     </tbody>
                 </table>
-                <div id="search"></div>
-                <input id="btn_query_QS" type="button" value="Run Search/Filter" style="visibility: hidden;" />
             </div>
-            <div class="col-md-9" style="padding-top:20px; padding-right: 1px" >
-                <div id="mapDiv" style="z-index:5">
+            
+            <div class="col-md-9" style="padding-top:20px; padding-right: 1px;" >
+                <div id="mapDiv" style="z-index:5; width:98% !important;">
                     <img id="loadingImg" src="images/loading.gif" style="position:absolute; right:50%; top:50%; z-index:100;" />
                 </div>
-                
-                
-                <!--<div id="block_container" style="position:relative; right:5px; bottom:90px; width:300px; z-Index:2; padding-bottom:0px; margin-bottom:0px; text-align:left">
-                    <div id="scaleDiv" style="position:relative; width:250px; font-size:11px; margin-left:10px;z-index:101"></div>
-                    <br />
-                    <br />
-                    <div id="basemapGallery"></div>
-                </div>-->
-
-                <div class="container">
+      
+                <div class="container" style="width: 99% !important;">
                     <div class="row">
                         <div class="col-xs-3">
                             <div id="basemapGallery"></div>
@@ -202,27 +195,20 @@
                             <p><div id="txt_xyCoords" style="color:#404040; width:200px; font-size:11px">Latitude: -<br>Longitude: -</div></p>
                         </div>
                         <div class="col-xs-1">
-                            <p><div id="scaleDiv" style="width:100px; font-size:11px;"></div></p>
+                            <p><div id="scaleDiv" style="font-size:11px;"></div></p>
                         </div>
                     </div>
                 </div>
 
-                <!--<div id="toggleLayers" style="position:relative; bottom:60px; left:25px; font-size:12px">-->
-                <div id="toggleLayers" style="font-size:10px">
+                <div id="toggleLayers" style="font-size:10px;">
                 </div>
 
-                <!--<button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; bottom:55px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>-->
                 <button type="button" class="btn btn-info" style="position:relative; font-size:12px; left:25px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#demo">Show/Hide Map Legend</button>
-                <!--<div id="demo" class="collapse  in"  style="position:relative; left:25px; bottom:55px;">
-                    <h2>Map Legend</h2>
-                    <div id="legendDiv" style="width:100%; padding: 2px 2px;"></div>
-                </div>-->
 
                 <div id="demo" class="collapse  in">
                     <h2>Map Legend</h2>
                     <div id="legendDiv"></div>
                 </div>
-
 
                 <div id="divSectionDetail_A" style="display:none; margin-bottom:0px;">
                     <!--<h2>Stream Section Detail</h2>-->
@@ -302,6 +288,9 @@
                     </div>
                 </div>
             </div>
+
+
+
         </div>
 
         <hr>

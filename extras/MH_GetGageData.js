@@ -864,7 +864,8 @@ define([
                         strTempText = strTempText.substring(strTempText.indexOf("strDailyStat_URL") + ("strDailyStat_URL".length + 2), strTempText.length);
                         var strDailyStat_URL = strTempText.substring(0, strTempText.indexOf("</span>"));
 
-                        app.dblExpandNum = 1.5;
+                        //app.dblExpandNum = 1.5;
+                        app.dblExpandNum = 0.8;
 
                         app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
 

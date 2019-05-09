@@ -305,7 +305,8 @@ define([
                  }
             });
 
-            var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" }, dojo.byId("scaleDiv")); 
+            var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" }, dojo.byId("scaleDiv"));
+            
             app.loading = dojo.byId("loadingImg");  //loading image. id
             dojo.connect(app.map, "onUpdateStart", showLoading);
             dojo.connect(app.map, "onUpdateEnd", hideLoading);
@@ -321,7 +322,7 @@ define([
             pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, 
                 infoTemplate: templateEPOINT,
                 outFields: ['*'],
-                minScale: 1200000
+                minScale: 1000000
             });
 
 
