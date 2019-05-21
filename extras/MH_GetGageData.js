@@ -12,10 +12,6 @@
 
 function ProcLinearRegression(arrray_Detail4Interpolation, strValueKey) {
     var str3DayCFSTrend = "images/blank.png";
-    //arrray_Detail4Interpolation.sort(function (a, b) {
-    //    var dateA = new Date(a.gagedatetime), dateB = new Date(b.gagedatetime)
-    //    return dateA - dateB //sort by date ascending
-    //})
     arrayX = [];
     arrayY = [];
     for (var ilr = 0; ilr < arrray_Detail4Interpolation.length; ilr++) {
@@ -24,8 +20,17 @@ function ProcLinearRegression(arrray_Detail4Interpolation, strValueKey) {
     }
     var lr = linearRegression(arrayY, arrayX);
 
+    var dMidRangeLow = -0.0000001;
+    var dMidRangeHigh = 0.0000001;
+
+    if (strValueKey == "TMP") {
+        dMidRangeLow = -0.000000001;
+        dMidRangeHigh = 0.000000001;
+    }
+
+
     islope = lr.slope;
-    if ((islope < 0.000001) & (islope > -0.000001)) {
+    if ((islope < dMidRangeHigh) & (islope > dMidRangeLow)) {
         str3DayCFSTrend = "images/flatline.png";
     } else if (islope > 0) {
         str3DayCFSTrend = "images/up.png";
@@ -111,6 +116,7 @@ define([
         m_arrayOIDYellow: [],
         m_arrayOIDsGold: [],
         m_arrayOIDsOrange: [],
+        m_arrayOIDsPlum: [],
         m_arrayOIDsRed: [],
         mIDXQuery1AtaTime: 0,
 
@@ -913,6 +919,10 @@ define([
                         (elements)[i].style.color = 'white';
                         (elements)[i].style.backgroundColor = "rgb(249, 166, 2)";
                     }
+                    if (str_overallSymbool == "Plum") {
+                        (elements)[i].style.color = 'black';
+                        (elements)[i].style.backgroundColor = "rgb(221, 160, 221)";
+                    }
                     if (str_overallSymbool == "Yellow") {
                         (elements)[i].style.color = 'black';
                         (elements)[i].style.backgroundColor = "rgb(255, 255, 0)";
@@ -925,7 +935,7 @@ define([
                     }
                 }
 
-                app.pSup.addStreamConditionFeatureLayer(m_arrayOIDYellow, m_arrayOIDsGold, m_arrayOIDsOrange, m_arrayOIDsRed);
+                app.pSup.addStreamConditionFeatureLayer(m_arrayOIDYellow, m_arrayOIDsGold, m_arrayOIDsOrange, m_arrayOIDsPlum, m_arrayOIDsRed);
                 tableHighlightRow();
                 document.getElementById("loadingImg2").style.display = "none";
                 document.getElementById("divLoadingUSGS").style.display = "none";
@@ -1004,7 +1014,8 @@ define([
             var strEndEndpoint = "";
             m_arrayOIDYellow =[];
             m_arrayOIDsGold =[];
-            m_arrayOIDsOrange =[];
+            m_arrayOIDsOrange = [];
+            m_arrayOIDsPlum = [];
             m_arrayOIDsRed = [];
             
             var strURLGagePrefix = "https://nwis.waterservices.usgs.gov/nwis/iv/";
@@ -1113,7 +1124,6 @@ define([
                             strSiteID = itemSectionRefined[1];  //since some sections do not have readings all the time setting this before finding data in the JSON
                             strStreamName = itemSectionRefined[0];  //since some sections do not have readings all the time setting this before finding data in the JSON
                             iSectionID = itemSectionRefined[2];  //since some sections do not have readings all the time setting this before finding data in the JSON
-                            iTempClosureValue = itemSectionRefined[6];
 
                             strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
                             strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
@@ -1152,29 +1162,31 @@ define([
                                     iLateFlowPref4ConsvValue = itemSectionRefined[3];
                                     iLateFlowConsvValue = itemSectionRefined[4];
                                     iLateFlowClosureValueFlow = itemSectionRefined[5];
+                                    iTempClosureValue = itemSectionRefined[6];
 
                                     if (blnIsInitialPageLoad) {
                                         if (app.test) {
                                             if (iLateFlowPref4ConsvValue == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                 iLateFlowPref4ConsvValue = 400;
-                                        }
+                                            }
                                             if (iLateFlowConsvValue == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                 iLateFlowConsvValue = 300;
-                                        }
+                                            }
                                             if (iLateFlowClosureValueFlow == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                iLateFlowClosureValueFlow = 200;
-                                        }
+                                                    iLateFlowClosureValueFlow = 200;
+                                            }
+                                            iTempClosureValue = 50;
                                         } else {
                                             if (iLateFlowPref4ConsvValue == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                 iLateFlowPref4ConsvValue = 0;
-                                        }
+                                            }
                                             if (iLateFlowConsvValue == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                 iLateFlowConsvValue = 0;
-                                        }
+                                            }
                                             if (iLateFlowClosureValueFlow == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                 iLateFlowClosureValueFlow = 0;
+                                            }
                                         }
-                                    }
 
                                     var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
                                     var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
@@ -1448,6 +1460,12 @@ define([
                 strOverallStatus = "UNOFFICIAL RIVER CLOSURE";
                 strOverallSymbol = "Orange";
                 m_arrayOIDsOrange.push(iOID);
+            }
+
+            if (strSiteTempStatus == "UNOFFICIAL RIVER CLOSURE") {
+                strOverallStatus = "PREPARE FOR HOOT-OWL FISHING RESTRICTIONS";
+                strOverallSymbol = "Plum";
+                m_arrayOIDsPlum.push(iOID);
             }
 
             if (strFWPWarn != "") {

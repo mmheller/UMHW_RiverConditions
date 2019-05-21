@@ -83,7 +83,7 @@ define([
 
     return declare([], {
 
-        addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDsRed) {
+        addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDPlum, arrayOIDsRed) {
             var defaultSymbol = new SimpleFillSymbol().setStyle(SimpleFillSymbol.STYLE_NULL);
             defaultSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
 
@@ -97,6 +97,9 @@ define([
             }
             for (var iii = 0; iii < arrayOIDsOrange.length; iii++) {
                 renderer.addValue(arrayOIDsOrange[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 18));
+            }
+            for (var iii = 0; iii < arrayOIDPlum.length; iii++) {
+                renderer.addValue(arrayOIDPlum[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([221, 160, 221]), 18));
             }
             for (var iiii = 0; iiii < arrayOIDsRed.length; iiii++) {
                 renderer.addValue(arrayOIDsRed[iiii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18));
@@ -248,9 +251,10 @@ define([
             }
 
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
-            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
+            //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
+            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
             
-            this.GetSetHeaderWarningContent(app.strHFL_URL + "11", app.H2O_ID, blnUseAlternateHeader);
+            this.GetSetHeaderWarningContent(app.strHFL_URL + "12", app.H2O_ID, blnUseAlternateHeader);
         },
 
         Phase2: function () {
@@ -529,6 +533,32 @@ define([
             document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
             app.pGage.Start(strDateTimeMinus3, strDateTime);
                        
+
+            var pRiverSymbolRenderer = new UniqueValueRenderer(null, "River Status");
+            function createSymbol(color) {
+                return new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color(color), 3);
+            }
+            pRiverSymbolRenderer.addValue({
+                value: "1",
+                symbol: createSymbol("#6EC4AE"),
+                label: "District 1 (Bartow)",
+                description: "SW Florida"
+            });
+            pRiverSymbolRenderer.addValue({
+                value: "2",
+                symbol: createSymbol("#37A9B7"),
+                label: "District 2 (Jacksonville)",
+                description: "Northeast Florida"
+            });
+            pRiverSymbolRenderer.addValue({
+                value: "3",
+                symbol: createSymbol("#D68989"),
+                label: "District 3 (Chipley)",
+                description: "Northwest Florida"
+            });
+            pRiverSymbolsFeatureLayer.setRenderer(pRiverSymbolRenderer);
+
+
             var legendLayers = [];
             legendLayers.push({ layer: pMonitoringCSVLayer, title: 'Monitoring Locations' });
             legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
@@ -700,7 +730,15 @@ define([
 
 
             if (typeof app.H2O_ID != 'undefined') {
+                var iMapOrientation = app.map.width / app.map.height;
+                
                 app.dblExpandNum = 0.5;
+                if ((iMapOrientation > 1.5) & ((app.H2O_ID == "Madison") | (app.H2O_ID == "Ruby") | (app.H2O_ID == "Upper Gallatin") | (app.H2O_ID == "Lower Gallatin"))) {
+                    app.dblExpandNum = 1;
+                } else if (app.H2O_ID == "Broadwater") {
+                    app.dblExpandNum = 1;
+                }
+
                 app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer, "OBJECTID");
             } else {
                 app.dblExpandNum = 0.5;
