@@ -936,6 +936,7 @@ define([
                 }
 
                 app.pSup.addStreamConditionFeatureLayer(m_arrayOIDYellow, m_arrayOIDsGold, m_arrayOIDsOrange, m_arrayOIDsPlum, m_arrayOIDsRed);
+                app.pSup.Phase3(m_arrayOIDYellow, m_arrayOIDsGold, m_arrayOIDsOrange, m_arrayOIDsPlum, m_arrayOIDsRed);
                 tableHighlightRow();
                 document.getElementById("loadingImg2").style.display = "none";
                 document.getElementById("divLoadingUSGS").style.display = "none";

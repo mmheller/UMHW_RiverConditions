@@ -82,34 +82,56 @@ define([
 ) {
 
     return declare([], {
+        m_pRiverSymbolsFeatureLayer: null,
+        m_StreamStatusRenderer: null,
 
         addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDPlum, arrayOIDsRed) {
-            var defaultSymbol = new SimpleFillSymbol().setStyle(SimpleFillSymbol.STYLE_NULL);
-            defaultSymbol.outline.setStyle(SimpleLineSymbol.STYLE_NULL);
+            var defaultSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 169, 230]), 5);
+            app.pSup.m_StreamStatusRenderer = new UniqueValueRenderer(defaultSymbol, "OBJECTID");//create renderer
+            app.pSup.m_StreamStatusRenderer.defaultLabel = "Stream Section (Open if not outlined with different color)";
 
-            var renderer = new UniqueValueRenderer(defaultSymbol, "OBJECTID");//create renderer
-            //add symbol for each possible value
             for (var i = 0; i < arrayOIDYellow.length; i++) {
-                renderer.addValue(arrayOIDYellow[i], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 255, 0]), 18));
+                app.pSup.m_StreamStatusRenderer.addValue({
+                    value: arrayOIDYellow[i],
+                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 255, 0]), 18),
+                    label: "Prepare"
+                });
             }
             for (var ii = 0; ii < arrayOIDsGold.length; ii++) {
-                renderer.addValue(arrayOIDsGold[ii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([249, 166, 2]), 18));
+                app.pSup.m_StreamStatusRenderer.addValue({
+                    value: arrayOIDsGold[ii],
+                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([249, 166, 2]), 18),
+                    label: "Conservation Actions"
+                });
             }
             for (var iii = 0; iii < arrayOIDsOrange.length; iii++) {
-                renderer.addValue(arrayOIDsOrange[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 18));
+                app.pSup.m_StreamStatusRenderer.addValue({
+                    value: arrayOIDsOrange[iii],
+                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 18),
+                    label: "Unnoficial Closure"
+                });
             }
             for (var iii = 0; iii < arrayOIDPlum.length; iii++) {
-                renderer.addValue(arrayOIDPlum[iii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([221, 160, 221]), 18));
+                app.pSup.m_StreamStatusRenderer.addValue({
+                    value: arrayOIDPlum[iii],
+                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([221, 160, 221]), 18),
+                    label: "Hoot Owl"
+                });
             }
             for (var iiii = 0; iiii < arrayOIDsRed.length; iiii++) {
-                renderer.addValue(arrayOIDsRed[iiii], new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18));
+                app.pSup.m_StreamStatusRenderer.addValue({
+                    value: arrayOIDsRed[iiii],
+                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18),
+                    label: "Offical Closure"
+                });
             }
 
             var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", {
                 mode: FeatureLayer.MODE_ONDEMAND,
                 outFields: ["OBJECTID "]
             });
-            featureLayer.setRenderer(renderer);
+            featureLayer.setRenderer(app.pSup.m_StreamStatusRenderer);
+            //featureLayer.setRenderer(renderer);
             app.map.addLayer(featureLayer);
             app.map.reorderLayer(featureLayer, 5);
         },
@@ -318,12 +340,13 @@ define([
             var template = new InfoTemplate();
             template.setTitle("Stream Gage");
             template.setContent("<b>${GageTitle}</b><br>Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
-            pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
+            var pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
 
             var templateEPOINT = new InfoTemplate();
             templateEPOINT.setTitle("<b>Start/End Section Locations</b>");
             templateEPOINT.setContent("Placename: ${Endpoint_Name}<br>Section: ${Start_End} of ${Section_Name}<br>Stream: ${Stream_Name}<br>");
-            pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, 
+            pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", {
+                mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
                 infoTemplate: templateEPOINT,
                 outFields: ['*'],
                 minScale: 1000000
@@ -360,7 +383,10 @@ define([
                         
             pEPointsFeatureLayer.setDefinitionExpression(strQueryDef1);
 
-            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, autoGeneralize: true, "opacity": 0.9, outFields: ['*'] });
+            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", {
+                mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
+                autoGeneralize: true, "opacity": 0.9, outFields: ['*']
+            });
             pSectionsFeatureLayer.setDefinitionExpression(strQueryDef2);
             app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
 
@@ -390,6 +416,16 @@ define([
             var pLabelRendererBLM = new SimpleRenderer(pLabelBLM);
             var pLabelsBLM = new LabelLayer({ id: "LabelsBLM" });
             pLabelsBLM.addFeatureLayer(pBLMFeatureLayer, pLabelRendererBLM, "{Facility_Name}");
+
+
+
+
+            var templateCZM = new InfoTemplate();
+            templateCZM.setTitle("<b>Channel Migration Zone</b>");
+            templateCZM.setContent("CMZ: ${CMZ}<br>Reach ID: ${RchID}");
+            var pCZMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "11",
+                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateCZM, outFields: ['*'], visible: false });
+
 
 
             var templateFWPAISAccess = new InfoTemplate();
@@ -496,7 +532,7 @@ define([
             plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
             plabels3.minScale = 1500000;
             
-            var pRiverSymbolsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "10",
+            app.pSup.m_pRiverSymbolsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "10",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND,  visible: true });
             // Use CORS
             esriConfig.defaults.io.corsEnabledServers.push("docs.google.com"); // supports CORS
@@ -513,7 +549,11 @@ define([
             pCSVTemplate.setContent("Station Name: ${STATION_NAME}<br>Drainage Name: ${Drainage_Name}<br><a href=${URL} target='_blank'> Link monitoring data</a>");
             pMonitoringCSVLayer.setInfoTemplate(pCSVTemplate);
 
-            app.map.addLayers([pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
+
+    //        app.map.addLayers([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pCZMFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
+    //pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
+    //               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsNOAA, pLabelsEndPoints, pMonitoringCSVLayer]);
+            app.map.addLayers([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pCZMFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
                 pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
                                plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsNOAA, pLabelsEndPoints, pMonitoringCSVLayer]);
             app.map.infoWindow.resize(300, 65);
@@ -532,34 +572,11 @@ define([
 
             document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
             app.pGage.Start(strDateTimeMinus3, strDateTime);
-                       
 
-            var pRiverSymbolRenderer = new UniqueValueRenderer(null, "River Status");
-            function createSymbol(color) {
-                return new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color(color), 3);
-            }
-            pRiverSymbolRenderer.addValue({
-                value: "1",
-                symbol: createSymbol("#6EC4AE"),
-                label: "District 1 (Bartow)",
-                description: "SW Florida"
-            });
-            pRiverSymbolRenderer.addValue({
-                value: "2",
-                symbol: createSymbol("#37A9B7"),
-                label: "District 2 (Jacksonville)",
-                description: "Northeast Florida"
-            });
-            pRiverSymbolRenderer.addValue({
-                value: "3",
-                symbol: createSymbol("#D68989"),
-                label: "District 3 (Chipley)",
-                description: "Northwest Florida"
-            });
-            pRiverSymbolsFeatureLayer.setRenderer(pRiverSymbolRenderer);
 
 
             var legendLayers = [];
+            legendLayers.push({ layer: pCZMFeatureLayer, title: 'Channel Migration Zones' });
             legendLayers.push({ layer: pMonitoringCSVLayer, title: 'Monitoring Locations' });
             legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
@@ -568,27 +585,32 @@ define([
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
             legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locations' });
             legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
-            legendLayers.push({ layer: pRiverSymbolsFeatureLayer, title: 'River Status' });
+            //legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
 
             if (app.test) {
-                legendLayers.push({ layer: pFWPFeatureLayer, title: 'Test Condition Messaging' });
+                legendLayers.push({ layer: app.pSup.m_pFWPFeatureLayer, title: 'Test Condition Messaging' });
             }
             else {
-                legendLayers.push({ layer: pFWPFeatureLayer, title: 'MT Waterbody Restrictions' });
+                legendLayers.push({ layer: app.pSup.m_pFWPFeatureLayer, title: 'MT Waterbody Restrictions' });
             }
-            
+
             dojo.connect(app.map, 'onLayersAddResult', function (results) {
-                var legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
-                legend.startup();
+                app.legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
+                app.legend.startup();
             });
+
+
+
+
 
             var cbxLayers = [];
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
             cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
-            cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites'});
-            cbxLayers.push({ layers: [pNOAAFeatureLayer, pLabelsNOAA], title: 'Weather Stations'});
+            cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
+            cbxLayers.push({ layers: [pNOAAFeatureLayer, pLabelsNOAA], title: 'Weather Stations' });
             cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'MT AIS Watercraft Access' });
             cbxLayers.push({ layers: [pMonitoringCSVLayer, pMonitoringCSVLayer], title: 'Monitoring Locations' });
+            cbxLayers.push({ layers: [pCZMFeatureLayer, pCZMFeatureLayer], title: 'Channel Migration Zones' });
             
             this.LayerCheckBoxSetup(cbxLayers);
             SetupStreamClick();
@@ -753,12 +775,10 @@ define([
                 app.map.on("mouse-move", showCoordinates); //after map loads, connect to listen to mouse move & drag events
                 app.map.on("mouse-drag", showCoordinates);
             }
-
             function showCoordinates(evt) {
                 var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
                 dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + "<br>Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
             }
-
             function SetupStreamClick() {
                 dojo.connect(app.map, "onClick", executeQueryTask);
 
@@ -809,6 +829,41 @@ define([
                     }
                 });
             }
+        },
+
+        Phase3: function (pArrayOIDYellow, pArrayOIDsGold, pArrayOIDsOrange, pArrayOIDsPlum, pArrayOIDsRed) {  //creating this phase 3 to create legend items for river status based on the summarized data
+            //var pRiverSymbolRenderer = new UniqueValueRenderer(null, "River Status");
+            //function createSymbol(color) {
+            //    return new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color(color), 3);
+            //}
+            //pRiverSymbolRenderer.addValue({
+            //    value: "1",
+            //    symbol: createSymbol("#6EC4AE"),
+            //    label: "District 1 (Bartow)",
+            //    description: "SW Florida"
+            //});
+            //pRiverSymbolRenderer.addValue({
+            //    value: "2",
+            //    symbol: createSymbol("#37A9B7"),
+            //    label: "District 2 (Jacksonville)",
+            //    description: "Northeast Florida"
+            //});
+            //pRiverSymbolRenderer.addValue({
+            //    value: "3",
+            //    symbol: createSymbol("#D68989"),
+            //    label: "District 3 (Chipley)",
+            //    description: "Northwest Florida"
+            //});
+            //app.pSup.m_pRiverSymbolsFeatureLayer.setRenderer(pRiverSymbolRenderer);
+
+            app.pSup.m_pRiverSymbolsFeatureLayer.setRenderer(app.pSup.m_StreamStatusRenderer);
+            
+
+            var legendLayers = app.legend.layerInfos;
+            legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
+            app.legend.layerInfos = legendLayers;
+            app.legend.refresh();
+
         },
 
         err: function (err) {
