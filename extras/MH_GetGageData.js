@@ -800,7 +800,8 @@ define([
                             if (arrayTabs.indexOf("month_nu") > -1) {
                                 idxMonth = arrayTabs.indexOf("month_nu");
                                 idxDay = arrayTabs.indexOf("day_nu");
-                                idxMean = arrayTabs.indexOf("mean_va");
+                                //idxMean = arrayTabs.indexOf("mean_va");
+                                idxMean = arrayTabs.indexOf("p50_va");  //when looking at the USGS charting, they are using this column vs the mean_va column
                             } else {
                                 if (isNaN(arrayTabs[idxMonth])) {
                                     console.log("This line describes the tab formatting and does not contain data");
