@@ -877,14 +877,19 @@ define([
 
 						$("#btnGetHistoricRestrctions").show();
 
-						if ($("#ViewModelHistoricRestrctions_div").attr("aria-expanded")){
+						if ($("#ViewModelHistoricRestrctions_div").attr("aria-expanded")) {
+							$("#divHistoricRecordText").html("");
 							$("#ViewModelHistoricRestrctions_div").collapse("hide");
 						}
 
+						$('#btnGetHistoricRestrctions').off('click');     //clear's any click event previoulsy set
                         $("#btnGetHistoricRestrctions").click(function () {
-                            //alert.show(strClickStreamName + ":" + strClickSegmentID);
+							console.log(strClickStreamName + ":" + strClickSegmentID)
 							app.pGetHistWarn.Start(strClickStreamName, strClickSegmentID);
 							$("#btnGetHistoricRestrctions").hide();
+
+							$("#btnHistsortByName").collapse('hide')
+							$("#btnHistsortByPubDate").collapse('hide')
                         });
 
                         app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);

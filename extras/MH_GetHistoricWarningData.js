@@ -109,7 +109,16 @@ define([
 			var resultCount = pWarnFeatures.length;
 			var initialData = [];
 
+			var strHistRecordString = resultCount.toString() + " historic records";
+			$("#divHistoricRecordText").html(strHistRecordString);
+
 			if (resultCount > 0) {
+				//$("#btnHistsortByName").show();
+				//$("#btnHistsortByPubDate").show();
+
+				$("#btnHistsortByName").collapse('show');
+				$("#btnHistsortByPubDate").collapse('show');
+
 				for (var i = 0; i < resultCount; i++) {
 					pCurrentFWPFeature = pWarnFeatures[i]
 					//Add to the m_streamSectionArrray based on values from the via m_FWPWarnFeatures and m_StepThruCounter
@@ -174,7 +183,7 @@ define([
 							}
 
 						],
-						pageSize: 4
+						pageSize: 10
 					});
 				};
 

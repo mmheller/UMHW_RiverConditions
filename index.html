@@ -154,7 +154,7 @@
 		<div class="row">
 
 			<div class="col-md-3" style="padding-left: 1px; padding-right: 1px" id="entriesCon_div">
-				<h2>Unofficial: Summary of Conditions</h2>
+				<h2>Summary of Conditions</h2>
 				<p><i>Click section listed below or on Map for detail display below the Map Legend</i></p>
 
 				<p id="txtFromToDate"></p>
@@ -281,8 +281,8 @@
 							<div>Stream Name: <span data-bind='text: $root.CurrentDisplayGageRecord().StreamName'></span></div>
 							<div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
 							<div>Stream Section Description:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
-							<div>Section Start:  <span data-bind='text: $root.CurrentDisplayGageRecord().StartEndpoint'></span></div>
-							<div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>
+							<!--<div>Section Start:  <span data-bind='text: $root.CurrentDisplayGageRecord().StartEndpoint'></span></div>
+							<div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>-->
 							<hr style="margin-top:5px; margin-bottom:5px;">
 							<div id="detailSectionUSGSCurrent">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
 							<br />
@@ -353,19 +353,30 @@
 					<!--<div data-bind='simpleGrid: gridViewModel'> </div>-->
 					<!--<div class='liveExample'>-->
 
+					<div id="divHistoricRecordText"></div>
+
 					<div data-bind='simpleGrid: gridViewModel, simpleGridTemplate:"custom_grid_template"'> </div>
 					<!--</div>-->
-					<button data-bind='click: sortByName'>
+					<button id="btnHistsortByName" data-bind='click: sortByName' class="collapse">
 						Sort by Location
 					</button>
 
-					<button data-bind='click: sortByPubDate'>
+					<button id="btnHistsortByPubDate"  data-bind='click: sortByPubDate' class="collapse">
 						Sort by Publication Date
 					</button>
 
+					<!--<button id="btnHistsortByName" data-bind='click: sortByName'>
+						Sort by Location
+					</button>
+
+					<button id="btnHistsortByPubDate" data-bind='click: sortByPubDate'>
+						Sort by Publication Date
+					</button>-->
+
+
 					<!--<button data-bind='click: jumpToFirstPage, enable: gridViewModel.currentPageIndex'>
-			Jump to first page
-		</button>-->
+		Jump to first page
+	</button>-->
 				</div>
 
 
@@ -377,7 +388,7 @@
 
 		<hr>
 		<footer>
-			<p>Hosted by the <a href="http://dnrc.mt.gov/divisions/water/management/regional-river-basin-information/upper-missouri-river-basin" target="_blank"> Upper Missouri Headwaters Basin</a>.  Developed by the USFWS Region 6 Science Applications in cooperation with Upper Missouri Headwaters Basin and associated watersheds.  Version: Draft 1.5</p>
+			<p>Hosted by the <a href="https://uppermissouriheadwaters.org/" target="_blank"> Upper Missouri Headwaters</a>.  Developed by the USFWS Region 6 Science Applications in cooperation with Upper Missouri Headwaters and associated watersheds.  Version: 1.0</p>
 		</footer>
 	</div> <!-- /container -->
 

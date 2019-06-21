@@ -472,14 +472,10 @@ define([
                 //app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
                 app.strFWPQuery = "(PUBLISHDATE > '7/15/2017') AND (PUBLISHDATE < '7/20/2017')";
             } else {
-                //app.strFWPQuery = "ARCHIVEDATE IS NULL";
-                app.strFWPQuery = "(PUBLISHDATE > '7/1/2017') AND (PUBLISHDATE < '9/20/2017')";
-                //var strFWPQuery = "(PUBLISHDATE > '1/1/2019') and (ARCHIVEDATE IS NULL)";
+                app.strFWPQuery = "ARCHIVEDATE IS NULL";
+                //app.strFWPQuery = "(PUBLISHDATE > '7/1/2017') AND (PUBLISHDATE < '9/20/2017')";
             }
-
-
-            
-            
+			            
             var sfsFWP = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
               new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
               new Color([255, 0, 0]), 5), new Color([255, 0, 0, 0.25])
@@ -557,10 +553,6 @@ define([
             pCSVTemplate.setContent("Station Name: ${STATION_NAME}<br>Drainage Name: ${Drainage_Name}<br><a href=${URL} target='_blank'> Link monitoring data</a>");
             pMonitoringCSVLayer.setInfoTemplate(pCSVTemplate);
 
-
-    //        app.map.addLayers([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pCZMFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
-    //pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
-    //               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsNOAA, pLabelsEndPoints, pMonitoringCSVLayer]);
             app.map.addLayers([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pCZMFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
                 pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
                                plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsNOAA, pLabelsEndPoints, pMonitoringCSVLayer]);
@@ -568,7 +560,6 @@ define([
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 0.5;
-
 
             var dteDateTime = new Date();
             var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
@@ -580,8 +571,6 @@ define([
 
             document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
             app.pGage.Start(strDateTimeMinus3, strDateTime);
-
-
 
             var legendLayers = [];
             legendLayers.push({ layer: pCZMFeatureLayer, title: 'Channel Migration Zones' });
@@ -610,10 +599,9 @@ define([
 
             var cbxLayers = [];
 
-            
-            cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Water Restrictions' });
-            cbxLayers.push({ layers: [pWatershedsMaskFeatureLayer, pWatershedsMaskFeatureLayer], title: 'Other Watersheds' });
-            cbxLayers.push({ layers: [pBasinsMaskFeatureLayer, pBasinsMaskFeatureLayer], title: 'Other Basins' });
+            //cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Water Restrictions' });
+            //cbxLayers.push({ layers: [pWatershedsMaskFeatureLayer, pWatershedsMaskFeatureLayer], title: 'Other Watersheds' });
+            //cbxLayers.push({ layers: [pBasinsMaskFeatureLayer, pBasinsMaskFeatureLayer], title: 'Other Basins' });
 
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
             cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
@@ -766,9 +754,9 @@ define([
                 var iMapOrientation = app.map.width / app.map.height;
                 
                 app.dblExpandNum = 0.5;
-                if ((iMapOrientation > 1.5) & ((app.H2O_ID == "Madison") | (app.H2O_ID == "Ruby") | (app.H2O_ID == "Upper Gallatin") | (app.H2O_ID == "Lower Gallatin"))) {
+				if ((iMapOrientation > 1.5) & ((app.H2O_ID == "Madison") | (app.H2O_ID == "Boulder") | (app.H2O_ID == "Ruby") | (app.H2O_ID == "Upper Gallatin") | (app.H2O_ID == "Lower Gallatin"))) {
                     app.dblExpandNum = 1;
-                } else if (app.H2O_ID == "Broadwater") {
+				} else if ((app.H2O_ID == "Broadwater") | (app.H2O_ID == "Boulder"))  {
                     app.dblExpandNum = 1;
                 }
 
