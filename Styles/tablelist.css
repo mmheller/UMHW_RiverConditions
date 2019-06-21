@@ -42,3 +42,42 @@ thead > tr, tbody{ display:block;}
 
 #entries tr.clicked { background: #ccd; }
 #entries tr.highlight { background: #eef; }
+
+
+.rTable {
+  	display: table;
+  	width: 100%;
+}
+.rTableRow {
+  	display: table-row;
+}
+.rTableHeading {
+  	display: table-header-group;
+  	background-color: #ddd;
+}
+.rTableCell, .rTableHead {
+  	display: table-cell;
+  	padding: 1px 0px;
+  	/*border: 1px solid #999999;*/
+}
+
+.rTableCellFW, .rTableHeadFW {
+  	display: table-cell;
+  	padding: 0px 0px;
+  	/*border: 1px solid #999999;*/
+    width: 100px;
+}
+
+.rTableHeading {
+  	display: table-header-group;
+  	background-color: #ddd;
+  	font-weight: bold;
+}
+.rTableFoot {
+  	display: table-footer-group;
+  	font-weight: bold;
+  	background-color: #ddd;
+}
+.rTableBody {
+  	display: table-row-group;
+}

@@ -1,0 +1,198 @@
+﻿function formatDate(value) {
+    if (value) {
+        var inputDate = new Date(value);
+        return dojo.date.locale.format(inputDate, {
+            selector: 'date',
+            datePattern: 'MM/dd/yyyy HH:mm:ss'
+        });
+
+
+    } else {
+        return "";
+    }
+}
+
+function stripHTML(html) {
+	var tmp = document.createElement("DIV");
+	tmp.innerHTML = html;
+	return tmp.textContent || tmp.innerText || "";
+}
+
+
+//Explore drilldown examples https://js.devexpress.com/Demos/WidgetsGallery/Demo/Charts/ChartsDrillDown/Knockout/Light/
+
+define([
+        "esri/tasks/QueryTask",
+        "esri/tasks/query",
+                "esri/geometry/Polyline",
+  "dojo/_base/declare",
+  "dojo/_base/lang",
+  "esri/request",
+  "dojo/promise/all",
+  "dojo/promise/all",
+  "esri/request", "dojo/_base/array", 
+  "dojo/dom",
+  "dojo/dom-class",
+  "dijit/registry",
+  "dojo/on",
+
+], function (
+           QueryTask, Query, Polyline, declare, lang, esriRequest, all, All, request, dom, domClass, registry, on
+) {
+
+    return declare([], {
+        m_streamSectionArrray: [],
+        m_strSteamSectionQuery: "",
+        m_FWPWarnFeatures: [],
+        m_StepThruCounter: 0,
+
+        Start: function (strClickStreamName, strClickSegmentID) {
+            var pQuery = new Query();
+            var queryTask = new QueryTask(app.strHFL_URL + "5");
+            
+            pQuery.where = "(StreamName = '" + strClickStreamName + "') and (SectionID = '" + strClickSegmentID + "')";
+            pQuery.returnGeometry = true;
+            pQuery.outFields = ["OBJECTID"];
+            pQuery.outSpatialReference = {"wkid": 102100};
+            //pQuery.geometry = sectionGeometries;
+            //pQuery.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
+            queryTask.execute(pQuery, this.GetSectionGeometryResults1, this.GetSectionGeometryError1);
+        },
+
+        ClearVars: function () {
+            m_streamSectionArrray = [];
+            m_strSteamSectionQuery = "";
+            m_FWPWarnFeatures = [];
+            m_StepThruCounter = 0;
+        },
+        
+        GetSectionGeometryResults1: function (results) {
+            var pSectionGeometryFeatures = results.features;
+
+            var resultCount = pSectionGeometryFeatures.length;
+            if (resultCount > 0) {
+                var sectionGeometries = new Polyline(app.map.spatialReference);
+                for (var i = 0; i < pSectionGeometryFeatures.length; i++) {
+                    var paths = pSectionGeometryFeatures[i].geometry.paths;
+                    for (var j = 0; j < paths.length; j++) { //needed for multi part lines  
+                        sectionGeometries.addPath(paths[j]);
+                    }
+                }
+                this.app.pGetHistWarn.FindFWPWarnFeaturesOverlappingSections2(sectionGeometries);
+
+                //var x = document.getElementById("divFWPAlert");
+                //if (x.style.visibility === "hidden") {
+                //    x.style.visibility = 'visible';
+                //}
+            }
+        },
+
+        GetSectionGeometryError1: function (results) {
+            alert("Error with query on FWS warn history layer1");
+            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
+            this.app.pGetWarn.ClearVars();
+        },  
+        
+        FindFWPWarnFeaturesOverlappingSections2: function (pGeometry) {
+            var pQuery = new Query();
+            var queryTask = new QueryTask(app.strFWPURL);
+            pQuery.returnGeometry = false;
+            pQuery.outFields = ["TITLE", "LOCATION", "DESCRIPTION", "PRESSRELEASE", "PUBLISHDATE", "ARCHIVEDATE"];
+            pQuery.outSpatialReference = {"wkid": 102100};
+            pQuery.geometry = pGeometry;
+            pQuery.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
+            queryTask.execute(pQuery, this.GetFWPWarnResults2, this.GetFWPWarnResultsError2);
+		},
+
+		GetFWPWarnResults2: function (results) {
+			var pWarnFeatures = results.features;
+			var resultCount = pWarnFeatures.length;
+			var initialData = [];
+
+			if (resultCount > 0) {
+				for (var i = 0; i < resultCount; i++) {
+					pCurrentFWPFeature = pWarnFeatures[i]
+					//Add to the m_streamSectionArrray based on values from the via m_FWPWarnFeatures and m_StepThruCounter
+					var strDESCRIPTION = pCurrentFWPFeature.attributes["DESCRIPTION"];
+					var strLOCATION = pCurrentFWPFeature.attributes["LOCATION"];
+					var strPRESSRELEASE = pCurrentFWPFeature.attributes["PRESSRELEASE"];
+
+					if ((strPRESSRELEASE != null) | (strPRESSRELEASE != undefined)) {
+						if (strPRESSRELEASE.indexOf("href") >= 0) {
+							strPRESSRELEASE = strPRESSRELEASE.match(/href="([^"]*)/)[1];
+						} else {
+							strPRESSRELEASE = "";
+						}
+					} else {
+						strPRESSRELEASE = "";
+					}
+					var strPUBLISHDATEOrgFormat = pCurrentFWPFeature.attributes["PUBLISHDATE"];
+                    var strPUBLISHDATE = pCurrentFWPFeature.attributes["PUBLISHDATE"];
+					strPUBLISHDATE = formatDate(strPUBLISHDATE);
+					strPUBLISHDATE = strPUBLISHDATE.substring(0, 10);
+
+					var strArchiveDATE = pCurrentFWPFeature.attributes["ARCHIVEDATE"];
+					strArchiveDATE = formatDate(strPUBLISHDATE);
+					strArchiveDATE = strPUBLISHDATE.substring(0, 10);
+
+					var strTITLE = stripHTML(pCurrentFWPFeature.attributes["TITLE"]);
+					initialData.push({ TITLE: strTITLE, DESCRIPTION: strDESCRIPTION, LOCATION: strLOCATION, PRESSRELEASE: strPRESSRELEASE, PUBLISHDATE: strPUBLISHDATE, ARCHIVEDATE: strArchiveDATE, PUBLISHDATEOrgFormat: strPUBLISHDATEOrgFormat});
+				}
+
+				var PagedGridModel = function (items) {					//https://knockoutjs.com/examples/grid.html or http://jsfiddle.net/brendonparker/6S85t/
+					this.items = ko.observableArray(items);				//http://jsfiddle.net/u4Ymb/3/
+					this.sortByName = function () {
+						this.items.sort(function (a, b) {
+							return a.TITLE < b.TITLE ? -1 : 1;
+						});
+					};
+					this.sortByPubDate = function () {
+						this.items.sort(function (a, b) {
+							return a.PUBLISHDATEOrgFormat < b.PUBLISHDATEOrgFormat ? -1 : 1;
+						});
+					};
+					//this.jumpToFirstPage = function () {
+					//	this.gridViewModel.currentPageIndex(0);
+					//};
+					this.gridViewModel = new ko.simpleGrid.viewModel({
+						data: this.items,
+						columns: [
+							{ headerText: "TITLE", rowText: "TITLE" },
+							{ headerText: "DESCRIPTION", rowText: "DESCRIPTION" },
+							{ headerText: "LOCATION", rowText: "LOCATION" },
+							{ headerText: "PUBLISH DATE", rowText: "PUBLISHDATE" },
+							{ headerText: "Archive DATE", rowText: "ARCHIVEDATE" },
+							{
+								headerText: "Official Link", rowText: {
+									action: function (item) {
+										return function () {
+											window.open(item.PRESSRELEASE);
+											//alert(item.selected());
+										}
+									}
+								}
+							}
+
+						],
+						pageSize: 4
+					});
+				};
+
+				//clear out the model array if exists
+				var elementHistoric = $('#ViewModelHistoricRestrctions_div')[0];
+				ko.cleanNode(elementHistoric);
+				ko.applyBindings(new PagedGridModel(initialData), document.getElementById("ViewModelHistoricRestrctions_div"));
+            }
+        },
+
+        GetFWPWarnResultsError2: function (results) {
+            console.log("Failed to get results from Sections Layer when querying by FWP Warn polygon due to an error: ", err);
+            alert("Error with query on FWS warn history layer2");
+            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
+            this.app.pGetWarn.ClearVars();
+        }
+    });
+}
+);
+
+

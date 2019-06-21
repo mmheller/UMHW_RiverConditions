@@ -874,6 +874,19 @@ define([
                         //app.dblExpandNum = 1.5;
                         app.dblExpandNum = 0.8;
 
+
+						$("#btnGetHistoricRestrctions").show();
+
+						if ($("#ViewModelHistoricRestrctions_div").attr("aria-expanded")){
+							$("#ViewModelHistoricRestrctions_div").collapse("hide");
+						}
+
+                        $("#btnGetHistoricRestrctions").click(function () {
+                            //alert.show(strClickStreamName + ":" + strClickSegmentID);
+							app.pGetHistWarn.Start(strClickStreamName, strClickSegmentID);
+							$("#btnGetHistoricRestrctions").hide();
+                        });
+
                         app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
 
                         var blnZoom = true;
@@ -1413,36 +1426,6 @@ define([
 
 
         DivyUpStatusandColors: function (iOID, strSiteFlowStatus, strSiteTempStatus, strTITLE, strDESCRIPTION, strLOCATION, strPRESSRELEASE, strPUBLISHDATE, strFWPWarn) {
-            //if ((elements)[i].innerHTML.indexOf("STATE") > -1) {
-            //    (elements)[i].style.color = 'white';
-            //    (elements)[i].style.backgroundColor = "rgb(255, 0, 0)";
-            //}
-            //if ((elements)[i].innerHTML.indexOf("UNOFFICIAL") > -1) {
-            //    (elements)[i].style.color = 'white';
-            //    (elements)[i].style.backgroundColor = "rgb(253, 106, 2)";
-            //}
-            //else if (((elements)[i].innerHTML.indexOf("CONSERVATION") > -1) & ((elements)[i].innerHTML.indexOf("PREPARE FOR CONSERVATION") == -1)) {
-            //    (elements)[i].style.color = 'white';
-            //    (elements)[i].style.backgroundColor = "rgb(249, 166, 2)";
-            //}
-            //else if ((elements)[i].innerHTML.indexOf("PREPARE FOR CONSERVATION") > -1) {
-            //    (elements)[i].style.color = 'black';
-            //    (elements)[i].style.backgroundColor = "rgb(255, 255, 0)";
-            //}
-            //else if (((elements)[i].innerHTML.indexOf('formattedDischargeDateTime}">Not Collected') > -1) &
-            //         ((elements)[i].innerHTML.indexOf('formattedWaterTempDateTime}">Not Collected') > -1)) {
-            //    (elements)[i].style.color = "rgb(128, 128, 128)";
-            //}
-
-            //else if ((elements)[i].innerHTML.indexOf("OPEN") > -1) {
-            //    (elements)[i].style.color = 'black';
-            //} else {
-            //    var temp2 = "";
-            //}
-
-            //FLOW: OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
-            //TEMP: OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
-
             var strOverallStatus = "Open";
             var strOverallSymbol = "White";
             
@@ -1472,6 +1455,7 @@ define([
 
             if (strFWPWarn != "") {
                 strSiteFlowStatus = "MT FWS Restriction (click for details)";
+                strOverallStatus = "MT FWP Official Restriction (click for details)";
                 strOverallSymbol = "Red";
                 m_arrayOIDsRed.push(iOID);
             }

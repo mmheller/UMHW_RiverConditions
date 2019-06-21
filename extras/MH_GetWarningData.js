@@ -44,6 +44,7 @@ define([
             
             var pQuery = new Query();
             var queryTask = new QueryTask(app.strFWPURL);
+            pQuery.where = app.strFWPQuery;
             pQuery.returnGeometry = true;
             pQuery.outFields = ["*"];
             pQuery.outSpatialReference = {"wkid": 102100};
@@ -121,7 +122,7 @@ define([
                             app.pGetWarn.m_streamSectionArrray[is][19] = strPRESSRELEASE;
                             app.pGetWarn.m_streamSectionArrray[is][20] = strPUBLISHDATE;
                             app.pGetWarn.m_streamSectionArrray[is][21] = strTITLE;
-                            app.pGetWarn.m_streamSectionArrray[is][22] = "MT FWS Restriction(click for details)";
+                            app.pGetWarn.m_streamSectionArrray[is][22] = "MT FWP Restriction (click for details)";
                         }
                     }
                 }

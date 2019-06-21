@@ -463,14 +463,21 @@ define([
             pLabelsNOAA.addFeatureLayer(pNOAAFeatureLayer, pLabelRendererNOAA, "{STNNAME}");
            
             var templateFWP = new InfoTemplate();
-            templateFWP.setTitle("<b>${TITLE}</b>");
-            templateFWP.setContent("${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
+            templateFWP.setTitle("Official Stream Restriction");
+            templateFWP.setContent("<b>${TITLE}</b><br>${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
+
+            app.strFWPURL = "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/ArcGIS/rest/services/FISH_WATERBODY_RESTRICTIONS/FeatureServer/0";
 
             if (app.test) {
-                app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
+                //app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
+                app.strFWPQuery = "(PUBLISHDATE > '7/15/2017') AND (PUBLISHDATE < '7/20/2017')";
             } else {
-                app.strFWPURL = "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/WaterbodyRestrictions/FeatureServer/0";
+                //app.strFWPQuery = "ARCHIVEDATE IS NULL";
+                app.strFWPQuery = "(PUBLISHDATE > '7/1/2017') AND (PUBLISHDATE < '9/20/2017')";
+                //var strFWPQuery = "(PUBLISHDATE > '1/1/2019') and (ARCHIVEDATE IS NULL)";
             }
+
+
             
             
             var sfsFWP = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
@@ -478,13 +485,14 @@ define([
               new Color([255, 0, 0]), 5), new Color([255, 0, 0, 0.25])
             );
             var rendererFWP = new SimpleRenderer(sfsFWP);
+
             var pFWPFeatureLayer = new esri.layers.FeatureLayer(app.strFWPURL,
                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'], visible: true });
             pFWPFeatureLayer.setRenderer(rendererFWP);
+            pFWPFeatureLayer.setDefinitionExpression(app.strFWPQuery);
 
             var pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
             var pCartoFeatureLayerPoly = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
-
 
             var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
                 new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
@@ -600,10 +608,13 @@ define([
             });
 
 
-
-
-
             var cbxLayers = [];
+
+            
+            cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Water Restrictions' });
+            cbxLayers.push({ layers: [pWatershedsMaskFeatureLayer, pWatershedsMaskFeatureLayer], title: 'Other Watersheds' });
+            cbxLayers.push({ layers: [pBasinsMaskFeatureLayer, pBasinsMaskFeatureLayer], title: 'Other Basins' });
+
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
             cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
             cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
@@ -829,41 +840,16 @@ define([
                     }
                 });
             }
+
         },
 
         Phase3: function (pArrayOIDYellow, pArrayOIDsGold, pArrayOIDsOrange, pArrayOIDsPlum, pArrayOIDsRed) {  //creating this phase 3 to create legend items for river status based on the summarized data
-            //var pRiverSymbolRenderer = new UniqueValueRenderer(null, "River Status");
-            //function createSymbol(color) {
-            //    return new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color(color), 3);
-            //}
-            //pRiverSymbolRenderer.addValue({
-            //    value: "1",
-            //    symbol: createSymbol("#6EC4AE"),
-            //    label: "District 1 (Bartow)",
-            //    description: "SW Florida"
-            //});
-            //pRiverSymbolRenderer.addValue({
-            //    value: "2",
-            //    symbol: createSymbol("#37A9B7"),
-            //    label: "District 2 (Jacksonville)",
-            //    description: "Northeast Florida"
-            //});
-            //pRiverSymbolRenderer.addValue({
-            //    value: "3",
-            //    symbol: createSymbol("#D68989"),
-            //    label: "District 3 (Chipley)",
-            //    description: "Northwest Florida"
-            //});
-            //app.pSup.m_pRiverSymbolsFeatureLayer.setRenderer(pRiverSymbolRenderer);
-
             app.pSup.m_pRiverSymbolsFeatureLayer.setRenderer(app.pSup.m_StreamStatusRenderer);
-            
 
             var legendLayers = app.legend.layerInfos;
             legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
             app.legend.layerInfos = legendLayers;
             app.legend.refresh();
-
         },
 
         err: function (err) {
