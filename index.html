@@ -350,40 +350,21 @@
 
 				<div id="ViewModelHistoricRestrctions_div" class="collapse">
 					<div><h3>Historic Official Waterbody Closures/Restrictions</h3></div>
-					<!--<div data-bind='simpleGrid: gridViewModel'> </div>-->
-					<!--<div class='liveExample'>-->
-
 					<div id="divHistoricRecordText"></div>
 
 					<div data-bind='simpleGrid: gridViewModel, simpleGridTemplate:"custom_grid_template"'> </div>
-					<!--</div>-->
-					<button id="btnHistsortByName" data-bind='click: sortByName' class="collapse">
+
+					<button id="btnHistsortByName" data-bind='click: sortByName' style="display:none;">
 						Sort by Location
 					</button>
 
-					<button id="btnHistsortByPubDate"  data-bind='click: sortByPubDate' class="collapse">
+					<button id="btnHistsortByPubDate" data-bind='click: sortByPubDate' style="display:none;">
 						Sort by Publication Date
 					</button>
+					<p><i>Note: Historic waterbody closures/restrictions listed include any historic spatial information that intersects the selected stream section.  The results can include adjacent stream closure/restriction (i.e. stream confluences).</i></p>
 
-					<!--<button id="btnHistsortByName" data-bind='click: sortByName'>
-						Sort by Location
-					</button>
-
-					<button id="btnHistsortByPubDate" data-bind='click: sortByPubDate'>
-						Sort by Publication Date
-					</button>-->
-
-
-					<!--<button data-bind='click: jumpToFirstPage, enable: gridViewModel.currentPageIndex'>
-		Jump to first page
-	</button>-->
 				</div>
-
-
 			</div>
-
-
-
 		</div>
 
 		<hr>

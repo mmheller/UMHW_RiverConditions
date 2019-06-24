@@ -46,7 +46,7 @@ define([
         m_FWPWarnFeatures: [],
         m_StepThruCounter: 0,
 
-        Start: function (strClickStreamName, strClickSegmentID) {
+		Start: function (strClickStreamName, strClickSegmentID) {
             var pQuery = new Query();
             var queryTask = new QueryTask(app.strHFL_URL + "5");
             
@@ -113,85 +113,79 @@ define([
 			$("#divHistoricRecordText").html(strHistRecordString);
 
 			if (resultCount > 0) {
-				//$("#btnHistsortByName").show();
-				//$("#btnHistsortByPubDate").show();
+				var xN = document.getElementById("btnHistsortByName");
+				xN.style.display = "block";
+				var xP = document.getElementById("btnHistsortByPubDate");
+				xP.style.display = "block";
+			}
+			for (var i = 0; i < resultCount; i++) {
+				pCurrentFWPFeature = pWarnFeatures[i]
+				//Add to the m_streamSectionArrray based on values from the via m_FWPWarnFeatures and m_StepThruCounter
+				var strDESCRIPTION = pCurrentFWPFeature.attributes["DESCRIPTION"];
+				var strLOCATION = pCurrentFWPFeature.attributes["LOCATION"];
+				var strPRESSRELEASE = pCurrentFWPFeature.attributes["PRESSRELEASE"];
 
-				$("#btnHistsortByName").collapse('show');
-				$("#btnHistsortByPubDate").collapse('show');
-
-				for (var i = 0; i < resultCount; i++) {
-					pCurrentFWPFeature = pWarnFeatures[i]
-					//Add to the m_streamSectionArrray based on values from the via m_FWPWarnFeatures and m_StepThruCounter
-					var strDESCRIPTION = pCurrentFWPFeature.attributes["DESCRIPTION"];
-					var strLOCATION = pCurrentFWPFeature.attributes["LOCATION"];
-					var strPRESSRELEASE = pCurrentFWPFeature.attributes["PRESSRELEASE"];
-
-					if ((strPRESSRELEASE != null) | (strPRESSRELEASE != undefined)) {
-						if (strPRESSRELEASE.indexOf("href") >= 0) {
-							strPRESSRELEASE = strPRESSRELEASE.match(/href="([^"]*)/)[1];
-						} else {
-							strPRESSRELEASE = "";
-						}
+				if ((strPRESSRELEASE != null) | (strPRESSRELEASE != undefined)) {
+					if (strPRESSRELEASE.indexOf("href") >= 0) {
+						strPRESSRELEASE = strPRESSRELEASE.match(/href="([^"]*)/)[1];
 					} else {
 						strPRESSRELEASE = "";
 					}
-					var strPUBLISHDATEOrgFormat = pCurrentFWPFeature.attributes["PUBLISHDATE"];
-                    var strPUBLISHDATE = pCurrentFWPFeature.attributes["PUBLISHDATE"];
-					strPUBLISHDATE = formatDate(strPUBLISHDATE);
-					strPUBLISHDATE = strPUBLISHDATE.substring(0, 10);
-
-					var strArchiveDATE = pCurrentFWPFeature.attributes["ARCHIVEDATE"];
-					strArchiveDATE = formatDate(strPUBLISHDATE);
-					strArchiveDATE = strPUBLISHDATE.substring(0, 10);
-
-					var strTITLE = stripHTML(pCurrentFWPFeature.attributes["TITLE"]);
-					initialData.push({ TITLE: strTITLE, DESCRIPTION: strDESCRIPTION, LOCATION: strLOCATION, PRESSRELEASE: strPRESSRELEASE, PUBLISHDATE: strPUBLISHDATE, ARCHIVEDATE: strArchiveDATE, PUBLISHDATEOrgFormat: strPUBLISHDATEOrgFormat});
+				} else {
+					strPRESSRELEASE = "";
 				}
+				var strPUBLISHDATEOrgFormat = pCurrentFWPFeature.attributes["PUBLISHDATE"];
+				var strPUBLISHDATE = pCurrentFWPFeature.attributes["PUBLISHDATE"];
+				strPUBLISHDATE = formatDate(strPUBLISHDATE);
+				strPUBLISHDATE = strPUBLISHDATE.substring(0, 10);
 
-				var PagedGridModel = function (items) {					//https://knockoutjs.com/examples/grid.html or http://jsfiddle.net/brendonparker/6S85t/
-					this.items = ko.observableArray(items);				//http://jsfiddle.net/u4Ymb/3/
-					this.sortByName = function () {
-						this.items.sort(function (a, b) {
-							return a.TITLE < b.TITLE ? -1 : 1;
-						});
-					};
-					this.sortByPubDate = function () {
-						this.items.sort(function (a, b) {
-							return a.PUBLISHDATEOrgFormat < b.PUBLISHDATEOrgFormat ? -1 : 1;
-						});
-					};
-					//this.jumpToFirstPage = function () {
-					//	this.gridViewModel.currentPageIndex(0);
-					//};
-					this.gridViewModel = new ko.simpleGrid.viewModel({
-						data: this.items,
-						columns: [
-							{ headerText: "TITLE", rowText: "TITLE" },
-							{ headerText: "DESCRIPTION", rowText: "DESCRIPTION" },
-							{ headerText: "LOCATION", rowText: "LOCATION" },
-							{ headerText: "PUBLISH DATE", rowText: "PUBLISHDATE" },
-							{ headerText: "Archive DATE", rowText: "ARCHIVEDATE" },
-							{
-								headerText: "Official Link", rowText: {
-									action: function (item) {
-										return function () {
-											window.open(item.PRESSRELEASE);
-											//alert(item.selected());
-										}
+				var strArchiveDATE = pCurrentFWPFeature.attributes["ARCHIVEDATE"];
+				strArchiveDATE = formatDate(strPUBLISHDATE);
+				strArchiveDATE = strPUBLISHDATE.substring(0, 10);
+
+				var strTITLE = stripHTML(pCurrentFWPFeature.attributes["TITLE"]);
+				initialData.push({ TITLE: strTITLE, DESCRIPTION: strDESCRIPTION, LOCATION: strLOCATION, PRESSRELEASE: strPRESSRELEASE, PUBLISHDATE: strPUBLISHDATE, ARCHIVEDATE: strArchiveDATE, PUBLISHDATEOrgFormat: strPUBLISHDATEOrgFormat });
+			}
+
+			var PagedGridModel = function (items) {					//https://knockoutjs.com/examples/grid.html or http://jsfiddle.net/brendonparker/6S85t/
+				this.items = ko.observableArray(items);				//http://jsfiddle.net/u4Ymb/3/
+				this.sortByName = function () {
+					this.items.sort(function (a, b) {
+						return a.TITLE < b.TITLE ? -1 : 1;
+					});
+				};
+				this.sortByPubDate = function () {
+					this.items.sort(function (a, b) {
+						return a.PUBLISHDATEOrgFormat < b.PUBLISHDATEOrgFormat ? -1 : 1;
+					});
+				};
+				this.gridViewModel = new ko.simpleGrid.viewModel({
+					data: this.items,
+					columns: [
+						{ headerText: "TITLE", rowText: "TITLE" },
+						{ headerText: "DESCRIPTION", rowText: "DESCRIPTION" },
+						{ headerText: "LOCATION", rowText: "LOCATION" },
+						{ headerText: "PUBLISH DATE", rowText: "PUBLISHDATE" },
+						{ headerText: "Archive DATE", rowText: "ARCHIVEDATE" },
+						{
+							headerText: "Official Link", rowText: {
+								action: function (item) {
+									return function () {
+										window.open(item.PRESSRELEASE);
+										//alert(item.selected());
 									}
 								}
 							}
+						}
+					],
+					pageSize: 10
+				});
+			};
 
-						],
-						pageSize: 10
-					});
-				};
-
-				//clear out the model array if exists
-				var elementHistoric = $('#ViewModelHistoricRestrctions_div')[0];
-				ko.cleanNode(elementHistoric);
-				ko.applyBindings(new PagedGridModel(initialData), document.getElementById("ViewModelHistoricRestrctions_div"));
-            }
+			//clear out the model array if exists
+			var elementHistoric = $('#ViewModelHistoricRestrctions_div')[0];
+			ko.cleanNode(elementHistoric);
+			ko.applyBindings(new PagedGridModel(initialData), document.getElementById("ViewModelHistoricRestrctions_div"));
         },
 
         GetFWPWarnResultsError2: function (results) {

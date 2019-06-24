@@ -882,14 +882,16 @@ define([
 							$("#ViewModelHistoricRestrctions_div").collapse("hide");
 						}
 
+						var xN = document.getElementById("btnHistsortByName");
+						xN.style.display = "none";
+						var xP = document.getElementById("btnHistsortByPubDate");
+						xP.style.display = "none";
+						
 						$('#btnGetHistoricRestrctions').off('click');     //clear's any click event previoulsy set
                         $("#btnGetHistoricRestrctions").click(function () {
 							console.log(strClickStreamName + ":" + strClickSegmentID)
 							app.pGetHistWarn.Start(strClickStreamName, strClickSegmentID);
 							$("#btnGetHistoricRestrctions").hide();
-
-							$("#btnHistsortByName").collapse('hide')
-							$("#btnHistsortByPubDate").collapse('hide')
                         });
 
                         app.pGage.GraphSingleSEction(strClickStreamName, strClickSegmentID, strClickSiteID, iCFSTarget1, iCFSTarget2, iCFSTarget3, strDailyStat_URL, iTempCloseValue);
