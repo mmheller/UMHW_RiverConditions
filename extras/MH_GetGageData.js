@@ -285,7 +285,7 @@ define([
                 //if (strGageID_Source != null) {
                     streamSectionArrray.push([strStreamName, strGageID_Source,
                         strSectionID, strCFS_Prep4Conserv, strCFS_Conserv, strCFS_NotOfficialClosure, iConsvTemp,
-                        "startDate", "toDate", "someval", "somenote",
+						"Temperature Conservation Target Start Date: year round", "Temperature Conservation Target End Date: year round", "someval", "somenote",
                         iCFS_Note_Prep4Conserv, iCFS_Note_Conserv, iCFS_Note_NotOfficialClosure,
                         strTempCollected, iOID, DailyStat_URL,
                         "", //Placeholder for FWP ward description

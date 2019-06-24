@@ -303,7 +303,7 @@
 
 								<div style="margin:10px;">Stream status based on waterflow (cfs) targets:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteFlowStatus'></span></div>
 								<br />
-								<div style="margin-left:30px">Waterflow target definitions for this stream section:</div>
+								<div style="margin-left:30px"> <u>Waterflow target definitions for this stream section</u></div>
 								<div class="tab">
 									<table>
 										<tr><td>PREPARE FOR CONSERVATION:</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateFlowPref4ConsvValue'></span> (cfs):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateFlowPref4ConsvValue'></span></td></tr>
@@ -329,11 +329,12 @@
 							<div>Current Water Temperature (F): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterTemp'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterTempDateTime'></span></div>
 							<div id="divDay3TMPTrend">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3TMPTrend}" />)</div>
 							<div>Stream status based on temperature target: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteTempStatus'></span></div>
+							<br />
 							<div><u>Temperature target definition for this stream section</u></div>
 							<div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
 							<!--<div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>-->
-							<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
-							<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
+							<!--<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
+							<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>-->
 						</div>
 					</div>
 				</div>

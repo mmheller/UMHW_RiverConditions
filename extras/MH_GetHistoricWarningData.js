@@ -1,9 +1,9 @@
-﻿function formatDate(value) {
+﻿function formatDate2(value) {
     if (value) {
         var inputDate = new Date(value);
         return dojo.date.locale.format(inputDate, {
             selector: 'date',
-            datePattern: 'MM/dd/yyyy HH:mm:ss'
+			datePattern: 'yyyy, MM/dd'
         });
 
 
@@ -136,12 +136,10 @@ define([
 				}
 				var strPUBLISHDATEOrgFormat = pCurrentFWPFeature.attributes["PUBLISHDATE"];
 				var strPUBLISHDATE = pCurrentFWPFeature.attributes["PUBLISHDATE"];
-				strPUBLISHDATE = formatDate(strPUBLISHDATE);
-				strPUBLISHDATE = strPUBLISHDATE.substring(0, 10);
+				strPUBLISHDATE = formatDate2(strPUBLISHDATE);
 
 				var strArchiveDATE = pCurrentFWPFeature.attributes["ARCHIVEDATE"];
-				strArchiveDATE = formatDate(strPUBLISHDATE);
-				strArchiveDATE = strPUBLISHDATE.substring(0, 10);
+				strArchiveDATE = formatDate2(strArchiveDATE);
 
 				var strTITLE = stripHTML(pCurrentFWPFeature.attributes["TITLE"]);
 				initialData.push({ TITLE: strTITLE, DESCRIPTION: strDESCRIPTION, LOCATION: strLOCATION, PRESSRELEASE: strPRESSRELEASE, PUBLISHDATE: strPUBLISHDATE, ARCHIVEDATE: strArchiveDATE, PUBLISHDATEOrgFormat: strPUBLISHDATEOrgFormat });
