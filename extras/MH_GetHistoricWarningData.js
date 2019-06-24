@@ -160,11 +160,11 @@ define([
 				this.gridViewModel = new ko.simpleGrid.viewModel({
 					data: this.items,
 					columns: [
-						{ headerText: "TITLE", rowText: "TITLE" },
-						{ headerText: "DESCRIPTION", rowText: "DESCRIPTION" },
-						{ headerText: "LOCATION", rowText: "LOCATION" },
-						{ headerText: "PUBLISH DATE", rowText: "PUBLISHDATE" },
-						{ headerText: "Archive DATE", rowText: "ARCHIVEDATE" },
+						{ headerText: "Title", rowText: "TITLE" },
+						{ headerText: "Description", rowText: "DESCRIPTION" },
+						{ headerText: "Location", rowText: "LOCATION" },
+						{ headerText: "Publish Date", rowText: "PUBLISHDATE" },
+						{ headerText: "Archive Date", rowText: "ARCHIVEDATE" },
 						{
 							headerText: "Official Link", rowText: {
 								action: function (item) {
