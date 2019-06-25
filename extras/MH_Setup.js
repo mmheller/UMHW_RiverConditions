@@ -88,7 +88,7 @@ define([
         addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDPlum, arrayOIDsRed) {
             var defaultSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 169, 230]), 5);
             app.pSup.m_StreamStatusRenderer = new UniqueValueRenderer(defaultSymbol, "OBJECTID");//create renderer
-            app.pSup.m_StreamStatusRenderer.defaultLabel = "Stream Section (Open if not outlined with different color)";
+            app.pSup.m_StreamStatusRenderer.defaultLabel = "Stream Section (Open)";
 
             for (var i = 0; i < arrayOIDYellow.length; i++) {
                 app.pSup.m_StreamStatusRenderer.addValue({

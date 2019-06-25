@@ -112,7 +112,7 @@ define([
 			var strHistRecordString = resultCount.toString() + " historic records";
 			$("#divHistoricRecordText").html(strHistRecordString);
 
-			if (resultCount > 0) {
+			if (resultCount > 1) {
 				var xN = document.getElementById("btnHistsortByName");
 				xN.style.display = "block";
 				var xP = document.getElementById("btnHistsortByPubDate");
