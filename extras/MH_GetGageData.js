@@ -1323,7 +1323,7 @@ define([
                                 dteLatestDateTimeCFS = new Date();
                                 strNoDataLabel4ChartingCFS = " (No Data)";
                             } else if (dblLatestCFS == "") {
-                                dblLatestCFS = "Not collected"
+                                dblLatestCFS = "*Not collected"
                                 strNoDataLabel4ChartingCFS = " (No Data)";
                                 dteLatestDateTimeCFS = new Date();
                             } else {//determine the site's status based on discharge
@@ -1344,7 +1344,7 @@ define([
                                 strNoDataLabel4ChartingTMP = " (No Data)";
                                 dteLatestDateTimeTMP = new Date();
                             } else if (dblLatestTMP == "") {
-                                dblLatestTMP = "Not collected"
+                                dblLatestTMP = "*Not collected"
                                 strNoDataLabel4ChartingTMP = " (No Data)";
                                 dteLatestDateTimeTMP = new Date();
                             } else if (dblLatestTMP > iTempClosureValue) {
