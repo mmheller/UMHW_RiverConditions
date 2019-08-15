@@ -195,7 +195,16 @@
 				<div id="toggleLayers" style="font-size:10px;">
 				</div>
 
-				<button type="button" class="btn btn-info" id="btnShowHideLegend" style="position:relative; font-size:12px; left:25px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#divShowHideLegendBtn">Show/Hide Map Legend</button>
+				<div class="container" style="width: 99% !important;">
+					<div class="row">
+						<div class="col-xs-9">
+							<button type="button" class="btn btn-info" id="btnShowHideLegend" style="position:relative; font-size:12px; left:10px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#divShowHideLegendBtn">Show/Hide Map Legend</button>
+						</div>
+						<div class="col-xs-3">
+							<button type="button" class="btn btn-info" id="btnJump2FEMA" style="position:relative; font-size:12px; right:15px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;">Jump to FEMA Map</button>
+						</div>
+					</div>
+				</div>
 
 				<div id="divShowHideLegendBtn" class="collapse  in">
 					<h2>Map Legend</h2>
@@ -224,7 +233,7 @@
 							<div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
 							<div>Stream Section Description:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
 							<!--<div>Section Start:  <span data-bind='text: $root.CurrentDisplayGageRecord().StartEndpoint'></span></div>
-							<div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>-->
+				<div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>-->
 							<hr style="margin-top:5px; margin-bottom:5px;">
 							<div id="detailSectionUSGSCurrent">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
 							<br />
@@ -276,7 +285,7 @@
 							<div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
 							<!--<div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>-->
 							<!--<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
-							<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>-->
+				<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>-->
 						</div>
 					</div>
 				</div>
@@ -310,96 +319,96 @@
 			</div>
 
 
-			<div class="col-md-3 col-md-pull-9" style="padding-left: 5px; padding-right: 5px" id="entriesCon_div">
-				<h2>Summary of Conditions</h2>
-				<p><i>Click section listed below or on Map for detail display below the Map Legend</i></p>
+					<div class="col-md-3 col-md-pull-9" style="padding-left: 5px; padding-right: 5px" id="entriesCon_div">
+						<h2>Summary of Conditions</h2>
+						<p><i>Click section listed below or on Map for detail display below the Map Legend</i></p>
 
-				<p id="txtFromToDate"></p>
-				<img id="loadingImg2" src="images/loading.gif" />
-				<div id="divLoadingUSGS"><i>Loading USGS Data...</i></div>
-				<table class="TableListJS" id="entries">
-					<thead>
-					</thead>
-					<tbody data-bind="foreach: {data: gageRecords}" style="font-size: 13px;">
-						<tr style="cursor:pointer;" data-bind="click: $root.selectThing ">
-							<td>
-								<div class="rTableBody">
-									<div class="rTableRow">
-										<div class="rTableCellFW">
-											Stream
-										</div>
-										<div class="rTableCell">
-											<span data-bind='text: StreamName'></span>
-										</div>
-									</div>
-									<div class="rTableRow">
-										<div class="rTableCellFW">
-											Section
-										</div>
-										<div class="rTableCell">
-											<span data-bind='text: SectionID'></span> <span data-bind='text: SiteName'></span>
-										</div>
-									</div>
-									<div class="rTableRow">
-										<div class="rTableCellFW">
-											Streamflow (cfs)
-										</div>
-										<div class="rTableCell">
-											<span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3CFSTrend}" />)
-										</div>
-									</div>
+						<p id="txtFromToDate"></p>
+						<img id="loadingImg2" src="images/loading.gif" />
+						<div id="divLoadingUSGS"><i>Loading USGS Data...</i></div>
+						<table class="TableListJS" id="entries">
+							<thead>
+							</thead>
+							<tbody data-bind="foreach: {data: gageRecords}" style="font-size: 13px;">
+								<tr style="cursor:pointer;" data-bind="click: $root.selectThing ">
+									<td>
+										<div class="rTableBody">
+											<div class="rTableRow">
+												<div class="rTableCellFW">
+													Stream
+												</div>
+												<div class="rTableCell">
+													<span data-bind='text: StreamName'></span>
+												</div>
+											</div>
+											<div class="rTableRow">
+												<div class="rTableCellFW">
+													Section
+												</div>
+												<div class="rTableCell">
+													<span data-bind='text: SectionID'></span> <span data-bind='text: SiteName'></span>
+												</div>
+											</div>
+											<div class="rTableRow">
+												<div class="rTableCellFW">
+													Streamflow (cfs)
+												</div>
+												<div class="rTableCell">
+													<span data-bind='text: Discharge, attr: {title: formattedDischargeDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3CFSTrend}" />)
+												</div>
+											</div>
 
-									<div class="rTableRow">
-										<div class="rTableCellFW">
-											H2O Temp (F)
-										</div>
-										<div class="rTableCell">
-											<span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3TMPTrend}" />)
-										</div>
-									</div>
+											<div class="rTableRow">
+												<div class="rTableCellFW">
+													H2O Temp (F)
+												</div>
+												<div class="rTableCell">
+													<span data-bind='text: WaterTemp, attr: {title: formattedWaterTempDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3TMPTrend}" />)
+												</div>
+											</div>
 
-									<div class="rTableRow">
-										<div class="rTableCellFW">
-											Status
+											<div class="rTableRow">
+												<div class="rTableCellFW">
+													Status
+												</div>
+												<div class="rTableCell">
+													<span data-bind='text: overallStatus'></span>
+												</div>
+											</div>
 										</div>
-										<div class="rTableCell">
-											<span data-bind='text: overallStatus'></span>
-										</div>
-									</div>
-								</div>
-							</td>
-							<td class="htmlRowNotDisplayed">
-								<div><span data-bind='text: strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
-								<div><span data-bind='text: strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
-								<div><span data-bind='text: iLateFlowPref4ConsvValue'></span></div>
-								<div><span data-bind='text: iLateFlowConsvValue'></span></div>
-								<div><span data-bind='text: iLateFlowClosureValueFlow'></span></div>
-								<div><span data-bind='text: strLateFlowPref4ConsvValue'></span></div>
-								<div><span data-bind='text: strLateFlowConsvValue'></span></div>
-								<div><span data-bind='text: strLateFlowClosureValueFlow'></span></div>
-								<div><span data-bind='text: iTempClosureValue'></span></div>
-								<div><span data-bind='text: strTempCollected'></span></div>
-								<div><span data-bind='text: strSiteID'></span></div>
-								<div><span data-bind='text: strDailyStat_URL'></span></div>
-								<div><span data-bind='text: overallSymbol'></span></div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+									</td>
+									<td class="htmlRowNotDisplayed">
+										<div><span data-bind='text: strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
+										<div><span data-bind='text: strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>
+										<div><span data-bind='text: iLateFlowPref4ConsvValue'></span></div>
+										<div><span data-bind='text: iLateFlowConsvValue'></span></div>
+										<div><span data-bind='text: iLateFlowClosureValueFlow'></span></div>
+										<div><span data-bind='text: strLateFlowPref4ConsvValue'></span></div>
+										<div><span data-bind='text: strLateFlowConsvValue'></span></div>
+										<div><span data-bind='text: strLateFlowClosureValueFlow'></span></div>
+										<div><span data-bind='text: iTempClosureValue'></span></div>
+										<div><span data-bind='text: strTempCollected'></span></div>
+										<div><span data-bind='text: strSiteID'></span></div>
+										<div><span data-bind='text: strDailyStat_URL'></span></div>
+										<div><span data-bind='text: overallSymbol'></span></div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 
-				<p><i>* Indicates the reading (streamflow and/or temperature) for this USGS site is not collected.  To find out more information, click a stream section in the summary, next click the "USGS Source Data: Current" web link under "Stream Section Detail"</i></p>
-			</div>
-
-
+						<p><i>* Indicates the reading (streamflow and/or temperature) for this USGS site is not collected.  To find out more information, click a stream section in the summary, next click the "USGS Source Data: Current" web link under "Stream Section Detail"</i></p>
+					</div>
 
 
-		</div>
 
-		<hr>
-		<footer>
-			<p>Hosted by the <a href="https://uppermissouriheadwaters.org/" target="_blank"> Upper Missouri Headwaters</a>.  Developed by the USFWS Region 6 Science Applications in cooperation with Upper Missouri Headwaters and associated watersheds.  Version: 1.0</p>
-		</footer>
-	</div> <!-- /container -->
+
+				</div>
+
+				<hr>
+				<footer>
+					<p>Hosted by the <a href="https://uppermissouriheadwaters.org/" target="_blank"> Upper Missouri Headwaters</a>.  Developed by the USFWS Region 6 Science Applications in cooperation with Upper Missouri Headwaters and associated watersheds.  Version: 1.0</p>
+				</footer>
+			</div> <!-- /container -->
 
 
 
