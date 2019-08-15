@@ -241,6 +241,12 @@ define([
             var strURLPrefix = "index.html?H2O_ID=";
             var strURLSuffix = "";
 
+			if (getTokens()['UMHBanner'] != undefined) {
+				$('#UMH_NavBar2').show();
+				document.body.style.paddingTop = '130px';
+				UMH_NavBar1.style.paddingTop = '80px';
+			}
+
             app.H2O_ID = getTokens()['H2O_ID'];
 
             app.test = false;

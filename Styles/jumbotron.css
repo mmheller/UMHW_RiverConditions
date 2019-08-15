@@ -1,9 +1,47 @@
-/* Move down content because we have a fixed navbar that is 50px tall */
+﻿/* Move down content because we have a fixed navbar that is 50px tall */
 body {
-  padding-top: 350px;
-  padding-bottom: 5px;
+	/*padding-top: 650px;*/
+	/*padding-top: 350px;*/
+	padding-top: 35px;
+	padding-bottom: 5px;
 }
 
+/*.alignright {
+	float: left;
+	width: 33.33333%;
+	text-align: right;
+}*/
+
+​
+
+span.logo_helper {
+	display: inline-block;
+	width: 0;
+	height: 100%;
+	vertical-align: middle;
+}
+
+
+logo_container {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	transition:none;
+}
+
+#logo {
+	display: inline-block;
+	float: none;
+	height: 70px !important;
+	/*max-height: 56px !important;*/
+	padding-top: 10px !important;
+	margin-bottom: 0;
+	vertical-align: middle !important;
+	-webkit-transition: all .4s ease-in-out !important;
+	-moz-transition: all .4s ease-in-out !important;
+	transition: all .4s ease-in-out !important;
+	-webkit-transform: translate3d(0,0,0) !important;
+}
 
     text[fill="rgb(127, 82, 83)"]{  
       text-shadow: 1px 1px #DCE1E3;  
