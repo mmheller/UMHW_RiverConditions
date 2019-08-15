@@ -281,7 +281,9 @@ define([
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
             app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
-            
+
+
+
             this.GetSetHeaderWarningContent(app.strHFL_URL + "12", app.H2O_ID, blnUseAlternateHeader);
         },
 
@@ -617,7 +619,9 @@ define([
             cbxLayers.push({ layers: [pMonitoringCSVLayer, pMonitoringCSVLayer], title: 'Monitoring Locations' });
             cbxLayers.push({ layers: [pCZMFeatureLayer, pCZMFeatureLayer], title: 'Channel Migration Zones' });
             
-            this.LayerCheckBoxSetup(cbxLayers);
+			this.LayerCheckBoxSetup(cbxLayers);
+
+
             SetupStreamClick();
 
             ko.bindingHandlers.googleBarChart = {
@@ -843,7 +847,19 @@ define([
             var legendLayers = app.legend.layerInfos;
             legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
             app.legend.layerInfos = legendLayers;
-            app.legend.refresh();
+			app.legend.refresh();
+
+			$("#btnJump2FEMA").click(function () {
+				var pExtent = app.map.extent;
+				pSR_WKID = pExtent.spatialReference.wkid;
+				var strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
+				strURL += pExtent.xmin + ",";
+				strURL += pExtent.ymin + ",";
+				strURL += pExtent.xmax + ",";
+				strURL += pExtent.ymax + ",";
+				strURL += pSR_WKID.toString();
+				window.open(strURL);
+			});
         },
 
         err: function (err) {
