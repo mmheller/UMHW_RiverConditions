@@ -122,7 +122,7 @@ define([
                 app.pSup.m_StreamStatusRenderer.addValue({
                     value: arrayOIDsRed[iiii],
                     symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18),
-                    label: "Offical Closure"
+                    label: "Offical Restriction"
                 });
             }
 
@@ -476,12 +476,19 @@ define([
 
             app.strFWPURL = "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/ArcGIS/rest/services/FISH_WATERBODY_RESTRICTIONS/FeatureServer/0";
 
+			var dteDateTime = new Date();
+			var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
+			var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
+			var dteDateTimeMinus3 = new Date();
+			dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
+			var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
+			var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
+
             if (app.test) {
                 //app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
                 app.strFWPQuery = "(PUBLISHDATE > '7/15/2017') AND (PUBLISHDATE < '7/20/2017')";
             } else {
-                app.strFWPQuery = "ARCHIVEDATE IS NULL";
-                //app.strFWPQuery = "(PUBLISHDATE > '7/1/2017') AND (PUBLISHDATE < '9/20/2017')";
+				app.strFWPQuery = "(ARCHIVEDATE IS NULL) OR (ARCHIVEDATE > '" + strDateTimeUserFreindly + "')";
             }
 			            
             var sfsFWP = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
@@ -568,14 +575,6 @@ define([
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 0.5;
-
-            var dteDateTime = new Date();
-            var strDateTime = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
-            var strDateTimeUserFreindly = (dteDateTime.getMonth() + 1) + "/" + dteDateTime.getDate() + "/" + dteDateTime.getFullYear();
-            var dteDateTimeMinus3 = new Date();
-            dteDateTimeMinus3.setDate(dteDateTimeMinus3.getDate() - 3);
-            var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
-            var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
 
             document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
             app.pGage.Start(strDateTimeMinus3, strDateTime);
@@ -860,7 +859,15 @@ define([
 				strURL += pSR_WKID.toString();
 				window.open(strURL);
 			});
-        },
+
+			$("#btnJump2FWP").click(function () {
+				var pExtent = app.map.extent;
+				pSR_WKID = pExtent.spatialReference.wkid;
+				var strURL = "http://fwp.mt.gov/gis/maps/fishingGuide/index.html";
+				window.open(strURL);
+			});
+
+		},
 
         err: function (err) {
             console.log("Failed to get stat results due to an error: ", err);
