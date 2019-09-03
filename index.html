@@ -31,8 +31,12 @@
 	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
 	<script src="assets//knockout.simpleGrid.3.0.js"></script>
+	
+	
 	<!--<script src="//js.arcgis.com/3.13compact"></script>-->
-	<script src="https://js.arcgis.com/3.12compact"></script>
+	<script src="https://js.arcgis.com/3.13compact"></script>
+	<!--<script src="https://js.arcgis.com/3.12compact"></script>-->
+
 
 	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 	<link href="/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -45,22 +49,73 @@
 
 
 
-		.liveExample { padding: 1em; background-color: #EEEEDD; border: 1px solid #CCC;}
-		.liveExample input { font-family: Arial; }
-		.liveExample b { font-weight: bold; }
-		.liveExample p { margin-top: 0.9em; margin-bottom: 0.9em; }
-		.liveExample select[multiple] { width: 100%; height: 8em; }
-		.liveExample h2 { margin-top: 0.4em; }
+		.liveExample {
+			padding: 1em;
+			background-color: #EEEEDD;
+			border: 1px solid #CCC;
+		}
 
-		.ko-grid { margin-bottom: 1em; width: 100%; border: 1px solid silver; background-color:White; }
-		.ko-grid th { text-align:left; background-color: #004876 !important; color:White; }
-		.ko-grid td, th { padding: 0.4em; }
-		.ko-grid tr:nth-child(odd) { background-color: #DDD; }
-		.ko-grid-pageLinks { margin-bottom: 1em; }
-		.ko-grid-pageLinks a { padding: 0.5em; }
-		.ko-grid-pageLinks a.selected { background-color: Black; color: White; }
-		li { list-style-type: disc; margin-left: 20px; }
-			   
+			.liveExample input {
+				font-family: Arial;
+			}
+
+			.liveExample b {
+				font-weight: bold;
+			}
+
+			.liveExample p {
+				margin-top: 0.9em;
+				margin-bottom: 0.9em;
+			}
+
+			.liveExample select[multiple] {
+				width: 100%;
+				height: 8em;
+			}
+
+			.liveExample h2 {
+				margin-top: 0.4em;
+			}
+
+		.ko-grid {
+			margin-bottom: 1em;
+			width: 100%;
+			border: 1px solid silver;
+			background-color: White;
+		}
+
+			.ko-grid th {
+				text-align: left;
+				background-color: #004876 !important;
+				color: White;
+			}
+
+			.ko-grid td, th {
+				padding: 0.4em;
+			}
+
+			.ko-grid tr:nth-child(odd) {
+				background-color: #DDD;
+			}
+
+		.ko-grid-pageLinks {
+			margin-bottom: 1em;
+		}
+
+			.ko-grid-pageLinks a {
+				padding: 0.5em;
+			}
+
+				.ko-grid-pageLinks a.selected {
+					background-color: Black;
+					color: White;
+				}
+
+		li {
+			list-style-type: disc;
+			margin-left: 20px;
+		}
+
 
 
 
@@ -165,7 +220,7 @@
 			<div id="divCustomAlert" style="line-height: normal; background-color: #fa021b;">
 			</div>
 			<div id="divFWPAlert" style="line-height: normal; background-color: #b30000; visibility:hidden; padding:2px;">
-				<span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/" target="_blank" style="color:white; font-weight:bold;">here for official information...</a></span>
+				<span style="color: #ffffff; font-size: 12pt;">Montana FWP stream restrictions in this area!! Click section in "Sumary of Conditions" below for detailed information and <a href="http://fwp.mt.gov/news/restrictions/" target="_blank" style="color:white; font-weight:bold;">here for official information...</a></span>
 			</div>
 		</div>
 	</div>
