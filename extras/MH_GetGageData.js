@@ -191,7 +191,6 @@ define([
         },
         
         handleSectionGageResults: function (results) {
-
             var items = dom.map(results, function (result) {
                 return result;
             });
@@ -216,7 +215,8 @@ define([
             var strStartEndpoint = "";
             var strEndEndpoint = "";
 
-            dom.map(items[0].features, function (itemSection) {
+			dom.map(items[0].features, function (itemSection) {
+				//console.log("handleSectionGageResults2");
                 var strGageID_Source = null;
                 var strTempCollected = null;
                 var DailyStat_URL = "";
@@ -252,7 +252,8 @@ define([
                 iCFS_Note_NotOfficialClosure = itemSection.attributes.CFS_Note_NotOfficialClosure;
                 iOID = itemSection.attributes.OBJECTID;
 
-                dom.map(items[1].features, function (itemGage) {                //query by     Watershed , StreamName, Section_ID 
+				dom.map(items[1].features, function (itemGage) {                //query by     Watershed , StreamName, Section_ID 
+					//console.log("handleSectionGageResults3");
                     if ((itemGage.attributes.Watershed === itemSection.attributes.Watershed) &
                         (itemGage.attributes.StreamName === itemSection.attributes.StreamName) &
                         (itemGage.attributes.Section_ID === itemSection.attributes.SectionID) &
@@ -266,7 +267,8 @@ define([
                     }
                 })
 
-                dom.map(items[2].features, function (itemEndpoint) {                //query by     Watershed , StreamName, Section_ID 
+				dom.map(items[2].features, function (itemEndpoint) {                //query by     Watershed , StreamName, Section_ID 
+					//console.log("handleSectionGageResults4");
                     if ((itemEndpoint.attributes.Watershed_Name === itemSection.attributes.Watershed) &
                         (itemEndpoint.attributes.Stream_Name === itemSection.attributes.StreamName) &
                         ((itemEndpoint.attributes.Section_ID === itemSection.attributes.SectionID) | (itemEndpoint.attributes.Section_Name === itemSection.attributes.SectionID) | (itemEndpoint.attributes.Section_Name === itemSection.attributes.SectionName)) &
@@ -280,7 +282,6 @@ define([
                             strEndEndpoint = itemEndpoint.attributes.Endpoint_Name;
                     }
                 })
-
 
                 //if (strGageID_Source != null) {
                     streamSectionArrray.push([strStreamName, strGageID_Source,
@@ -318,11 +319,11 @@ define([
                     sectionGeometries.addPath(paths[j]);
             }
             }
-
-            app.pGetWarn.Start(sectionGeometries, streamSectionArrray);
+			app.pGetWarn.Start(sectionGeometries, streamSectionArrray);
         },
 
-        getArray2Process: function (strURL, strQuery) {// Class to represent a row in the gage values grid
+		getArray2Process: function (strURL, strQuery) {// Class to represent a row in the gage values grid
+			console.log("getArray2Process");
             var siteNameArrray = [];
 
             qt_Layer1 = new esri.tasks.QueryTask(strURL + "5"); //sections layer
@@ -349,7 +350,7 @@ define([
             pPromises.then(this.handleSectionGageResults, this.err);
         },
         
-        ViewModel2TMP: function () {  //this is for google charts
+		ViewModel2TMP: function () {  //this is for google charts
             //https://developers.google.com/chart/interactive/docs/datatables_dataviews
             var self = this;
             self.ViewModel2TMP_LineData = ko.computed(function () {
@@ -484,7 +485,7 @@ define([
             });
         },
 
-        ViewModel2CFS: function () {  //this is for google charts
+		ViewModel2CFS: function () {  //this is for google charts
             //https://developers.google.com/chart/interactive/docs/datatables_dataviews
             var self = this;
             self.ViewModel2CFS_LineData = ko.computed(function () {
@@ -638,7 +639,8 @@ define([
             });
         },
 
-        readingsViewModel: function () {
+		readingsViewModel: function () {
+			console.log("readingsViewModel");
             var self = this;
             
             if (typeof app.pGage.m_arrray_RiverSectionStatus !== "undefined") {//this feed then gageReadings: function 
@@ -1000,7 +1002,8 @@ define([
         },
 
         SectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime) {
-            app.map.disableMapNavigation();
+			console.log("SectionsReceived");
+			app.map.disableMapNavigation();
             app.map.hideZoomSlider();
 
             app.pGage.m_arrray_Detail4ChartCFS = [];
@@ -1315,7 +1318,7 @@ define([
 
                             if (itemFound.length > 0) {
                             var item = itemFound[0];
-                                    strSiteName = item.sourceInfo.siteName;
+								strSiteName = item.sourceInfo.siteName;
                             }
                             var strNoDataLabel4ChartingCFS = "";
                             if (dblLatestCFS == -999999) {

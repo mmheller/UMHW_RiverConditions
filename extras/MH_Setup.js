@@ -128,7 +128,7 @@ define([
 
             var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", {
                 mode: FeatureLayer.MODE_ONDEMAND,
-                outFields: ["OBJECTID "]
+                outFields: ["OBJECTID"]
             });
             featureLayer.setRenderer(app.pSup.m_StreamStatusRenderer);
             //featureLayer.setRenderer(renderer);
@@ -147,7 +147,8 @@ define([
             query.where = "Name = '" + strH2OID + "'";
             queryTask.execute(query, showHeaderWarningContentResults);
 
-            function showHeaderWarningContentResults(results) {
+			function showHeaderWarningContentResults(results) {
+				console.log("showHeaderWarningContentResults");
                 var resultItems = [];
                 var resultCount = results.features.length;
                 for (var i = 0; i < resultCount; i++) {
@@ -156,36 +157,36 @@ define([
                 }
 
                 $.get(strGoogleSheetURL)
-                                   .done(function (jsonResult) {
-                                       if (jsonResult.feed != undefined) {
-                                           var strHeaderTxt = "";
-                                           var strAlertTxt = "";
-                                           var pEntries = jsonResult.feed.entry;
+                    .done(function (jsonResult) {
+                        if (jsonResult.feed != undefined) {
+                            var strHeaderTxt = "";
+                            var strAlertTxt = "";
+                            var pEntries = jsonResult.feed.entry;
 
-                                           if (blnUseAlternateHeader) {
-                                               strHeaderTxt = pEntries[0].gsx$headeralt.$t
-                                           } else {
-                                               strHeaderTxt = pEntries[0].gsx$header.$t
-                                           }
+                            if (blnUseAlternateHeader) {
+                                strHeaderTxt = pEntries[0].gsx$headeralt.$t
+                            } else {
+                                strHeaderTxt = pEntries[0].gsx$header.$t
+                            }
 
-                                           strAlertTxt = pEntries[0].gsx$customalert.$t
-                                           $("#divWatershedBasinInfoTop").html(strHeaderTxt);
-                                           $("#divCustomAlert").html(strAlertTxt);
-                                       }
-                                   })
-                                   .always(function (data) {
-                                       app.pSup.Phase2();  //starting up the map and other content becuase the header content can mess up the content dimiensions if done prior
-                                   });
+                            strAlertTxt = pEntries[0].gsx$customalert.$t
+                            $("#divWatershedBasinInfoTop").html(strHeaderTxt);
+                            $("#divCustomAlert").html(strAlertTxt);
+                        }
+                    })
+					.always(function (data) {
+                        app.pSup.Phase2();  //starting up the map and other content becuase the header content can mess up the content dimiensions if done prior
+                    });
             }
         },
 
         LayerCheckBoxSetup: function (cbxLayers) {
             dojo.connect(app.map, 'onLayersAddResult', function (results) {            //add check boxes 
-                if (results !== 'undefined') {
+				if (results !== 'undefined') {
                     var des = document.getElementById('toggleLayers');
 
                     dojo.forEach(cbxLayers, function (playerset) {
-                        var strLayerName = playerset.title;
+						var strLayerName = playerset.title;
                         var clayer0 = playerset.layers[0];
                         var clayer1 = playerset.layers[1];
                         var pID0 = clayer0.id;
@@ -225,13 +226,14 @@ define([
                         des.appendChild(checkboxHTML);
                         des.appendChild(document.createTextNode('\u00A0'))
                         des.appendChild(label);
-                        des.appendChild(document.createTextNode('\u00A0\u00A0\u00A0\u00A0'))
+						des.appendChild(document.createTextNode('\u00A0\u00A0\u00A0\u00A0'));
                     });
                 }
             });
         },
 
-        Phase1: function () {
+		Phase1: function () {
+			console.log("MH_setup Phase1");
             var arrayNavList = [["Beaverhead/Centennial", "Beaverhead"], ["Big Hole", "Big Hole"],
                 ["Boulder", "Boulder"], ["Broadwater", "Broadwater"], 
                 ["Gallatin-Lower", "Lower Gallatin"], ["Gallatin-Upper", "Upper Gallatin"], ["Jefferson", "Jefferson"],
@@ -326,7 +328,7 @@ define([
                         basemapGallery.basemaps[cnt].title === "OpenStreetMap" ||
                         basemapGallery.basemaps[cnt].title === "Terrain with Labels" ||
                         basemapGallery.basemaps[cnt].title === "USA Topo Maps") {
-                        console.log("Removing..." + basemapGallery.basemaps[cnt].title);
+                        //console.log("Removing..." + basemapGallery.basemaps[cnt].title);
                         basemapGallery.remove(basemapGallery.basemaps[cnt].id);
                     }
                 }
@@ -335,7 +337,7 @@ define([
             on(app.map, "layers-add-result", function(e) {
               for (var i = 0; i < e.layers.length; i++) {
                  var result = (e.layers[i].error == undefined) ? "OK": e.layers[i].error.message;
-                 console.log(" - " +e.layers[i].layer.id + ": " +result);
+                 //console.log(" - " +e.layers[i].layer.id + ": " +result);
                  }
             });
 
@@ -359,7 +361,6 @@ define([
                 outFields: ['*'],
                 minScale: 1000000
             });
-
 
             var vMagentaColor = new Color("#E11AEE");              // create a text symbol to define the style of labels
             var pLabelEndPoints = new TextSymbol().setColor(vMagentaColor);
@@ -598,18 +599,16 @@ define([
                 legendLayers.push({ layer: app.pSup.m_pFWPFeatureLayer, title: 'MT Waterbody Restrictions' });
             }
 
-            dojo.connect(app.map, 'onLayersAddResult', function (results) {
+			dojo.connect(app.map, 'onLayersAddResult', function (results) {
+				console.log("onLayersAddResult");
                 app.legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
-                app.legend.startup();
+				app.legend.startup();
             });
 
-
             var cbxLayers = [];
-
             //cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Water Restrictions' });
             //cbxLayers.push({ layers: [pWatershedsMaskFeatureLayer, pWatershedsMaskFeatureLayer], title: 'Other Watersheds' });
             //cbxLayers.push({ layers: [pBasinsMaskFeatureLayer, pBasinsMaskFeatureLayer], title: 'Other Basins' });
-
             cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
             cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
             cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
@@ -625,8 +624,8 @@ define([
 
             ko.bindingHandlers.googleBarChart = {
                 init: function (element, valueAccessor, allBindingsAccesor, viewModel, bindingContext) {
-                    var chart = new google.visualization.LineChart(element);
-                    ko.utils.domData.set(element, 'googleLineChart', chart);
+					var chart = new google.visualization.LineChart(element);
+					ko.utils.domData.set(element, 'googleLineChart', chart);
                 },
                 update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
                     var value = ko.unwrap(valueAccessor());
@@ -781,7 +780,8 @@ define([
 
             function mapLoaded() {        // map loaded//            // Map is ready
                 app.map.on("mouse-move", showCoordinates); //after map loads, connect to listen to mouse move & drag events
-                app.map.on("mouse-drag", showCoordinates);
+				app.map.on("mouse-drag", showCoordinates);
+				console.log("maploaded")
             }
             function showCoordinates(evt) {
                 var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
@@ -809,7 +809,8 @@ define([
                 query.geometry = qGeom;
                 queryTask.execute(query, showResults);
             }
-            function showResults(featureSet) {
+			function showResults(featureSet) {
+				console.log("showResults")
                 //QueryTask returns a featureSet.  Loop through features in the featureSet and add them to the map.
                 dojo.forEach(featureSet.features, function (feature) {
                     var strStreamName = feature.attributes.StreamName;
@@ -843,10 +844,16 @@ define([
         Phase3: function (pArrayOIDYellow, pArrayOIDsGold, pArrayOIDsOrange, pArrayOIDsPlum, pArrayOIDsRed) {  //creating this phase 3 to create legend items for river status based on the summarized data
             app.pSup.m_pRiverSymbolsFeatureLayer.setRenderer(app.pSup.m_StreamStatusRenderer);
 
-            var legendLayers = app.legend.layerInfos;
-            legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
-            app.legend.layerInfos = legendLayers;
-			app.legend.refresh();
+			try {
+				var legendLayers = app.legend.layerInfos;
+				legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
+				app.legend.layerInfos = legendLayers;
+				app.legend.refresh();
+			}
+			catch (err) {
+				console.log("Phase3 legendlayers issue::", err.message);
+				$("#divShowHideLegendBtn").hide;
+			}
 
 			$("#btnJump2FEMA").click(function () {
 				var pExtent = app.map.extent;

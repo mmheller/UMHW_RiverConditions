@@ -20,7 +20,10 @@ define([
 ) {
 
     return declare([], {
-        qry_Zoom2FeatureLayerExtent: function (pFeatureLayer1, strQueryField) {
+		qry_Zoom2FeatureLayerExtent: function (pFeatureLayer1, strQueryField) {
+
+			console.log("qry_Zoom2FeatureLayerExtent");
+
             var pQueryT1 = new esri.tasks.QueryTask(pFeatureLayer1.url);
             var pQuery1 = new esri.tasks.Query();
 
@@ -61,7 +64,8 @@ define([
                     }
                     if (pExtent) {
                         pExtent = pExtent.expand(app.dblExpandNum);
-                        app.map.setExtent(pExtent, true);
+						app.map.setExtent(pExtent, true);
+						var strtemp = "";
                     }
                     else { var strMessage = "hold it up here"; }
                 }

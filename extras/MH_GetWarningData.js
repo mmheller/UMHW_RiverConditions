@@ -40,6 +40,7 @@ define([
 			m_StepThruCounter: 0,
 
 			Start: function (sectionGeometries, streamSectionArrray) {
+				console.log("Get warn Start");
 				this.m_streamSectionArrray = streamSectionArrray;
 				//this.m_pSectionsPolysFL_URLL = pSectionsPolysFL;
 
@@ -67,7 +68,6 @@ define([
 				if (resultCount > 0) {
 					var pFeature = results.features[this.app.pGetWarn.m_StepThruCounter];
 					this.app.pGetWarn.FindSectionsOverlappingFWPWarnFeatures2(pFeature.geometry);
-
 					var x = document.getElementById("divFWPAlert");
 					if (x.style.visibility === "hidden") {
 						x.style.visibility = 'visible';
@@ -85,6 +85,7 @@ define([
 			},
 
 			FindSectionsOverlappingFWPWarnFeatures2: function (pFeature) {
+				console.log("FindSectionsOverlappingFWPWarnFeatures2")
 				var pQuery = new Query();
 				var queryTask = new QueryTask(app.strHFL_URL + "5");
 				pQuery.returnGeometry = true;
@@ -96,6 +97,7 @@ define([
 			},
 
 			GetFWPWarnResults2: function (results) {  //results from selecting all sections
+				console.log("GetFWPWarnResults2")
 				var resultCount = results.features.length;
 				var pCurrentFWPFeature = this.m_FWPWarnFeatures[this.app.pGetWarn.m_StepThruCounter];
 				var strLOCATION = pCurrentFWPFeature.attributes["LOCATION"];
