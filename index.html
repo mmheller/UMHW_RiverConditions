@@ -17,7 +17,7 @@
 	<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>-->
 	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 	<script src="assets/ie10-viewport-bug-workaround.js"></script>
-	
+
 	<script src="https://www.gstatic.com/charts/loader.js"></script>
 	<script>
 		google.charts.load('current', { packages: ['corechart'] });
@@ -182,7 +182,7 @@
 	<nav class="navbar navbar-inverse navbar-fixed-top" id="UMH_NavBar1">
 		<div class="container">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar2" aria-expanded="false" aria-controls="navbar2" style="margin-top:17px !important; margin-bottom:18px !important">
 					<span class="sr-only">Toggle navigation</span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
@@ -190,10 +190,29 @@
 				</button>
 				<a class="navbar-brand" href="index.html">River Conditions Tool Home</a>
 			</div>
-			<div id="navbar" class="navbar-collapse collapse">
-				<form class="navbar-form navbar-right">
-					<ul id="navList" class="nav nav-pills pull-right"></ul>
-				</form>
+			<div id="navbar2" class="navbar-collapse collapse" style="height:30px !important;">
+				<div style="margin-left:auto; margin-right:0; ">
+					<form class="navbar-form navbar-right" style="margin-top:2px !important; margin-right:0px;float:right !important;">
+
+						<div class="custom-select" style="width:245px; height:25px; margin-bottom:2px !important; height:25px; margin-right:0px; float:right !important; clear: both;">
+							<select id="sel_Basin" style="height:25px; text-align:right">
+								<option value="0" >Select Region/Basin:</option>
+							</select>
+						</div>
+						<ul id="navList" class="nav nav-pills pull-right" style="max-width:850px;  line-height: 0.8; float:right !important; clear: both;"></ul>
+
+					</form>
+				</div>
+				<!--<form class="navbar-form navbar-right" style="margin-top:2px !important; margin-bottom:2px !important; height:25px; margin-right:0px;">
+		<div class="custom-select" style="width:245px; height:25px;">
+			<select id="sel_Basin" style="height:25px;">
+				<option value="0">Select Region/Basin:</option>
+			</select>
+		</div>
+	</form>
+	<form class="navbar-form navbar-right" style="margin-top:2px !important; margin-bottom:2px !important">
+		<ul id="navList" class="nav nav-pills pull-right"></ul>
+	</form>-->
 			</div>
 		</div>
 	</nav>
@@ -219,7 +238,7 @@
 		</div>
 	</nav>
 
-	<!-- Main jumbotron for a primary marketing message or call to action -->
+	<!-- Main jumbotron  -->
 	<div class="jumbotron" style="margin-bottom:-10px; margin-top:0px; padding-bottom:0px; padding-top:5px; padding-left:0px; padding-right:10px;">
 		<div class="container" style="padding:5px;">
 			<div id="divWatershedBasinInfoTop" style="line-height: normal; padding:0px;">
@@ -266,6 +285,8 @@
 							<button type="button" class="btn btn-info" id="btnJump2FWP" style="position:relative; font-size:12px; right:15px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;">Open Official MT FWP Map</button>
 
 							<button type="button" class="btn btn-info" id="btnJump2FEMA" style="position:relative; font-size:12px; right:15px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;">Open FEMA Map</button>
+							
+							<button type="button" class="btn btn-info" id="btnJump2GYIAIS" style="position:relative; font-size:12px; right:15px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;">Open GYE AIS Map</button>
 						</div>
 					</div>
 				</div>
@@ -455,6 +476,7 @@
 								<div><span data-bind='text: strSiteID'></span></div>
 								<div><span data-bind='text: strDailyStat_URL'></span></div>
 								<div><span data-bind='text: overallSymbol'></span></div>
+								<div><span data-bind='text: strWatershed'></span></div>
 							</td>
 						</tr>
 					</tbody>

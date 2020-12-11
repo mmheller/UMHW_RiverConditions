@@ -5,6 +5,28 @@ function showLoading() {
     app.map.hideZoomSlider();
 }
 
+function closeAllSelect(elmnt) {
+	/*a function that will close all select boxes in the document,
+	except the current select box:*/
+	var x, y, i, xl, yl, arrNo = [];
+	x = document.getElementsByClassName("select-items");
+	y = document.getElementsByClassName("select-selected");
+	xl = x.length;
+	yl = y.length;
+	for (i = 0; i < yl; i++) {
+		if (elmnt == y[i]) {
+			arrNo.push(i)
+		} else {
+			y[i].classList.remove("select-arrow-active");
+		}
+	}
+	for (i = 0; i < xl; i++) {
+		if (arrNo.indexOf(i)) {
+			x[i].classList.add("select-hide");
+		}
+	}
+}
+
 function hideLoading(error) {
     esri.hide(app.loading);
     app.map.enableMapNavigation();
@@ -233,15 +255,123 @@ define([
         },
 
 		Phase1: function () {
+			app.H2O_ID = getTokens()['H2O_ID'];
+			app.Basin_ID = getTokens()['Basin_ID'];
+
+			if (app.Basin_ID == "UY_Shields") {
+				app.Basin_ID = "Upper Yellowstone Headwaters";
+			}
+
 			console.log("MH_setup Phase1");
-            var arrayNavList = [["Beaverhead/Centennial", "Beaverhead"], ["Big Hole", "Big Hole"],
-                ["Boulder", "Boulder"], ["Broadwater", "Broadwater"], 
-                ["Gallatin-Lower", "Lower Gallatin"], ["Gallatin-Upper", "Upper Gallatin"], ["Jefferson", "Jefferson"],
-                ["Madison", "Madison"], ["Ruby", "Ruby"]
+			app.arrayEntireList = [["Beaverhead/Centennial", "Beaverhead", "UMH"], ["Big Hole", "Big Hole", "UMH"],
+				["Boulder", "Boulder", "UMH"], ["Broadwater", "Broadwater", "UMH"], 
+				["Gallatin-Lower", "Lower Gallatin", "UMH"], ["Gallatin-Upper", "Upper Gallatin", "UMH"], ["Jefferson", "Jefferson", "UMH"],
+				["Madison", "Madison", "UMH"], ["Ruby", "Ruby", "UMH"],
+				["Shields", "Shields", "Upper Yellowstone Headwaters"], ["Upper Yellowstone", "Upper Yellowstone", "Upper Yellowstone Headwaters"], ["Yellowstone Headwaters", "Yellowstone Headwaters", "Upper Yellowstone Headwaters"]
             ];
 
-            var strURLPrefix = "index.html?H2O_ID=";
-            var strURLSuffix = "";
+			var arrayNavList = [];
+			if ((app.H2O_ID == undefined) & (app.Basin_ID == undefined)) {
+				arrayNavList = app.arrayEntireList;
+			} else if (app.Basin_ID != undefined) {
+				for (var ib2 = 0; ib2 < app.arrayEntireList.length; ib2++) { 							//if a watershed is passed, determine the correspoinding watersheds
+					if (app.Basin_ID == app.arrayEntireList[ib2][2]) {
+						arrayNavList.push(app.arrayEntireList[ib2]);
+					}
+				}
+			}
+			else {
+				for (var ib = 0; ib < app.arrayEntireList.length; ib++) { 			//if a watershed is passed, determine the area/basin
+					if (app.H2O_ID == app.arrayEntireList[ib][1]) {
+						app.Basin_ID = app.arrayEntireList[ib][2];
+						break;
+					}
+				}
+				for (var ib2 = 0; ib2 < app.arrayEntireList.length; ib2++) { 							//if a watershed is passed, determine the correspoinding watersheds
+					if (app.Basin_ID == app.arrayEntireList[ib2][2]) {
+						arrayNavList.push(app.arrayEntireList[ib2]);
+					}
+				}
+			}
+
+			var arrayNavListBasin = [["Upper Yellowstone/Shields", "UY_Shields"], ["Upper Missouri Headwaters", "UMH"]];
+
+			var strURLPrefix = "index.html?H2O_ID=";
+			var strURLPrefixBasin = "index.html?Basin_ID=";
+			var strURLSuffix = "";
+			document.addEventListener("click", closeAllSelect);
+
+			var selBasin = document.getElementById("sel_Basin");
+			for (var i = 0; i < arrayNavListBasin.length; i++) {
+				var a = document.createElement("a");
+				var newItem = document.createElement("option");
+				a.textContent = arrayNavListBasin[i][0];
+				a.setAttribute('role', "presentation");
+
+				a.setAttribute('href', strURLPrefixBasin + arrayNavListBasin[i][1] + strURLSuffix);
+				newItem.appendChild(a);
+				selBasin.add(newItem, i+1);
+
+				if (arrayNavListBasin[i][1] == app.Basin_ID) {				//set the region/basin in the dropdown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+					selBasin.options[i+1].selected = true;
+				}
+			}
+
+			var x, i, j, l, ll, selElmnt, a, b, c;
+			/*look for any elements with the class "custom-select":*/
+
+			x = document.getElementsByClassName("custom-select");
+			l = x.length;
+			for (i = 0; i < l; i++) {
+				selElmnt = x[i].getElementsByTagName("select")[0];
+				ll = selElmnt.length;
+				/*for each element, create a new DIV that will act as the selected item:*/
+				a = document.createElement("DIV");
+				a.setAttribute("class", "select-selected");
+				a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+				x[i].appendChild(a);
+				/*for each element, create a new DIV that will contain the option list:*/
+				b = document.createElement("DIV");
+				b.setAttribute("class", "select-items select-hide");
+				for (j = 1; j < ll; j++) {
+					/*for each option in the original select element, create a new DIV that will act as an option item:*/
+					c = document.createElement("DIV");
+					c.innerHTML = selElmnt.options[j].innerHTML;
+					c.addEventListener("click", function (e) {
+						/*when an item is clicked, update the original select box,and the selected item:*/
+						var y, i, k, s, h, sl, yl;
+						s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+						sl = s.length;
+						h = this.parentNode.previousSibling;
+						for (i = 0; i < sl; i++) {
+							if (s.options[i].innerHTML == this.innerHTML) {
+								s.selectedIndex = i;
+								h.innerHTML = this.innerHTML;
+								y = this.parentNode.getElementsByClassName("same-as-selected");
+								yl = y.length;
+								for (k = 0; k < yl; k++) {
+									y[k].removeAttribute("class");
+								}
+								this.setAttribute("class", "same-as-selected");
+								break;
+							}
+						}
+						h.click();
+					});
+					b.appendChild(c);
+				}
+				x[i].appendChild(b);
+				a.addEventListener("click", function (e) {
+					/*when the select box is clicked, close any other select boxes,	and open/close the current select box:*/
+					e.stopPropagation();
+					closeAllSelect(this);
+					this.nextSibling.classList.toggle("select-hide");
+					this.classList.toggle("select-arrow-active");
+					//alert("matt test");
+				});
+			}
+
+
 
 			if (getTokens()['UMHBanner'] != undefined) {
 				$('#UMH_NavBar2').show();
@@ -249,7 +379,7 @@ define([
 				UMH_NavBar1.style.paddingTop = '80px';
 			}
 
-            app.H2O_ID = getTokens()['H2O_ID'];
+
 
             app.test = false;
             var strTest = getTokens()['test'];
@@ -272,7 +402,6 @@ define([
             for (var i = 0; i < arrayNavList.length; i++) {
                 var a = document.createElement("a");
                 var newItem = document.createElement("li");
-
                 a.textContent = arrayNavList[i][0];
                 a.setAttribute('role', "presentation");
                 a.setAttribute('href', strURLPrefix + arrayNavList[i][1] + strURLSuffix);
@@ -280,9 +409,11 @@ define([
                 ulist.appendChild(newItem);
             }
 
+
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
-            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
+			//app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
+			app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/Temp_RCT/FeatureServer/"
 
 
 
@@ -374,10 +505,44 @@ define([
 
 
             var strQueryDef1 = "1=1";
-            var strQueryDef2 = "1=1";
-            var strQueryDef3 = "Name in ('Beaverhead','Broadwater','Ruby','Big Hole','Jefferson','Boulder','Madison','Gallatin')";
-            var strQueryDef4 = "Name in ('')";
-            if (typeof app.H2O_ID != 'undefined') {
+			var strQueryDef2 = "1=1";
+
+			//var strQueryDef3 = "Name in ('Beaverhead','Broadwater','Ruby','Big Hole','Jefferson','Boulder','Madison','Gallatin', 'Upper Yellowstone','Shields','Yellowstone Headwaters')";
+			var strQueryDef3 = "";
+			var strQueryDef4 = "Name in ('')";
+
+			arrayTmp4Query3 = [];
+			if ((app.Basin_ID == undefined) & (typeof app.H2O_ID == 'undefined')) {
+				for (var ib2 = 0; ib2 < app.arrayEntireList.length; ib2++) { 							//if a watershed is passed, determine the correspoinding watersheds
+						arrayTmp4Query3.push(app.arrayEntireList[ib2][1]);
+				}
+				strQueryDef3 = "Name in ('" + arrayTmp4Query3.join("','") + "')";
+			} else if ((app.Basin_ID != undefined) & (typeof app.H2O_ID == 'undefined')) {
+				for (var ib2 = 0; ib2 < app.arrayEntireList.length; ib2++) { 							//if a watershed is passed, determine the correspoinding watersheds
+					if (app.Basin_ID == app.arrayEntireList[ib2][2]) {
+						arrayTmp4Query3.push(app.arrayEntireList[ib2][1]);
+					}
+				}
+				strQueryDef1 = "(Watershed_Name in ('" + arrayTmp4Query3.join("','") +
+					"')) OR (WatershedName_Alt1 in ('" + arrayTmp4Query3.join("','") +
+					"')) OR (WatershedName_Alt2 in ('" + arrayTmp4Query3.join("','") + "'))";
+
+				//strQueryDef2 = "(Watershed in ('" + arrayTmp4Query3.join("','") +
+				//	"'))";
+
+				strQueryDef2 = "(Watershed in ('" + arrayTmp4Query3.join("','") +
+					"')) OR (WatershedName_Alt1 in ('" + arrayTmp4Query3.join("','") +
+					"')) OR (WatershedName_Alt2 in ('" + arrayTmp4Query3.join("','") + "'))";
+
+				strQueryDef3 = "(Name in ('" + arrayTmp4Query3.join("','") +
+					"')) OR (Name_Alternate1 in ('" + arrayTmp4Query3.join("','") +
+					"')) OR (Name_Alternate2 in ('" + arrayTmp4Query3.join("','") + "'))";
+
+				strQueryDef4 = "(NOT(Name in ('" + arrayTmp4Query3.join("','") + "'))) AND " +
+							  "((NOT(Name_Alternate1 in ('" + arrayTmp4Query3.join("','") + "'))) OR (Name_Alternate1 is Null)) AND" +
+					          "((NOT(Name_Alternate2 in ('" + arrayTmp4Query3.join("','") + "'))) OR (Name_Alternate1 is Null))";
+
+			} else if (typeof app.H2O_ID != 'undefined') {
                 strQueryDef1 = "Watershed_Name = '" + app.H2O_ID + "'" + " OR " + " WatershedName_Alt1 = '" + app.H2O_ID + "'" + " OR " + " WatershedName_Alt2 = '" + app.H2O_ID + "'";
                 strQueryDef2 = "Watershed = '" + app.H2O_ID + "'" + " OR " + " WatershedName_Alt1 = '" + app.H2O_ID + "'" + " OR " + " WatershedName_Alt2 = '" + app.H2O_ID + "'";
                 strQueryDef3 = "Name = '" + app.H2O_ID + "'" + " OR " + " Name_Alternate1 = '" + app.H2O_ID + "'" + " OR " + " Name_Alternate2 = '" + app.H2O_ID + "'"
@@ -385,11 +550,10 @@ define([
                 strQueryDef4 = "Name <> '" + app.H2O_ID + "'" + 
                                     " AND (" + " Name_Alternate1 <> '" + app.H2O_ID + "' OR (Name_Alternate1 is Null))" + 
                                     " AND (" + " Name_Alternate2 <> '" + app.H2O_ID + "' OR (Name_Alternate1 is Null))";
-
-                
-
             }
-                        
+
+			app.SectionQryStringGetGageData = strQueryDef2;
+
             pEPointsFeatureLayer.setDefinitionExpression(strQueryDef1);
 
             pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", {
@@ -400,6 +564,14 @@ define([
             app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
 
             var pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: ['*'] });
+			if (app.Basin_ID != undefined) {
+				if (app.Basin_ID == "UMH") {
+					pBasinsFeatureLayer.setDefinitionExpression("Name = 'Upper Missouri Headwaters'");
+				} else {
+					pBasinsFeatureLayer.setDefinitionExpression("Name = '" + app.Basin_ID + "'");
+				}
+			}
+
 
             var templateFAS = new InfoTemplate();
             templateFAS.setTitle("MT FAS (Fishing Access Site)");
@@ -864,6 +1036,21 @@ define([
 				strURL += pExtent.xmax + ",";
 				strURL += pExtent.ymax + ",";
 				strURL += pSR_WKID.toString();
+				window.open(strURL);
+			});
+
+
+			
+			$("#btnJump2GYIAIS").click(function () {
+				var pExtent = app.map.extent;
+				pSR_WKID = pExtent.spatialReference.wkid;
+				var strURL = "https://gagecarto.github.io/aquaticInvasiveExplorer/index.html#bnds=";
+				var pGeogExtent = webMercatorUtils.webMercatorToGeographic(pExtent);  //the map is in web mercator but display coordinates in geographic (lat, long)
+				strURL += Math.round(pGeogExtent.xmin * 100) / 100 + ",";
+				strURL += Math.round(pGeogExtent.ymin * 100) / 100 + ",";
+				strURL += Math.round(pGeogExtent.xmax * 100) / 100 + ",";
+				strURL += Math.round(pGeogExtent.ymax * 100) / 100;
+				//strURL += pSR_WKID.toString();
 				window.open(strURL);
 			});
 
