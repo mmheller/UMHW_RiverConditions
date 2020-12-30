@@ -158,10 +158,12 @@ define([
             app.map.reorderLayer(featureLayer, 5);
         },
 
-        GetSetHeaderWarningContent: function (strAGSIndexTableURL, strH2OID, blnUseAlternateHeader) {
-            if (typeof strH2OID == 'undefined') {
+        GetSetHeaderWarningContent: function (strAGSIndexTableURL, strH2OID, blnUseAlternateHeader, strBasinID) {
+			if ((typeof strH2OID == 'undefined') & (typeof strBasinID == 'undefined')) {
                 strH2OID = "UMH";
-            } 
+			} else if ((typeof strH2OID == 'undefined') & (typeof strBasinID != 'undefined')) {
+				strH2OID = strBasinID;
+			} 
             strURLFieldName = "URL";
             var query = new Query();
             query.outFields = [strURLFieldName];
@@ -175,7 +177,7 @@ define([
                 var resultCount = results.features.length;
                 for (var i = 0; i < resultCount; i++) {
                     var featureAttributes = results.features[i].attributes;
-                    var strGoogleSheetURL = featureAttributes[strURLFieldName]
+					var strGoogleSheetURL = featureAttributes[strURLFieldName];
                 }
 
                 $.get(strGoogleSheetURL)
@@ -409,15 +411,12 @@ define([
                 ulist.appendChild(newItem);
             }
 
-
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
 			//app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
 			app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/Temp_RCT/FeatureServer/"
-
-
-
-            this.GetSetHeaderWarningContent(app.strHFL_URL + "12", app.H2O_ID, blnUseAlternateHeader);
+			
+			this.GetSetHeaderWarningContent(app.strHFL_URL + "12", app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
         },
 
         Phase2: function () {
