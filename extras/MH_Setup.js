@@ -413,8 +413,8 @@ define([
 
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
-			//app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
-			app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/Temp_RCT/FeatureServer/"
+			app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
+			//app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/Temp_RCT/FeatureServer/"
 			
 			this.GetSetHeaderWarningContent(app.strHFL_URL + "12", app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
         },
