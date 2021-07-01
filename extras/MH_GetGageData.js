@@ -999,7 +999,7 @@ define([
 
             var EntiretrHTML = "";
             var iCounterTemperature = 0;
-
+			var strHyperlinkURL = "";
             var strSiteIDs = "";
             var iProcIndex = null;;
             var arraySiteIDInfo = null;;
@@ -1208,7 +1208,7 @@ define([
                                     var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
                                     iTempClosureValueCelsius = (iTempClosureValue -32) * (5 / 9);
 
-                                    var strHyperlinkURL = strURLGagePrefix + "&sites=" +strSiteID;        //siteID
+                                    strHyperlinkURL = strURLGagePrefix + "&sites=" +strSiteID;        //siteID
                                     strHyperlinkURL = returnURL4GSgage(strHyperlinkURL);
 
                                     blnRealValues = false;
