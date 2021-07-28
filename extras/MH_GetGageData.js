@@ -1429,13 +1429,15 @@ define([
 										var dteDateTime = new Date(item2.dateTime);
 									} else {
 										var dteDateTime = new Date(item2.attributes.Timestamp);
+										dteDateTime.setHours(dteDateTime.getHours() + 6);
+
 									}
                                     var strNoData = "";
 									var iCFSValue;
 									if (arrayDNRC_Sens_Loc == null) {
 										iCFSValue = parseFloat(item2.value);
 									} else {
-										iCFSValue = Math.round(parseFloat(item2.attributes.RecordedValue));
+										iCFSValue = Math.round(parseFloat(item2.attributes.RecordedValue)*10)/10;
 									}
 
                                     if (item2.value != -999999) {
@@ -1485,13 +1487,14 @@ define([
 										var dteDateTime = new Date(item22.dateTime);
 									} else {
 										var dteDateTime = new Date(item22.attributes.Timestamp);
+										dteDateTime.setHours(dteDateTime.getHours() + 6);
 									}
 
 									var iTempValue;
 									if (arrayDNRC_Sens_Loc == null) {
-										iTempValue = Math.round(parseFloat(item22.value) * 9 / 5 + 32);
+										iTempValue = Math.round((parseFloat(item22.value) * 9 / 5 + 32)*10)/10;
 									} else {
-										iTempValue = Math.round(parseFloat(item22.attributes.RecordedValue) * 9 / 5 + 32);
+										iTempValue = Math.round((parseFloat(item22.attributes.RecordedValue) * 9 / 5 + 32)*10)/10;
 									}
 
                                     var strNoData = "";
