@@ -89,7 +89,7 @@ define([
 
         GetSectionGeometryError1: function (results) {
             alert("Error with query on FWS warn history layer1");
-            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
+			this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false, null);  //if an error go continue with getting seciton detail and display
             this.app.pGetWarn.ClearVars();
         },  
         
@@ -189,7 +189,7 @@ define([
         GetFWPWarnResultsError2: function (results) {
             console.log("Failed to get results from Sections Layer when querying by FWP Warn polygon due to an error: ", err);
             alert("Error with query on FWS warn history layer2");
-            this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false);  //if an error go continue with getting seciton detail and display
+			this.app.pGage.SectionsReceived(streamSectionArrray, "", "", "", "", false, null);  //if an error go continue with getting seciton detail and display
             this.app.pGetWarn.ClearVars();
         }
     });

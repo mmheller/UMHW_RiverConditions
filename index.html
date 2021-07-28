@@ -320,9 +320,9 @@
 							<!--<div>Section Start:  <span data-bind='text: $root.CurrentDisplayGageRecord().StartEndpoint'></span></div>
 							<div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>-->
 							<hr style="margin-top:5px; margin-bottom:5px;">
-							<div id="detailSectionUSGSCurrent">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
+							<div id="detailSectionUSGSCurrent">Gage Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
 							<br />
-							<div id="detailSectionUSGSHistorical">USGS Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round historical data)</div>
+							<div id="detailSectionUSGSHistorical">Gage Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().strDailyStat_URL}" target="_blank">Historical</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round historical data)</div>
 
 						</div>
 
@@ -477,6 +477,7 @@
 								<div><span data-bind='text: strDailyStat_URL'></span></div>
 								<div><span data-bind='text: overallSymbol'></span></div>
 								<div><span data-bind='text: strWatershed'></span></div>
+								<div><span data-bind='text: strAgency'></span></div>
 							</td>
 						</tr>
 					</tbody>
