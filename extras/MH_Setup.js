@@ -180,20 +180,26 @@ define([
 					var strGoogleSheetURL = featureAttributes[strURLFieldName];
                 }
 
+				strGoogleSheetURL += "&key=AIzaSyA2E5MNl-Hqoy36tbqHpccVpsSPYbnL5BA";
+
                 $.get(strGoogleSheetURL)
                     .done(function (jsonResult) {
-                        if (jsonResult.feed != undefined) {
+						//if (jsonResult.feed != undefined) {
+						if (jsonResult != undefined) {
                             var strHeaderTxt = "";
                             var strAlertTxt = "";
-                            var pEntries = jsonResult.feed.entry;
+                            var pEntries = jsonResult.values[1];
 
                             if (blnUseAlternateHeader) {
-                                strHeaderTxt = pEntries[0].gsx$headeralt.$t
+								//strHeaderTxt = pEntries[0].gsx$headeralt.$t
+								strHeaderTxt = pEntries[2];
                             } else {
-                                strHeaderTxt = pEntries[0].gsx$header.$t
+								//strHeaderTxt = pEntries[0].gsx$header.$t
+								strHeaderTxt = pEntries[0];
                             }
 
-                            strAlertTxt = pEntries[0].gsx$customalert.$t
+							//strAlertTxt = pEntries[0].gsx$customalert.$t
+							strAlertTxt = pEntries[1];
                             $("#divWatershedBasinInfoTop").html(strHeaderTxt);
                             $("#divCustomAlert").html(strAlertTxt);
                         }
@@ -274,24 +280,30 @@ define([
 				["Madison", "Madison", "UMH"], ["Ruby", "Ruby", "UMH"],
 				["Shields", "Shields", "Upper Yellowstone Headwaters"],
 				["Upper Yellowstone", "Upper Yellowstone", "Upper Yellowstone Headwaters"],
-				["Yellowstone Headwaters", "Yellowstone Headwaters", "Upper Yellowstone Headwaters"]//,
-				//["Middle Musselshell", "Middle Musselshell", "Musselshell"],
-				//["Sun", "Sun", "Blackfoot-Sun"], ["Lower Musselshell", "Lower Musselshell", "Musselshell"],
-				//["Lower Bighorn", "Lower Bighorn", "Bighorn"], ["Little Bighorn", "Little Bighorn", "Bighorn"],
-				//["Flatwillow", "Flatwillow", "Musselshell"], ["Shoshone", "Shoshone", "Bighorn"],
-				//["Box Elder", "Box Elder", "Musselshell"], ["Blackfoot", "Blackfoot", "Blackfoot-Sun"],
-				//["Little Wind", "Little Wind", "Bighorn"], ["Lower Wind", "Lower Wind", "Bighorn"],
-				//["North Fork Shoshone", "North Fork Shoshone", "Bighorn"], ["Big Horn Lake", "Big Horn Lake", "Bighorn"],
-				//["South Fork Shoshone", "South Fork Shoshone", "Bighorn"], ["Upper Wind", "Upper Wind", "Bighorn"],
-				//["Greybull", "Greybull", "Bighorn"], ["Dry", "Dry", "Bighorn"],
-				//["Upper Bighorn", "Upper Bighorn", "Bighorn"], ["Upper Musselshell", "Upper Musselshell", "Musselshell"],
-				//["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
-				//["City of Choteau - Teton River", "Blackfoot-Sun"]
+				["Yellowstone Headwaters", "Yellowstone Headwaters", "Upper Yellowstone Headwaters"],
+				["Middle Musselshell", "Middle Musselshell", "Musselshell"],
+				["Sun", "Sun", "Blackfoot-Sun"], ["Lower Musselshell", "Lower Musselshell", "Musselshell"],
+				["Lower Bighorn", "Lower Bighorn", "Bighorn"], ["Little Bighorn", "Little Bighorn", "Bighorn"],
+				["Flatwillow", "Flatwillow", "Musselshell"], ["Shoshone", "Shoshone", "Bighorn"],
+				["Box Elder", "Box Elder", "Musselshell"], ["Blackfoot", "Blackfoot", "Blackfoot-Sun"],
+				["Little Wind", "Little Wind", "Bighorn"], ["Lower Wind", "Lower Wind", "Bighorn"],
+				["North Fork Shoshone", "North Fork Shoshone", "Bighorn"], ["Big Horn Lake", "Big Horn Lake", "Bighorn"],
+				["South Fork Shoshone", "South Fork Shoshone", "Bighorn"], ["Upper Wind", "Upper Wind", "Bighorn"],
+				["Greybull", "Greybull", "Bighorn"], ["Dry", "Dry", "Bighorn"],
+				["Upper Bighorn", "Upper Bighorn", "Bighorn"], ["Upper Musselshell", "Upper Musselshell", "Musselshell"],
+				["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
+				["City of Choteau - Teton River", "Blackfoot-Sun"]
             ];
 
-			var arrayNavList = [];
 			if ((app.H2O_ID == undefined) & (app.Basin_ID == undefined)) {
+				app.Basin_ID = "UMH";
+			}
+
+			var arrayNavList = [];
+			if (app.Basin_ID == "all") {
 				arrayNavList = app.arrayEntireList;
+				app.H2O_ID = undefined;
+				app.Basin_ID = undefined;
 			} else if (app.Basin_ID != undefined) {
 				for (var ib2 = 0; ib2 < app.arrayEntireList.length; ib2++) { 							//if a watershed is passed, determine the correspoinding watersheds
 					if (app.Basin_ID == app.arrayEntireList[ib2][2]) {
@@ -314,11 +326,12 @@ define([
 			}
 
 			var arrayNavListBasin = [["Upper Missouri Headwaters", "UMH"],
-									["Upper Yellowstone/Shields", "UY_Shields"]//,
-									//["Musselshell", "Musselshell"],
-									//["Blackfoot-Sun", "Blackfoot-Sun"],
-									//["Bighorn", "Bighorn"],
-									//["Boulder and East Boulder", "Boulder and East Boulder"]
+									["Upper Yellowstone/Shields", "UY_Shields"],
+									["Musselshell", "Musselshell"],
+									["Blackfoot-Sun", "Blackfoot-Sun"],
+									["Bighorn", "Bighorn"],
+									["Boulder and East Boulder", "Boulder and East Boulder"],
+									["All", "all"]
 			];
 
 			var strURLPrefix = "index.html?H2O_ID=";
@@ -436,8 +449,8 @@ define([
 
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
             //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
-			app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";
-			//app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/RCT_beta_Spring2021/FeatureServer/";
+			app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";  //PRODUCTION
+			//app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/RCT_beta_Spring2021/FeatureServer/";  //Melissa dev
 			//app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/Temp_RCT/FeatureServer/"
 			
 			this.GetSetHeaderWarningContent(app.strHFL_URL + "12", app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
