@@ -285,11 +285,12 @@ define([
 				["Sun", "Sun", "Blackfoot-Sun"], ["Lower Musselshell", "Lower Musselshell", "Musselshell"],
 				["Lower Bighorn", "Lower Bighorn", "Bighorn"], ["Little Bighorn", "Little Bighorn", "Bighorn"],
 				["Flatwillow", "Flatwillow", "Musselshell"], ["Shoshone", "Shoshone", "Bighorn"],
-				["Box Elder", "Box Elder", "Musselshell"], ["Blackfoot", "Blackfoot", "Blackfoot-Sun"],
+				//["Box Elder", "Box Elder", "Musselshell"],
+				["Blackfoot", "Blackfoot", "Blackfoot-Sun"],
 				["Little Wind", "Little Wind", "Bighorn"], ["Lower Wind", "Lower Wind", "Bighorn"],
-				["North Fork Shoshone", "North Fork Shoshone", "Bighorn"], ["Big Horn Lake", "Big Horn Lake", "Bighorn"],
+				["North Fork Shoshone", "North Fork Shoshone", "Bighorn"], ["Bighorn Lake", "Bighorn Lake", "Bighorn"],
 				["South Fork Shoshone", "South Fork Shoshone", "Bighorn"], ["Upper Wind", "Upper Wind", "Bighorn"],
-				["Greybull", "Greybull", "Bighorn"], ["Dry", "Dry", "Bighorn"],
+				//["Greybull", "Greybull", "Bighorn"], ["Dry", "Dry", "Bighorn"],
 				["Upper Bighorn", "Upper Bighorn", "Bighorn"], ["Upper Musselshell", "Upper Musselshell", "Musselshell"],
 				["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
 				["City of Choteau - Teton River", "Blackfoot-Sun"]
@@ -447,13 +448,11 @@ define([
                 ulist.appendChild(newItem);
             }
 
-            //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMHW/FeatureServer/";
-            //app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/Main_Map/FeatureServer/";
-			app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";  //PRODUCTION
+			//app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";  //PRODUCTION OLD
+			app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_Support/FeatureServer/";  //PRODUCTION
 			//app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/RCT_beta_Spring2021/FeatureServer/";  //Melissa dev
-			//app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/Temp_RCT/FeatureServer/"
 			
-			this.GetSetHeaderWarningContent(app.strHFL_URL + "12", app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
+			this.GetSetHeaderWarningContent(app.strHFL_URL + "11", app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
         },
 
         Phase2: function () {
@@ -640,9 +639,13 @@ define([
             var templateCZM = new InfoTemplate();
             templateCZM.setTitle("<b>Channel Migration Zone</b>");
             templateCZM.setContent("CMZ: ${CMZ}<br>Reach ID: ${RchID}");
-            var pCZMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "11",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateCZM, outFields: ['*'], visible: false });
+            //var pCZMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "11",
+            //                                            { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateCZM, outFields: ['*'], visible: false });
 
+			var pCZMFeatureLayer = new esri.layers.FeatureLayer("https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_CMZ/FeatureServer/" + "0",
+				{ mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateCZM, outFields: ['*'], visible: false });
+
+			
 
 
             var templateFWPAISAccess = new InfoTemplate();
@@ -751,7 +754,9 @@ define([
             var plabels1 = new LabelLayer({ id: "labels1" });
             plabels1.addFeatureLayer(pWatershedsFeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
 
-            var strlabelField3 = "SectionID";
+			var strlabelField3 = "SectionID";
+			//var strlabelField3 = "SectionName";
+			
             var sampleLabel = new TextSymbol().setColor(
               new Color([0, 0, 128])).setAlign(Font.ALIGN_START).setAngle(45).setFont(new Font("10pt").setWeight(Font.WEIGHT_BOLD).setFamily("arial"));
 
@@ -763,8 +768,9 @@ define([
             app.pSup.m_pRiverSymbolsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "10",
                                                         { mode: esri.layers.FeatureLayer.MODE_ONDEMAND,  visible: true });
             // Use CORS
-            esriConfig.defaults.io.corsEnabledServers.push("docs.google.com"); // supports CORS
-
+			esriConfig.defaults.io.corsEnabledServers.push("docs.google.com"); // supports CORS
+			esriConfig.defaults.io.corsEnabledServers.push("gis.dnrc.mt.gov"); // supports CORS
+			
             var pMonitoringCSVLayer = new CSVLayer("https://docs.google.com/spreadsheets/d/e/2PACX-1vTw0rCwCLxDg2jCLLCscILrMDMGBbInS1KmwH76CPyqVYqFolKdOfw0J4DIaJhWoPDPkwVNQI_Y7OeX/pub?output=csv", {
                 visible:false
             });
@@ -965,21 +971,65 @@ define([
                 },
             };
 
+			var iMapOrientation = app.map.width / app.map.height;
+			app.dblExpandNum = 0.5;
 
-            if (typeof app.H2O_ID != 'undefined') {
-                var iMapOrientation = app.map.width / app.map.height;
-                
-                app.dblExpandNum = 0.5;
-				if ((iMapOrientation > 1.5) & ((app.H2O_ID == "Madison") | (app.H2O_ID == "Boulder") | (app.H2O_ID == "Ruby") | (app.H2O_ID == "Upper Gallatin") | (app.H2O_ID == "Lower Gallatin"))) {
+			if (typeof app.H2O_ID != 'undefined') {
+				if ((iMapOrientation > 1.5) & ((app.H2O_ID == "Madison") |
+					(app.H2O_ID == "Boulder") |
+					(app.H2O_ID == "Ruby") |
+					(app.H2O_ID == "Sun") |
+					(app.H2O_ID == "Blackfoot") |
+					(app.H2O_ID == "Lower Bighorn") |
+					(app.H2O_ID == "Little Bighorn") |
+					(app.H2O_ID == "Little Wind") |
+					(app.H2O_ID == "Lower Wind") |
+					(app.H2O_ID == "Shoshone") |
+					(app.H2O_ID == "North Fork Shoshone") |
+					(app.H2O_ID == "South Fork Shoshone") |
+					(app.H2O_ID == "Bighorn Lake") |
+					(app.H2O_ID == "Upper Wind") |
+					(app.H2O_ID == "Upper Bighorn") |
+					(app.H2O_ID == "Upper Gallatin") |
+					(app.H2O_ID == "Lower Gallatin"))) {
                     app.dblExpandNum = 1;
-				} else if ((app.H2O_ID == "Broadwater") | (app.H2O_ID == "Boulder"))  {
+				} else if ((app.H2O_ID == "Broadwater") |
+					(app.H2O_ID == "Sun") |
+					(app.H2O_ID == "Blackfoot") |
+					(app.H2O_ID == "Shields") |
+					(app.H2O_ID == "Little Bighorn") |
+					(app.H2O_ID == "Little Wind") |
+					(app.H2O_ID == "Lower Wind") |
+					(app.H2O_ID == "Shoshone") |
+					(app.H2O_ID == "North Fork Shoshone") |
+					(app.H2O_ID == "South Fork Shoshone") |
+					(app.H2O_ID == "Bighorn Lake") |
+					(app.H2O_ID == "Upper Wind") |
+					(app.H2O_ID == "Lower Bighorn") |
+					(app.H2O_ID == "Upper Bighorn") |
+					(app.H2O_ID == "Boulder")) {
                     app.dblExpandNum = 1;
                 }
 
                 app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer, "OBJECTID");
             } else {
-                app.dblExpandNum = 0.5;
-                app.pZoom.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer, "FID");
+				if (typeof app.Basin_ID != 'undefined') {
+					if ((iMapOrientation > 1.5) & ((app.Basin_ID == "Musselshell") |
+						(app.Basin_ID == "Blackfoot-Sun") |
+						(app.Basin_ID == "Boulder and East Boulder") |
+						(app.Basin_ID == "Bighorn"))) {
+						app.dblExpandNum = 1;
+					} else if ((app.Basin_ID == "Musselshell") |
+						(app.Basin_ID == "Blackfoot-Sun") |
+						(app.Basin_ID == "Boulder and East Boulder") |
+						(app.Basin_ID == "Bighorn")) {
+						app.dblExpandNum = 1;
+					}
+
+					app.pZoom.qry_Zoom2FeatureLayerExtent(pWatershedsFeatureLayer, "OBJECTID");
+				} else {
+					app.pZoom.qry_Zoom2FeatureLayerExtent(pBasinsFeatureLayer, "FID");
+				}
             }
 
             function err(err) {

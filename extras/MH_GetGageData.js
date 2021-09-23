@@ -410,12 +410,15 @@ define([
                     if (app.pGage.m_arrray_StationIDsTMP.length == 1) {
                         blnSingleCharting = true;
                         var iTMPTarget1 = app.pGage.m_arrray_Detail4ChartTMP[0].TMPTarget1;
-                        if (!(isNaN(iTMPTarget1))) {
-                            iTMPTarget1 = Number(iTMPTarget1)
-                            if (iTMPTarget1 != 0) {
-                                iChart_TMP_ColumnNames.push(iTMPTarget1.toString() + "Consv. Target");
-                            }
-                        }
+
+						if (iTMPTarget1 != undefined) {
+							if (!(isNaN(iTMPTarget1))) {
+								iTMPTarget1 = Number(iTMPTarget1)
+								if (iTMPTarget1 != 0) {
+									iChart_TMP_ColumnNames.push(iTMPTarget1.toString() + "Consv. Target");
+								}
+							}
+						}
                     }
                 }
 
@@ -446,7 +449,7 @@ define([
                             arrayPrelimData_2.push(iVal2Chart);
 
                             if (blnSingleCharting) {
-                                if (iTMPTarget1 != 0) {
+                                if (iTMPTarget1 != undefined) {
                                     arrayPrelimData_2.push(iTMPTarget1); 
                                 }
                             }
@@ -799,6 +802,10 @@ define([
             //  var strURL = "https://nwis.waterdata.usgs.gov/nwis/dvstat?&site_no=" + strSiteID + "&agency_cd=USGS&por_" + strSiteID + "_80888=65063,00060,80888,1893-10-01,2017-10-29&stat_cds=mean_va&format=rdb";
 
 			var strURL = strDailyStat_URL;
+			if (strAgency == "MTDNRC") {
+				strURL = "";
+			}
+
 			console.log("retreiving historical information");
 
             $.get(strURL)   //http://api.jquery.com/jquery.getjson/
@@ -1027,7 +1034,8 @@ define([
 			app.map.hideZoomSlider();
 
 			var strURLGagePrefix = "https://gis.dnrc.mt.gov/arcgis/rest/services/WRD/WMB_StAGE/MapServer/3/query";
-			strURLGagePrefix += "?outFields=*&returnGeometry=false&f=json&where=SensorLabel+in+%28%27discharge%27%2C%27water+temp%27%29+and+LocationID+%3D+";
+			strURLGagePrefix += "?outFields=*&returnGeometry=false&f=json&where=SensorLabel+in+%28%27discharge%27%2C%27water+temp%27%29+and+LocationID+in+";
+			//strURLGagePrefix += "?outFields=*&returnGeometry=false&f=json&where=SensorLabel+in+%28%27discharge%27%2C%27water+temp%27%29+and+LocationID+%3D+";
 
 			var arrayProc2 = [];
 			var arraySiteIDsDNRC = [];
@@ -1128,7 +1136,11 @@ define([
 			}
 	
 			if ((app.pGage.m_arrayDNRC_Sens_Loc == null) | !(blnIsInitialPageLoad)) {  //clear out the symbology and charting
-				m_arrayOIDYellow = m_arrayOIDsRed = m_arrayOIDsPlum = m_arrayOIDsOrange = m_arrayOIDsGold = [];
+				m_arrayOIDYellow = [];
+				m_arrayOIDsRed = [];
+				m_arrayOIDsPlum = [];
+				m_arrayOIDsOrange = [];
+				m_arrayOIDsGold = [];
 				app.pGage.m_arrray_Detail4ChartCFS = [];
 				app.pGage.m_arrray_Detail4ChartTMP = [];
 			}
@@ -1365,6 +1377,7 @@ define([
                                     iLateFlowClosureValueFlow = itemSectionRefined[5];
                                     iTempClosureValue = itemSectionRefined[6];
 
+								
                                     if (blnIsInitialPageLoad) {
                                         if (app.test) {
                                             if (iLateFlowPref4ConsvValue == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1387,12 +1400,13 @@ define([
                                             if (iLateFlowClosureValueFlow == 9999) {  // this is for testing only!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                 iLateFlowClosureValueFlow = 0;
                                             }
-                                        }
+										}
 
                                     var strSiteFlowStatus = "OPEN" //OPEN, PREPARE FOR CONSERVATION, CONSERVATION, RIVER CLOSURE (CLOSED TO FISHING)
                                     var strSiteTempStatus = "OPEN" //OPEN, HOOT-OWL FISHING RESTRICTIONS CRITERIA, RIVER CLOSURE (CLOSED TO FISHING) CRITERIA
-                                    iTempClosureValueCelsius = (iTempClosureValue -32) * (5 / 9);
 
+									//iTempClosureValueCelsius = (iTempClosureValue - 32) * (5 / 9);
+	
 									if (arrayDNRC_Sens_Loc == null) {
 										strHyperlinkURL = strURLGagePrefix + "&sites=" + strSiteID;        //siteID
 										strHyperlinkURL = returnURL4GSgage(strHyperlinkURL);
@@ -1506,8 +1520,10 @@ define([
                                         obj["time"]= dteDateTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false});
 										obj["TMP"] = iTempValue;
 										//obj["TMP"] = Math.round(parseFloat(item22.value) * 9 / 5 + 32);
-                                        obj["gagedatetime"]= dteDateTime;
-                                        obj["TMPTarget1"]= iTMPTarget1;  //this are only used in single charting situations
+										obj["gagedatetime"] = dteDateTime;
+										if (iTMPTarget1 != 0) {
+											obj["TMPTarget1"] = iTMPTarget1;  //this are only used in single charting situations
+										}
                                         app.pGage.m_arrray_Detail4ChartTMP.push(obj);//populate the array that contains the data for charting
                                         obj["EPOCH"]= Date.parse(dteDateTime);
                                         arrray_Detail4InterpolationTMP.push(obj);  //populate the array that is used to determing the flow trent
@@ -1556,7 +1572,7 @@ define([
                                         strSiteFlowStatus = "CONSERVATION";
                                 }
                                 if (dblLatestCFS <= iLateFlowClosureValueFlow) {
-                                        strSiteFlowStatus = "UNOFFICIAL RIVER CLOSURE";
+                                        strSiteFlowStatus = "EXPANDED CONSERVATION MEASURES";
                                 }
                             }
 
@@ -1569,8 +1585,8 @@ define([
                                 dblLatestTMP = "*Not collected"
                                 strNoDataLabel4ChartingTMP = " (No Data)";
                                 dteLatestDateTimeTMP = new Date();
-                            } else if (dblLatestTMP > iTempClosureValue) {
-                                strSiteTempStatus = "UNOFFICIAL RIVER CLOSURE";
+							} else if ((dblLatestTMP > iTempClosureValue) & ( iTempClosureValue != 0)) {
+                                strSiteTempStatus = "EXPANDED CONSERVATION MEASURES";
                             }
 
                             if (itemSectionRefined[1]== null) {  //if no gage id then hardcode 
@@ -1697,13 +1713,13 @@ define([
                 m_arrayOIDsGold.push(iOID);
             }
 
-            if (strSiteFlowStatus == "UNOFFICIAL RIVER CLOSURE") {
-                strOverallStatus = "UNOFFICIAL RIVER CLOSURE";
+            if (strSiteFlowStatus == "EXPANDED CONSERVATION MEASURES") {
+                strOverallStatus = "EXPANDED CONSERVATION MEASURES";
                 strOverallSymbol = "Orange";
                 m_arrayOIDsOrange.push(iOID);
             }
 
-            if (strSiteTempStatus == "UNOFFICIAL RIVER CLOSURE") {
+            if (strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") {
                 strOverallStatus = "PREPARE FOR HOOT-OWL FISHING RESTRICTIONS";
                 strOverallSymbol = "Plum";
                 m_arrayOIDsPlum.push(iOID);
@@ -1718,7 +1734,6 @@ define([
 
             return [strOverallStatus, strOverallSymbol];
         },
-
 
         err: function (err) {
 			console.log("Failed to get results 1 due to an error: ");
