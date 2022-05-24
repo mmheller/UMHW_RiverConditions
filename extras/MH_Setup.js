@@ -289,7 +289,7 @@ define([
 				//["Greybull", "Greybull", "Bighorn"], ["Dry", "Dry", "Bighorn"],
 				["Upper Bighorn", "Upper Bighorn", "Bighorn"], ["Upper Musselshell", "Upper Musselshell", "Musselshell"],
 				["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
-                ["City of Choteau - Teton River", "City of Choteau - Teton River", "Blackfoot-Sun"],
+                /*["City of Choteau - Teton River", "City of Choteau - Teton River", "Blackfoot-Sun"],*/
                 ["North Fork Flathead", "North Fork Flathead", "test"],
                 ["Swan", "Swan", "test"],
                 ["Bitterroot", "Bitterroot", "test"],
@@ -298,7 +298,8 @@ define([
                 ["Middle Fork Flathead", "Middle Fork Flathead", "test"],
                 ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone", "test"],
                 ["South Fork Flathead", "South Fork Flathead", "test"],
-                ["Sweet Grass Creek", "Sweet Grass Creek", "test"]
+                ["Sweet Grass Creek", "Sweet Grass Creek", "test"],
+                ["Stillwater", "Stillwater", "test"]
 
             ];
 
