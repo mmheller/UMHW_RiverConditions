@@ -15,8 +15,9 @@
 //Explore drilldown examples https://js.devexpress.com/Demos/WidgetsGallery/Demo/Charts/ChartsDrillDown/Knockout/Light/
 
 define([
-        "esri/tasks/QueryTask",
-	"esri/tasks/query",
+	"esri/rest/query",
+	"esri/rest/support/Query",
+	"esri/core/Error",
 	"esri/geometry/geometryEngine",
   "dojo/_base/declare",
   "dojo/_base/lang",
@@ -30,7 +31,7 @@ define([
   "dojo/on",
 
 ], function (
-		QueryTask, Query, geometryEngine, declare, lang, esriRequest, all, All, request, dom, domClass, registry, on
+	query, Query, Error, geometryEngine, declare, lang, esriRequest, all, All, request, dom, domClass, registry, on
 ) {
 
 		return declare([], {
@@ -42,15 +43,32 @@ define([
 			Start: function (sectionGeometries, streamSectionArrray) {
 				console.log("Get warn Start");
 				this.m_streamSectionArrray = streamSectionArrray;
-				var pQuery = new Query();
-				var queryTask = new QueryTask(app.strFWPURL);
-				pQuery.where = app.strFWPQuery;
-				pQuery.returnGeometry = true;
-				pQuery.outFields = ["*"];
-				pQuery.outSpatialReference = { "wkid": 102100 };
-				pQuery.geometry = sectionGeometries;
-				pQuery.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
-				queryTask.execute(pQuery, this.GetFWPWarnResults1, this.GetFWPWarnResultsError1);
+
+				let queryObject = new Query();
+				queryObject.where = app.strFWPQuery;
+				queryObject.outSpatialReference = { wkid: 102100 };
+				queryObject.returnGeometry = true;
+				queryObject.outFields = ["*"];
+				queryObject.geometry = sectionGeometries;
+				queryObject.spatialRelationship = "intersects";  // this is the default
+
+				query.executeQueryJSON(app.strFWPURL, queryObject).then(function (results) {
+					this.m_FWPWarnFeatures = results.features;
+					var resultCount = this.m_FWPWarnFeatures.length;
+					if (resultCount > 0) {
+						var pFeature = results.features[this.app.pGetWarn.m_StepThruCounter];
+						this.app.pGetWarn.FindSectionsOverlappingFWPWarnFeatures2(pFeature.geometry);
+						var x = document.getElementById("divFWPAlert");
+						if (x.style.visibility === "hidden") {
+							x.style.visibility = 'visible';
+						}
+					} else {
+						this.app.pGage.SectionsReceived(app.pGetWarn.m_streamSectionArrray, "", "", "", "", false, null);  //if an error go continue with getting seciton detail and display
+						this.app.pGetWarn.ClearVars();
+					}
+				}).catch(function (error) {
+					console.log("informative error message at 'Get warn Start': ", error.message);
+				});;
 			},
 
 			ClearVars: function () {
@@ -85,7 +103,8 @@ define([
 			FindSectionsOverlappingFWPWarnFeatures2: function (pFeature) {
 				console.log("FindSectionsOverlappingFWPWarnFeatures2")
 				var pQuery = new Query();
-				var queryTask = new QueryTask(app.strHFL_URL + "5");
+				//var queryTask = new QueryTask(app.strHFL_URL + "5");
+				var queryTask = new QueryTask(app.strHFL_URL + app.idx11[5]);
 				pQuery.returnGeometry = true;
 				pQuery.outFields = ["StreamName", "SectionID"];
 				pQuery.outSpatialReference = { "wkid": 102100 };

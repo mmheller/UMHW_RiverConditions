@@ -1,18 +1,8 @@
 ﻿/* Move down content because we have a fixed navbar that is 50px tall */
 body {
-	/*padding-top: 650px;*/
-	/*padding-top: 350px;*/
 	padding-top: 60px !important;
 	padding-bottom: 5px;
 }
-
-/*.alignright {
-	float: left;
-	width: 33.33333%;
-	text-align: right;
-}*/
-
-​
 
 span.logo_helper {
 	display: inline-block;
@@ -33,7 +23,6 @@ logo_container {
 	display: inline-block;
 	float: none;
 	height: 70px !important;
-	/*max-height: 56px !important;*/
 	padding-top: 10px !important;
 	margin-bottom: 0;
 	vertical-align: middle !important;
@@ -51,7 +40,6 @@ logo_container {
 {
     display:inline;
 }
-
 
 h3 {
     padding: 5px !important;
@@ -81,27 +69,20 @@ a:link[role="presentation"],a:visited[role="presentation"] {
         background: #eee !important;
     }
 
-#mapDiv { /* Set the responsive map size here */
-    min-height: 80px !important;
+#mapDiv {  /*Set the responsive map size here*/ 
+    min-height: 300px !important;
     max-height: 600px !important;
 }
 
-.esriScalebarLabel {
-    font-size: 11px !important;
-    font-style: normal !important;
-    color: #404040 !important;
+.esri-scale-bar__label {
+	font-size: 11px !important;
+	font-style: normal !important;
+	color: #404040 !important;
 }
-
-.esriBasemapGalleryThumbnail {
-    height: 40px !important;
-    width: 40px !important;
-}
-
 
 .clsSectionDetailCFSTEMP_WARN {
     background-color: lightpink;
     color: red;
-    /*margin: 20px;*/
     padding: 10px;
 }
 
@@ -113,63 +94,57 @@ a:link[role="presentation"],a:visited[role="presentation"] {
 .clsSectionDetailCFSTEMP {
     background-color: #004876;
     color: white;
-    /*margin: 20px;*/
     padding: 10px;
 }
 
 .clsSectionDetailCFSTEMP_Alt {
     background-color: white;
     color: black;
-    /*margin: 20px;*/
     padding: 10px;
 }
 
 
-
-/*.esriBasemapGalleryThumbnail {
-    height: 40px;
-    width: 40px;
-}*/
-
-/*.esriBasemapGalleryNode {
-    width: 40px;
-}*/
-
-.esriBasemapGalleryNode {
-    width: 40px !important;
+.esri-basemap-gallery__item-container {
+	width: 100% !important;
+	display: flex !important;
+	justify-content: end !important;
+	flex-flow: wrap;
 }
 
-.esriLegendService { /*between GIS layers*/
-    padding-bottom: 5px !important;
+.esri-basemap-gallery__item-thumbnail {
+	width: 40px !important;
+	height: 40px !important;
 }
 
-.esriLegendServiceLabel {
-    font-weight: bold !important;
+.esri-basemap-gallery__item {
+	width: 40px;
+	margin: 5px;
+	padding: 1px;
 }
 
-.esriLegendLayerLabel {
-    padding-top: 15px !important;
+.esri-basemap-gallery__item-title {
+	font-family: Arial !important;
+	font-size: 10px;
+	display:none;
 }
 
-.esriLegendLayer tr { /*the div with all the symbols*/
-    float: left !important;
-    white-space: nowrap !important;
-    border: none !important;
-    border-width: 0px 0 !important;
-    padding-right: 10px;
+.esri-legend__service { /*between GIS layers*/
+	padding: 5px !important;
 }
 
-.esriLegendLayer {
-    background-color: #BBD1E8 !important;
+.esri-widget__heading esri-legend__service-label {
+	font-weight: bold !important;
+	padding-top: 15px !important;
 }
 
-    .esriLegendLayer tbody { /*the table with all the symbols for a GIS layer*/
-        height: 80% !important;
-        overflow: hidden !important;
-    }
 
-
-
+.esri-legend__layer-row { /*the div with all the symbols*/
+	float: left !important;
+	white-space: nowrap !important;
+	border: none !important;
+	border-width: 0px 0 !important;
+	padding-right: 10px;
+}
 
 /* The container must be positioned relative: */
 .custom-select {
@@ -230,3 +205,52 @@ a:link[role="presentation"],a:visited[role="presentation"] {
 .select-items div:hover, .same-as-selected {
 	background-color: rgba(0, 0, 0, 0.1);
 }
+
+
+.esri-legend__layer-caption {
+	display: none;
+}
+
+
+.liveExample {
+	padding: 1em;
+	background-color: #EEEEDD;
+	border: 1px solid #CCC;
+}
+
+	.liveExample input {
+		font-family: Arial;
+	}
+
+	.liveExample b {
+		font-weight: bold;
+	}
+
+	.liveExample p {
+		margin-top: 0.9em;
+		margin-bottom: 0.9em;
+	}
+
+	.liveExample select[multiple] {
+		width: 100%;
+		height: 8em;
+	}
+
+	.liveExample h2 {
+		margin-top: 0.4em;
+	}
+
+.ko-grid {
+	margin-bottom: 1em;
+	width: 100%;
+	border: 1px solid silver;
+	background-color: White;
+}
+
+
+/*.dropdown-menu,
+.dropdown-menu ul {
+	list-style: none !important;
+	background-color: red !important;
+	list-style-type: none !important;
+}*/

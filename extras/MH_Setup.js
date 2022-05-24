@@ -1,8 +1,17 @@
 ﻿
 function showLoading() {
-    esri.show(app.loading);
-    app.map.disableMapNavigation();
-    app.map.hideZoomSlider();
+    //esri.show(app.loading);
+    //app.map.disableMapNavigation();
+    //app.map.hideZoomSlider();
+    $("#loadingImg").show();
+}
+
+function getPageWidth() {
+    var body = document.body,
+        html = document.documentElement;
+    var width = Math.max(body.scrollWidth, body.offsetWidth,
+        html.clientWidth, html.scrollWidth, html.offsetWidth);
+    return width;
 }
 
 function closeAllSelect(elmnt) {
@@ -28,9 +37,10 @@ function closeAllSelect(elmnt) {
 }
 
 function hideLoading(error) {
-    esri.hide(app.loading);
-    app.map.enableMapNavigation();
-    app.map.showZoomSlider();
+    //esri.hide(app.loading);
+    //app.map.enableMapNavigation();
+    //app.map.showZoomSlider();
+    $("#loadingImg").hide();
 }
 
 function getTokens() {
@@ -48,59 +58,21 @@ function getTokens() {
 }
 
 define([
-    "esri/symbols/Font",
-    "extras/MH_Zoom2FeatureLayers",
-    "esri/dijit/BasemapGallery",
-    "esri/layers/CSVLayer",
-    "esri/renderers/UniqueValueRenderer",
-    "esri/geometry/webMercatorUtils",
-    "dojo/_base/declare",
-    "dojo/_base/lang",
-    "esri/request",
-    "dojo/promise/all",
-    "esri/urlUtils",
-    "esri/layers/FeatureLayer",
-            "esri/tasks/QueryTask",
-    "esri/tasks/query",
-    "dojo/promise/all",
-    "esri/dijit/Scalebar",
-    "dojo/sniff",
-    "esri/geometry/scaleUtils", "esri/request", "dojo/_base/array", "esri/graphic",
-    "esri/dijit/editing/Editor-all",
-    "esri/SnappingManager",
-    "esri/layers/FeatureLayer",
-    "esri/renderers/SimpleRenderer",
-    "esri/symbols/SimpleMarkerSymbol",
-    "esri/symbols/SimpleFillSymbol",
-    "esri/symbols/SimpleLineSymbol",
-    "dijit/form/CheckBox",
-   "esri/dijit/Legend",
-    "dijit/Toolbar",
-      "esri/Color",
-        "esri/layers/LabelLayer",
-  "esri/symbols/TextSymbol",
-    "esri/geometry/Polygon", "esri/InfoTemplate",
-    "dojo/dom",
-    "dojo/dom-class",
-    "dijit/registry",
-    "dojo/mouse",
-    "dojo/on",
-    "esri/map",
-        "esri/dijit/InfoWindowLite",
-        "esri/InfoTemplate",
-        "esri/layers/FeatureLayer",
-        "dojo/dom-construct","application/bootstrapmap",
-        "dojo/domReady!"
+    "esri/config", "esri/Map", "esri/views/MapView", "dojo/_base/declare",
+    "esri/rest/support/Query", "esri/tasks/QueryTask", "esri/rest/geometryService",
+    "esri/geometry/support/webMercatorUtils",
+    "esri/widgets/BasemapGallery", "esri/widgets/BasemapGallery/support/PortalBasemapsSource", "esri/widgets/ScaleBar", "dojo",
+    "esri/PopupTemplate", "esri/layers/FeatureLayer", "esri/Color", "esri/renderers/SimpleRenderer", "esri/layers/CSVLayer",
+    "extras/MH_Zoom2FeatureLayers", "esri/renderers/UniqueValueRenderer",
+    "esri/widgets/Legend", "esri/widgets/Locate", "esri/layers/GraphicsLayer",
+    "esri/core/watchUtils",
+    "dojo/dom", "dojo/dom-style",
 ], function (
-            Font, MH_Zoom2FeatureLayers, BasemapGallery, CSVLayer, UniqueValueRenderer, webMercatorUtils, declare, lang, esriRequest, all, urlUtils, FeatureLayer, QueryTask, Query, All,
-            Scalebar, sniff, scaleUtils, request, arrayUtils, Graphic, Editorall, SnappingManager, FeatureLayer,
-        SimpleRenderer, SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
-        CheckBox, Legend, Toolbar, Color, LabelLayer, TextSymbol, Polygon, InfoTemplate, dom, domClass, registry, mouse, on, Map,
-          InfoWindowLite,
-          InfoTemplate,
-          FeatureLayer,
-          domConstruct,
-          BootstrapMap
+    esriConfig, Map, MapView, declare, Query, QueryTask, geometryService,
+    webMercatorUtils, BasemapGallery, PortalSource, ScaleBar, dojo,
+    PopupTemplate, FeatureLayer, Color,
+    SimpleRenderer, CSVLayer,
+    MH_Zoom2FeatureLayers, UniqueValueRenderer, Legend, Locate, GraphicsLayer, watchUtils, dom, domStyle
 ) {
 
     return declare([], {
@@ -108,55 +80,79 @@ define([
         m_StreamStatusRenderer: null,
 
         addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDPlum, arrayOIDsRed) {
-            var defaultSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 169, 230]), 5);
-            app.pSup.m_StreamStatusRenderer = new UniqueValueRenderer(defaultSymbol, "OBJECTID");//create renderer
-            app.pSup.m_StreamStatusRenderer.defaultLabel = "Stream Section (Open)";
+            console.log("add Stream Condition FeatureLayer")
+            let defaultUniqueSymbolRenderer = {
+                type: "unique-value",  // autocasts as new UniqueValueRenderer()
+                /*field: "OBJECTID",*/
+                valueExpression: 'When(${OBJECTID} == 36, 1111)',
+                defaultSymbol: {
+                    type: "simple-line", color: [0, 169, 230], width: 1
+                    /*, style: "short-dot"*/
+                }  // autocasts as new SimplelineSymbol()
+                
+            };
 
-            for (var i = 0; i < arrayOIDYellow.length; i++) {
-                app.pSup.m_StreamStatusRenderer.addValue({
-                    value: arrayOIDYellow[i],
-                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 255, 0]), 18),
-                    label: "Prepare"
-                });
-            }
+            app.pSup.m_StreamStatusRenderer = defaultUniqueSymbolRenderer;
+            app.pSup.m_StreamStatusRenderer.defaultLabel = "Stream Section (Open)";
+          
+            let ArrayUniqueVals2Add = []
+
+            //for (var i = 0; i < arrayOIDYellow.length; i++) {
+            //    ArrayUniqueVals2Add.push({
+            //        value: arrayOIDYellow[i],
+            //        symbol: {type: "simple-line", color: [255, 255, 0], width: 18},
+            //        label: "Prepare"
+            //    });
+            //}
+
+            ArrayUniqueVals2Add.push({
+                value: 1111,
+                symbol: { type: "simple-line", color: [255, 255, 0], width: 18 },
+                label: "Prepare"
+            });
+
             for (var ii = 0; ii < arrayOIDsGold.length; ii++) {
-                app.pSup.m_StreamStatusRenderer.addValue({
+                ArrayUniqueVals2Add.push({
                     value: arrayOIDsGold[ii],
-                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([249, 166, 2]), 18),
+                    symbol: { type: "simple-line", color: [249, 166, 2], width: 18 },
                     label: "Conservation Actions"
                 });
             }
             for (var iii = 0; iii < arrayOIDsOrange.length; iii++) {
-                app.pSup.m_StreamStatusRenderer.addValue({
+                ArrayUniqueVals2Add.push({
                     value: arrayOIDsOrange[iii],
-                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([253, 106, 2]), 18),
-                    label: "Unnoficial Closure"
+                    symbol: { type: "simple-line", color: [253, 106, 2], width: 18 },
+                    label: "Unofficial Closure"
                 });
             }
-            for (var iii = 0; iii < arrayOIDPlum.length; iii++) {
-                app.pSup.m_StreamStatusRenderer.addValue({
-                    value: arrayOIDPlum[iii],
-                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([221, 160, 221]), 18),
+            for (var iii2 = 0; iii2 < arrayOIDPlum.length; iii2++) {
+                ArrayUniqueVals2Add.push({
+                    value: arrayOIDPlum[iii2],
+                    symbol: { type: "simple-line", color: [221, 160, 221], width: 18 },
                     label: "Hoot Owl"
                 });
             }
             for (var iiii = 0; iiii < arrayOIDsRed.length; iiii++) {
-                app.pSup.m_StreamStatusRenderer.addValue({
+                ArrayUniqueVals2Add.push({
                     value: arrayOIDsRed[iiii],
-                    symbol: new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 18),
+                    symbol: { type: "simple-line", color: [255, 0, 0], width: 18 },
                     label: "Offical Restriction"
                 });
             }
 
-            var featureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", {
-                mode: FeatureLayer.MODE_ONDEMAND,
-                outFields: ["OBJECTID"]
+            if (ArrayUniqueVals2Add.length > 0) {  //getting an error when trying to use addUniqueValueInfo, I think due to the google chart api conflict, so using universal adding to an array then adding to the unique value renderer dictionary
+                app.pSup.m_StreamStatusRenderer["uniqueValueInfos"] = ArrayUniqueVals2Add;
+            }
+
+
+            //let featureLayer = new FeatureLayer({url: app.strHFL_URL + "5",
+            let featureLayer = new FeatureLayer({
+                url: app.strHFL_URL + app.idx11[5],
+                outFields: ["OBJECTID"],
+                renderer: app.pSup.m_StreamStatusRenderer
             });
-            featureLayer.setRenderer(app.pSup.m_StreamStatusRenderer);
-            //featureLayer.setRenderer(renderer);
-            app.map.addLayer(featureLayer);
-            app.map.reorderLayer(featureLayer, 5);
-        },
+            app.map.layers.add(featureLayer, 5);
+         },
 
         GetSetHeaderWarningContent: function (strAGSIndexTableURL, strH2OID, blnUseAlternateHeader, strBasinID) {
 			if ((typeof strH2OID == 'undefined') & (typeof strBasinID == 'undefined')) {
@@ -165,11 +161,13 @@ define([
 				strH2OID = strBasinID;
 			} 
             strURLFieldName = "URL";
-            var query = new Query();
+            let query = new Query();
             query.outFields = [strURLFieldName];
-            var queryTask = new QueryTask(strAGSIndexTableURL);
+            let queryTask = new QueryTask(strAGSIndexTableURL);
             query.where = "Name = '" + strH2OID + "'";
-            queryTask.execute(query, showHeaderWarningContentResults);
+            //queryTask.execute(query, showHeaderWarningContentResults);
+
+            queryTask.execute(query).then(showHeaderWarningContentResults);
 
 			function showHeaderWarningContentResults(results) {
 				console.log("showHeaderWarningContentResults");
@@ -194,11 +192,9 @@ define([
 								//strHeaderTxt = pEntries[0].gsx$headeralt.$t
 								strHeaderTxt = pEntries[2];
                             } else {
-								//strHeaderTxt = pEntries[0].gsx$header.$t
 								strHeaderTxt = pEntries[0];
                             }
 
-							//strAlertTxt = pEntries[0].gsx$customalert.$t
 							strAlertTxt = pEntries[1];
                             $("#divWatershedBasinInfoTop").html(strHeaderTxt);
                             $("#divCustomAlert").html(strAlertTxt);
@@ -211,66 +207,66 @@ define([
         },
 
         LayerCheckBoxSetup: function (cbxLayers) {
-            dojo.connect(app.map, 'onLayersAddResult', function (results) {            //add check boxes 
-				if (results !== 'undefined') {
-                    var des = document.getElementById('toggleLayers');
+            app.view.when(() => {
+                console.log("resources in the MapView have loaded"); // when the resources in the MapView have loaded.
+                var des = document.getElementById('toggleLayers');
 
-                    dojo.forEach(cbxLayers, function (playerset) {
-						var strLayerName = playerset.title;
-                        var clayer0 = playerset.layers[0];
-                        var clayer1 = playerset.layers[1];
-                        var pID0 = clayer0.id;
-                        var pID1 = clayer1.id;
+                dojo.forEach(cbxLayers, function (playerset) {
+                    var strLayerName = playerset.title;
+                    var clayer0 = playerset.layers[0];
+                    var clayer1 = playerset.layers[1];
+                    var pID0 = clayer0.id;
+                    var pID1 = clayer1.id;
 
-                        var blnCheckIt = false;  // determine if checkbox will be on/off
+                    var blnCheckIt = false;  // determine if checkbox will be on/off
+                    if (clayer0.visible) {
+                        blnCheckIt = true;
+                    }
+
+                    var checkboxHTML = document.createElement('input');
+                    checkboxHTML.type = "checkbox";
+                    checkboxHTML.name = strLayerName;
+                    checkboxHTML.value = [clayer0, clayer1];
+                    checkboxHTML.id = pID0 + pID1;
+                    checkboxHTML.checked = blnCheckIt;
+
+                    checkboxHTML.onchange = function (evt) {
                         if (clayer0.visible) {
-                            blnCheckIt = true;
+                            clayer0.visible = false;
+                            clayer1.visible = false;
+                        } else {
+                            clayer0.visible = true;
+                            clayer1.visible = true;
                         }
-                        
-                        var checkboxHTML = document.createElement('input');
-                        checkboxHTML.type = "checkbox";
-                        checkboxHTML.name = strLayerName;
-                        checkboxHTML.value = [clayer0, clayer1];
-                        checkboxHTML.id = pID0 + pID1;
-                        checkboxHTML.checked = blnCheckIt;
+                        this.checked = clayer0.visible;
+                    }
 
-                        //if (blnCheckIt) {
-                        //    checkboxHTML.setAttribute("checked");
-                        //}
-                        
-                        checkboxHTML.onchange = function (evt) {
-                            if (clayer0.visible) {
-                                clayer0.hide();
-                                clayer1.hide();
-                            } else {
-                                clayer0.show();
-                                clayer1.show();
-                            }
-                            this.checked = clayer0.visible;
-                        }
-                      
-                        var label = document.createElement('label')
-                        label.htmlFor = pID0 + pID1;
-                        label.appendChild(document.createTextNode(strLayerName));
+                    var label = document.createElement('label')
+                    label.htmlFor = pID0 + pID1;
+                    label.appendChild(document.createTextNode(strLayerName));
 
-                        des.appendChild(checkboxHTML);
-                        des.appendChild(document.createTextNode('\u00A0'))
-                        des.appendChild(label);
-						des.appendChild(document.createTextNode('\u00A0\u00A0\u00A0\u00A0'));
-                    });
-                }
+                    des.appendChild(checkboxHTML);
+                    des.appendChild(document.createTextNode('\u00A0'))
+                    des.appendChild(label);
+                    des.appendChild(document.createTextNode('\u00A0\u00A0\u00A0\u00A0'));
+                });
             });
         },
 
 		Phase1: function () {
-			app.H2O_ID = getTokens()['H2O_ID'];
+            console.log("MH_setup Phase1");
+
+            app.H2O_ID = getTokens()['H2O_ID'];
 			app.Basin_ID = getTokens()['Basin_ID'];
 
 			if (app.Basin_ID == "UY_Shields") {
 				app.Basin_ID = "Upper Yellowstone Headwaters";
 			}
 
-			console.log("MH_setup Phase1");
+            $("#dropDownId").append("<li><a data-value='MT Channel Migration Zones'>Channel Migration Zones</a></li>")
+            $("#dropDownId").append("<li><a data-value='FEMA Flood Layer Hazard Viewer'>FEMA Flood Layer Hazard Viewer</a></li>")
+            $("#dropDownId").append("<li><a data-value='GYE Aqiatic Invasives'>GYE Aqiatic Invasives</a></li>")
+            $("#dropDownId").append("<li><a data-value='Official MT FWP (closures, etc.)'>Official MT FWP (closures, etc.)</a></li>")
 
 			//array [watershed listed on website, watershed in layer, basin name in website]
 			app.arrayEntireList = [["Beaverhead/Centennial", "Beaverhead", "UMH"],
@@ -293,7 +289,17 @@ define([
 				//["Greybull", "Greybull", "Bighorn"], ["Dry", "Dry", "Bighorn"],
 				["Upper Bighorn", "Upper Bighorn", "Bighorn"], ["Upper Musselshell", "Upper Musselshell", "Musselshell"],
 				["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
-				["City of Choteau - Teton River", "Blackfoot-Sun"]
+                ["City of Choteau - Teton River", "City of Choteau - Teton River", "Blackfoot-Sun"],
+                ["North Fork Flathead", "North Fork Flathead", "test"],
+                ["Swan", "Swan", "test"],
+                ["Bitterroot", "Bitterroot", "test"],
+                ["Lower Flathead", "Lower Flathead", "test"],
+                ["South Fork Flathead", "South Fork Flathead", "test"],
+                ["Middle Fork Flathead", "Middle Fork Flathead", "test"],
+                ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone", "test"],
+                ["South Fork Flathead", "South Fork Flathead", "test"],
+                ["Sweet Grass Creek", "Sweet Grass Creek", "test"]
+
             ];
 
 			if ((app.H2O_ID == undefined) & (app.Basin_ID == undefined)) {
@@ -332,7 +338,8 @@ define([
 									["Blackfoot-Sun", "Blackfoot-Sun"],
 									["Bighorn", "Bighorn"],
 									["Boulder and East Boulder", "Boulder and East Boulder"],
-									["All", "all"]
+                                    ["All", "all"],
+                                    ["Bitter Root, CF of Y., Flathead", "test"]
 			];
 
 			var strURLPrefix = "index.html?H2O_ID=";
@@ -410,15 +417,11 @@ define([
 				});
 			}
 
-
-
 			if (getTokens()['UMHBanner'] != undefined) {
 				$('#UMH_NavBar2').show();
 				document.body.style.paddingTop = '130px';
 				UMH_NavBar1.style.paddingTop = '80px';
 			}
-
-
 
             app.test = false;
             var strTest = getTokens()['test'];
@@ -448,11 +451,14 @@ define([
                 ulist.appendChild(newItem);
             }
 
-			//app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/UMH2/FeatureServer/";  //PRODUCTION OLD
-			app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_Support/FeatureServer/";  //PRODUCTION
-			//app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/RCT_beta_Spring2021/FeatureServer/";  //Melissa dev
-			
-			this.GetSetHeaderWarningContent(app.strHFL_URL + "11", app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
+            
+			//app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_Support/FeatureServer/";  //PRODUCTION
+            //app.idx11 = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];  //PRODUCTION
+
+            app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/RCT_2022_Initial_Update/FeatureServer/";  //Melissa dev
+            app.idx11 = ["0", "1", "2", "3", "6", "9", "8", "10", "11", "12", "13", "15"];  //Melissa dev
+
+            this.GetSetHeaderWarningContent(app.strHFL_URL + app.idx11[11], app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
         },
 
         Phase2: function () {
@@ -465,87 +471,108 @@ define([
                 var izoomVal = 11;
             }
                         
-            esri.config.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
-            app.map = BootstrapMap.create("mapDiv", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false});// Get a reference to the ArcGIS Map class
-            
-            app.map.disableMapNavigation();
-            app.map.hideZoomSlider();
+            esriConfig.apiKey = "AAPK47ae32508072459cb3fa84646f0f3928F7dRMTNaroq-OYC7WBC-O1R3frCJVtlOtnnJ-hSUIKUXJPaglsAO9sQ4AxRYBPy_";
 
-            if (app.map.loaded) {
-                mapLoaded();
-            } else {
-                app.map.on("load", function () { mapLoaded(); });
-            }
-
-            var basemapGallery = new BasemapGallery({showArcGISBasemaps: true, map: app.map}, "basemapGallery");
-            basemapGallery.startup();
-            basemapGallery.on("error", function (msg) {
-                console.log("basemap gallery error:  ", msg);
-            });
-            basemapGallery.on("load", function () {
-                var tot = basemapGallery.basemaps.length;
-                for (var cnt = tot - 1; cnt >= 0; cnt--) {
-                    if (basemapGallery.basemaps[cnt].title === "Oceans" ||
-                        basemapGallery.basemaps[cnt].title === "Imagery" ||
-                        basemapGallery.basemaps[cnt].title === "Light Gray Canvas" ||
-                        basemapGallery.basemaps[cnt].title === "National Geographic" ||
-                        basemapGallery.basemaps[cnt].title === "USGS National Map" ||
-                        basemapGallery.basemaps[cnt].title === "Streets" ||
-                        basemapGallery.basemaps[cnt].title === "OpenStreetMap" ||
-                        basemapGallery.basemaps[cnt].title === "Terrain with Labels" ||
-                        basemapGallery.basemaps[cnt].title === "USA Topo Maps") {
-                        //console.log("Removing..." + basemapGallery.basemaps[cnt].title);
-                        basemapGallery.remove(basemapGallery.basemaps[cnt].id);
-                    }
+            app.map = new Map({ basemap: "arcgis-topographic" }); // Basemap layer
+            app.view = new MapView({  //app.map = BootstrapMap.create("mapDiv", { basemap: "topo", center: arrayCenterZoom, zoom: izoomVal, scrollWheelZoom: false});// Get a reference to the ArcGIS Map class
+                map: app.map,
+                center: arrayCenterZoom,
+                zoom: izoomVal, // scale: 72223.819286
+                container: "mapDiv",
+                constraints: {
+                    snapToZoom: false
                 }
             });
 
-            on(app.map, "layers-add-result", function(e) {
-              for (var i = 0; i < e.layers.length; i++) {
-                 var result = (e.layers[i].error == undefined) ? "OK": e.layers[i].error.message;
-                 //console.log(" - " +e.layers[i].layer.id + ": " +result);
-                 }
+            const locateBtn = new Locate({
+                view: app.view
+            });
+            app.view.ui.add(locateBtn, {
+                position: "top-left"
             });
 
-            var scalebar = new Scalebar({ map: app.map, scalebarUnit: "dual" }, dojo.byId("scaleDiv"));
+
+            let iPateWidth = getPageWidth();
+            domStyle.set("mapDiv", "height", iPateWidth - 100 + "px");
+
+            app.view.watch("widthBreakpoint", function (newVal) {
+                if (newVal === "xsmall") {
+                    console.log("resized", "");
+                }
+                if (newVal === "small") {
+                    console.log("resized", "");
+                }
+            });
+
+            app.view.when(function () {
+                mapLoaded();
+            })
+            
+            const allowedBasemapTitles = ["Imagery Hybrid", "Topographic", "Dark Gray Canvas"];
+            const source = new PortalSource({                // filtering portal basemaps
+                filterFunction: (basemap) => allowedBasemapTitles.indexOf(basemap.portalItem.title) > -1
+            });
+            const basemapGallery = new BasemapGallery({
+                showArcGISBasemaps: true,
+                view: app.view,
+                source: source
+            }, "basemapGallery");
+                        
+            let scaleBar = new ScaleBar({
+                view: app.view,
+                container: "scaleDiv",
+                unit: "dual"
+            });
             
             app.loading = dojo.byId("loadingImg");  //loading image. id
-            dojo.connect(app.map, "onUpdateStart", showLoading);
-            dojo.connect(app.map, "onUpdateEnd", hideLoading);
 
-            var template = new InfoTemplate();
-            template.setTitle("Stream Gage");
-            template.setContent("<b>${GageTitle}</b><br>Watershed:${Watershed}<br><a href=${GageURL} target='_blank'>Link to gage at ${Agency} website</a>");
-            var pGageFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "1", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: template, outFields: ['*'] });
+            app.view.watch('updating', function (evt) {
+                if (evt === true) {
+                    showLoading();
+                } else {
+                    hideLoading();
+                }
+            })
 
-            var templateEPOINT = new InfoTemplate();
-            templateEPOINT.setTitle("<b>Start/End Section Locations</b>");
-            templateEPOINT.setContent("Placename: ${Endpoint_Name}<br>Section: ${Start_End} of ${Section_Name}<br>Stream: ${Stream_Name}<br>");
-            pEPointsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "0", {
-                mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
-                infoTemplate: templateEPOINT,
-                outFields: ['*'],
-                minScale: 1000000
+            let template = new PopupTemplate();
+            template.title = "Gage (Watershed:{Watershed})";
+            template.content = "<b>{GageTitle}</b><br><a href={GageURL} target='_blank'>Link to gage at {Agency} website</a>";
+            //var pGageFeatureLayer = new FeatureLayer({ url: app.strHFL_URL + "1", popupTemplate: template });
+            var pGageFeatureLayer = new FeatureLayer({ url: app.strHFL_URL + app.idx11[1], popupTemplate: template });
+            
+
+            var templateEPOINT = new PopupTemplate();
+            templateEPOINT.title = "<b>Start/End Section Locations</b>";
+            templateEPOINT.content = "Placename:{Endpoint_Name}<br>Section:{Start_End} of {Section_Name}<br>Stream:{Stream_Name}<br>";
+
+            const EndPoints_labelClass = {// autocasts as new LabelClass()
+                symbol: {
+                    type: "text",  // autocasts as new TextSymbol()
+                    color: [255, 26, 238],
+                    font: {  // autocast as new Font()
+                        family: "arial",
+                        size: 9,
+                        weight: "bold"
+                    }
+                },
+                labelPlacement: "above-center",
+                labelExpressionInfo: {
+                    expression: "$feature.Start_End + ' of ' + $feature.Section_Name"
+                },
+                minScale: 600000
+            };
+
+            pEPointsFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "0",
+                url: app.strHFL_URL + app.idx11[0],
+                popupTemplate: templateEPOINT,
+                minScale: 1000000,
+                labelingInfo: [EndPoints_labelClass]
             });
-
-            var vMagentaColor = new Color("#E11AEE");              // create a text symbol to define the style of labels
-            var pLabelEndPoints = new TextSymbol().setColor(vMagentaColor);
-            pLabelEndPoints.font.setSize("9pt");
-            pLabelEndPoints.font.setFamily("arial");
-            var pLabelRendererEndPoints = new SimpleRenderer(pLabelEndPoints);
-            var pLabelsEndPoints = new LabelLayer({
-                id: "LabelsEndPoints",
-                minScale: 600000});
-            pLabelsEndPoints.addFeatureLayer(pEPointsFeatureLayer, pLabelRendererEndPoints, "{Start_End} of Section {Section_Name}");
-
-
-            var strQueryDef1 = "1=1";
-			var strQueryDef2 = "1=1";
-
-			//var strQueryDef3 = "Name in ('Beaverhead','Broadwater','Ruby','Big Hole','Jefferson','Boulder','Madison','Gallatin', 'Upper Yellowstone','Shields','Yellowstone Headwaters')";
-			var strQueryDef3 = "";
-			var strQueryDef4 = "Name in ('')";
-
+            let strQueryDef1 = "1=1";
+            let strQueryDef2 = "1=1";
+            let strQueryDef3 = "";
+            let strQueryDef4 = "Name in ('')";
 			arrayTmp4Query3 = [];
 			if ((app.Basin_ID == undefined) & (typeof app.H2O_ID == 'undefined')) {
 				for (var ib2 = 0; ib2 < app.arrayEntireList.length; ib2++) { 							//if a watershed is passed, determine the correspoinding watersheds
@@ -561,9 +588,6 @@ define([
 				strQueryDef1 = "(Watershed_Name in ('" + arrayTmp4Query3.join("','") +
 					"')) OR (WatershedName_Alt1 in ('" + arrayTmp4Query3.join("','") +
 					"')) OR (WatershedName_Alt2 in ('" + arrayTmp4Query3.join("','") + "'))";
-
-				//strQueryDef2 = "(Watershed in ('" + arrayTmp4Query3.join("','") +
-				//	"'))";
 
 				strQueryDef2 = "(Watershed in ('" + arrayTmp4Query3.join("','") +
 					"')) OR (WatershedName_Alt1 in ('" + arrayTmp4Query3.join("','") +
@@ -587,105 +611,146 @@ define([
                                     " AND (" + " Name_Alternate2 <> '" + app.H2O_ID + "' OR (Name_Alternate1 is Null))";
             }
 
-			app.SectionQryStringGetGageData = strQueryDef2;
+            //let strlabelField3 = "SectionID";
+            let strlabelField3 = "SectionName";
+            const Secitons_labelClass = {// autocasts as new LabelClass()
+                symbol: {
+                    type: "text",  // autocasts as new TextSymbol()
+                    color: new Color([0, 0, 128]),
+                    font: { family: "arial", size: 10 },
+                    setAlign: { setAngle: 45 }
+                },
+                labelPlacement: "center-along",
+                labelRotation: false,
+                labelExpressionInfo: { expression: "$feature." + strlabelField3 },
+                minScale: 1500000
+            };
 
-            pEPointsFeatureLayer.setDefinitionExpression(strQueryDef1);
+            app.SectionQryStringGetGageData = strQueryDef2;
+            pEPointsFeatureLayer.definitionExpression = strQueryDef1;
 
-            pSectionsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "5", {
-                mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
-                autoGeneralize: true, "opacity": 0.9, outFields: ['*']
+            pSectionsFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "5",
+                url: app.strHFL_URL + app.idx11[5],
+                opacity: 0.9,
+                labelingInfo: [Secitons_labelClass], outFields: ["StreamName", "SectionID", "SectionName"]
             });
-            pSectionsFeatureLayer.setDefinitionExpression(strQueryDef2);
+            pSectionsFeatureLayer.definitionExpression = strQueryDef2;
             app.pGetWarn.m_strSteamSectionQuery = strQueryDef2;
 
-            var pBasinsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "8", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: ['*'] });
-			if (app.Basin_ID != undefined) {
+            pBasinsFeatureLayer = new FeatureLayer({
+                url: app.strHFL_URL + app.idx11[8],
+                opacity: 0.5
+            });
+            //pBasinsFeatureLayer = new FeatureLayer({ url: app.strHFL_URL + "8", opacity: 0.5 });
+            
+
+            if (app.Basin_ID != undefined) {
 				if (app.Basin_ID == "UMH") {
-					pBasinsFeatureLayer.setDefinitionExpression("Name = 'Upper Missouri Headwaters'");
+                    pBasinsFeatureLayer.definitionExpression = "Name = 'Upper Missouri Headwaters'";
 				} else {
-					pBasinsFeatureLayer.setDefinitionExpression("Name = '" + app.Basin_ID + "'");
+                    pBasinsFeatureLayer.definitionExpression = "Name = '" + app.Basin_ID + "'";
 				}
 			}
 
+            let vColor22 = new Color("#3F3F40");
 
-            var templateFAS = new InfoTemplate();
-            templateFAS.setTitle("MT FAS (Fishing Access Site)");
-            templateFAS.setContent("<b>${NAME}</b><br>${BOAT_FAC}<br><a href=${WEB_PAGE} target='_blank'>Link to Fish Access Site</a>");
-            var pFASFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFAS, "opacity": 0.5, outFields: ['*'], visible: false });
-            var vDarkGreyColor = new Color("#3F3F40");              // create a text symbol to define the style of labels
-            var pLabelFAS = new TextSymbol().setColor(vDarkGreyColor);
-            pLabelFAS.font.setSize("9pt");
-            pLabelFAS.font.setFamily("arial");
-            var pLabelRendererFAS = new SimpleRenderer(pLabelFAS);
-            var pLabelsFAS = new LabelLayer({ id: "LabelsFAS" });
-            pLabelsFAS.addFeatureLayer(pFASFeatureLayer, pLabelRendererFAS, "{NAME}");
-            
-            var templateBLM = new InfoTemplate();
-            templateBLM.setTitle("<b>BLM Facility</b>");
-            templateBLM.setContent("${Facility_Name}<br><a href=${URL} target='_blank'>Link to BLM Facility</a>");
-            var pBLMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "2",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateBLM, outFields: ['*'], visible: false });
-            var pLabelBLM = new TextSymbol().setColor(vDarkGreyColor);
-            pLabelBLM.font.setSize("9pt");
-            pLabelBLM.font.setFamily("arial");
-            var pLabelRendererBLM = new SimpleRenderer(pLabelBLM);
-            var pLabelsBLM = new LabelLayer({ id: "LabelsBLM" });
-            pLabelsBLM.addFeatureLayer(pBLMFeatureLayer, pLabelRendererBLM, "{Facility_Name}");
+            let templateFAS = new PopupTemplate();
+            templateFAS.title = "MT FAS (Fishing Access Site)";
+            templateFAS.content = "<b>{NAME}</b><br>{BOAT_FAC}<br><a href={WEB_PAGE} target='_blank'>Link to Fish Access Site</a>";
+            const FAS_labelClass = {// autocasts as new LabelClass()
+                symbol: {type: "text", color: vColor22,
+                            font: { family: "arial", size: 9, weight: "bold" }
+                },
+                labelPlacement: "above-center",
+                labelExpressionInfo: {expression: "$feature.NAME"}
+            };
+            let pFASFeatureLayer = new FeatureLayer({url: "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FWPLND_FAS_POINTS/FeatureServer/0",
+                popupTemplate: templateFAS,
+                opacity: 0.5,
+                visible: false,
+                labelingInfo: [FAS_labelClass]
+            });
+
+            let vDarkGreyColor = new Color("#3F3F40");
+
+            let templateBLM = new PopupTemplate();
+            templateBLM.title = "<b>BLM Facility</b>";
+            templateBLM.content = "{Facility_Name}<br><a href={URL} target='_blank'>Link to BLM Facility</a>";
+            const BLM_labelClass = {// autocasts as new LabelClass()
+                symbol: {
+                    type: "text",  // autocasts as new TextSymbol()
+                    color: vDarkGreyColor,
+                    font: { family: "arial", size: 9}
+                },
+                labelPlacement: "above-center",
+                labelExpressionInfo: { expression: "$feature.Facility_Name" }
+            };
+            let pBLMFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "2",
+                url: app.strHFL_URL + app.idx11[2],
+                popupTemplate: templateBLM, opacity: 0.5,
+                visible: false, labelingInfo: [BLM_labelClass]
+            });
+
+            //let templateCZM = new PopupTemplate();
+            //templateCZM.title = "<b>Channel Migration Zone</b>";
+            //templateCZM.content = "CMZ: ${CMZ}<br>Reach ID: ${RchID}";
+            //let pCZMFeatureLayer = new FeatureLayer({
+            //    url: "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_CMZ/FeatureServer/" + "0",
+            //    popupTemplate: templateCZM, visible: false });
+
+            var templateFWPAISAccess = new PopupTemplate();
+            templateFWPAISAccess.title = "Montana AIS Watercraft Access";
+            templateFWPAISAccess.content = "{SITENAME}</br>{ACCESSTYPE}</br>{WATERBODY}</br>{STATUS}</b>";
+            var pFWPAISAccessFeatureLayer = new FeatureLayer({
+                url: "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FISH_AIS_WATERCRAFT_ACCESS/FeatureServer/0",
+                popupTemplate: templateFWPAISAccess, minScale: 5200000, visible: false });
 
 
+            var templateSNOTEL = new PopupTemplate();
+            templateSNOTEL.title = "<b>{Name} {SitePageURL} SNOTEL Site</b>";
+            var strSNOTELGraphURL = "https://wcc.sc.egov.usda.gov/nwcc/view?intervalType=+View+Current+&report=WYGRAPH&timeseries=Daily&format=plot&sitenum={stationID}&interval=WATERYEAR";
+            templateSNOTEL.content = "<a href={SitePageURL} target='_blank'>Link to SNOTEL Site Page</a><br><a href=" + strSNOTELGraphURL + " target='_blank'>Link to SWE Current/Historical Graphs</a> ";
 
+            const SNOTEL_labelClass = {// autocasts as new LabelClass()
+                symbol: {
+                    type: "text",  // autocasts as new TextSymbol()
+                    color: vDarkGreyColor,
+                    font: { family: "arial", size: 9, weight: "bold" }
+                },
+                labelPlacement: "above-center",
+                labelExpressionInfo: { expression: "$feature.Name" }
+            };
+            let pSNOTELFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "3",
+                url: app.strHFL_URL + app.idx11[3],
+                popupTemplate: templateSNOTEL, visible: false,
+                labelingInfo: [SNOTEL_labelClass]
+            });
 
-            var templateCZM = new InfoTemplate();
-            templateCZM.setTitle("<b>Channel Migration Zone</b>");
-            templateCZM.setContent("CMZ: ${CMZ}<br>Reach ID: ${RchID}");
-            //var pCZMFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "11",
-            //                                            { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateCZM, outFields: ['*'], visible: false });
+            let templateNOAA = new PopupTemplate();
+            templateNOAA.title = "<b>Weather Station</b>";
+            templateNOAA.content = "<b>{STNNAME}</b>({OWNER})<br><a href={URL} target='_blank'>More info...</a>";
 
-			var pCZMFeatureLayer = new esri.layers.FeatureLayer("https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_CMZ/FeatureServer/" + "0",
-				{ mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateCZM, outFields: ['*'], visible: false });
+            const NOAA_labelClass = {// autocasts as new LabelClass()
+                symbol: {
+                    type: "text", color: vDarkGreyColor,
+                    font: { family: "arial", size: 9, weight: "bold" }
+                },
+                labelPlacement: "above-center",
+                labelExpressionInfo: { expression: "$feature.STNNAME" }
+            };
+            let pNOAAFeatureLayer = new FeatureLayer({
+                url: "https://nowcoast.noaa.gov/arcgis/rest/services/nowcoast/obs_meteoceanhydro_insitu_pts_geolinks/MapServer/1",
+                popupTemplate: templateNOAA,
+                visible: false,
+                labelingInfo: [NOAA_labelClass]
+            });
 
-			
-
-
-            var templateFWPAISAccess = new InfoTemplate();
-            templateFWPAISAccess.setTitle("Montana AIS Watercraft Access");
-            templateFWPAISAccess.setContent("${SITENAME}</br>${ACCESSTYPE}</br>${WATERBODY}</br>${STATUS}</b>");
-            var pFWPAISAccessFeatureLayer = new esri.layers.FeatureLayer("https://services3.arcgis.com/Cdxz8r11hT0MGzg1/arcgis/rest/services/FISH_AIS_WATERCRAFT_ACCESS/FeatureServer/0",
-                {
-                    mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWPAISAccess, outFields: ['*'],
-                    minScale: 5200000, visible: false });
-
-
-            var templateSNOTEL = new InfoTemplate();
-            templateSNOTEL.setTitle("<b>${Name} SNOTEL Site</b>");
-            var strSNOTELGraphURL = "https://wcc.sc.egov.usda.gov/nwcc/view?intervalType=+View+Current+&report=WYGRAPH&timeseries=Daily&format=plot&sitenum=${stationID}&interval=WATERYEAR";
-            templateSNOTEL.setContent("<a href=${SitePageURL} target='_blank'>Link to SNOTEL Site Page</a>, <a href=" + strSNOTELGraphURL + " target='_blank'>Link to SWE Current/Historical Graphs</a> ");
-            var pSNOTELFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "3",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateSNOTEL, outFields: ['*'], visible: false });
-            var pLabelSNOTEL = new TextSymbol().setColor(vDarkGreyColor);
-            pLabelSNOTEL.font.setSize("9pt");
-            pLabelSNOTEL.font.setFamily("arial");
-            var pLabelRendererSNOTEL = new SimpleRenderer(pLabelSNOTEL);
-            var pLabelsSNOTEL = new LabelLayer({ id: "LabelsSNOTEL" });
-            pLabelsSNOTEL.addFeatureLayer(pSNOTELFeatureLayer, pLabelRendererSNOTEL, "{Name}");
-
-            var templateNOAA = new InfoTemplate();
-            templateNOAA.setTitle("<b>Weather Station</b>");
-            templateNOAA.setContent("<b>${STNNAME}</b>(${OWNER})<br><a href=${URL} target='_blank'>More info...</a>");
-            var pNOAAFeatureLayer = new esri.layers.FeatureLayer("https://nowcoast.noaa.gov/arcgis/rest/services/nowcoast/obs_meteoceanhydro_insitu_pts_geolinks/MapServer/1",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateNOAA, outFields: ['*'], visible: false });
-            var pLabelNOAA = new TextSymbol().setColor(vDarkGreyColor);
-            pLabelNOAA.font.setSize("9pt");
-            pLabelNOAA.font.setFamily("arial");
-            var pLabelRendererNOAA = new SimpleRenderer(pLabelNOAA);
-            var pLabelsNOAA = new LabelLayer({ id: "LabelsNOAA" });
-            pLabelsNOAA.addFeatureLayer(pNOAAFeatureLayer, pLabelRendererNOAA, "{STNNAME}");
-           
-            var templateFWP = new InfoTemplate();
-            templateFWP.setTitle("Official Stream Restriction");
-            templateFWP.setContent("<b>${TITLE}</b><br>${WATERBODY}<br>${DESCRIPTION} Publish Date: ${PUBLISHDATE}");
-
+            let templateFWP = new PopupTemplate();
+            templateFWP.title = "Official Stream Restriction";
+            templateFWP.content = "<b>{TITLE}</b><br>{WATERBODY}<br>{DESCRIPTION} Publish Date:{PUBLISHDATE}";
             app.strFWPURL = "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/ArcGIS/rest/services/FISH_WATERBODY_RESTRICTIONS/FeatureServer/0";
 
 			var dteDateTime = new Date();
@@ -696,97 +761,142 @@ define([
 			var strDateTimeMinus3 = dteDateTimeMinus3.getFullYear() + "-" + ("0" + (dteDateTimeMinus3.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTimeMinus3.getDate()).slice(-2);
 			var strDateTimeMinus3UserFreindly = (dteDateTimeMinus3.getMonth() + 1) + "/" + dteDateTimeMinus3.getDate() + "/" + dteDateTimeMinus3.getFullYear();
 
-            if (app.test) {
-                //app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
+            if (app.test) {                //app.strFWPURL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/TestH2ORest/FeatureServer/0";
                 app.strFWPQuery = "(PUBLISHDATE > '7/15/2017') AND (PUBLISHDATE < '7/20/2017')";
             } else {
 				app.strFWPQuery = "(ARCHIVEDATE IS NULL) OR (ARCHIVEDATE > '" + strDateTimeUserFreindly + "')";
             }
 			            
-            var sfsFWP = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-              new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-              new Color([255, 0, 0]), 5), new Color([255, 0, 0, 0.25])
-            );
-            var rendererFWP = new SimpleRenderer(sfsFWP);
+            let sfsr_FWP = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: {
+                    type: "simple-fill", color: [255, 0, 0, 0.25], style: "solid",
+                    outline: { color: [255, 0, 0], width: 5 }
+                },  
+            };
 
-            var pFWPFeatureLayer = new esri.layers.FeatureLayer(app.strFWPURL,
-                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, infoTemplate: templateFWP, "opacity": 0.6, outFields: ['*'], visible: true });
-            pFWPFeatureLayer.setRenderer(rendererFWP);
-            pFWPFeatureLayer.setDefinitionExpression(app.strFWPQuery);
-
-            var pCartoFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "4", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
-            var pCartoFeatureLayerPoly = new esri.layers.FeatureLayer(app.strHFL_URL + "6", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: ['*'] });
-
-            var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-                new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-              new Color([0, 72, 118]), 2), new Color([255, 255, 255, 0.10])
-            );
-
-            var rendererWatersheds = new SimpleRenderer(sfs);
-            var strlabelField1 = "Name";
-            var pWatershedsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.9, autoGeneralize: true, outFields: [strlabelField1] });
-            pWatershedsFeatureLayer.setDefinitionExpression(strQueryDef3);
-            pWatershedsFeatureLayer.setRenderer(rendererWatersheds);
-
-            var sfsMask = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-              new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-              new Color([200, 200, 200]), 2), new Color([9, 60, 114, 0.25])
-            );
-            var rendererWatershedsMask = new SimpleRenderer(sfsMask);
-            var pWatershedsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.5, autoGeneralize: true, outFields: [strlabelField1] });
-            pWatershedsMaskFeatureLayer.setDefinitionExpression(strQueryDef4);
-            pWatershedsMaskFeatureLayer.setRenderer(rendererWatershedsMask);
-
-            var sfsBasinMask = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-              new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-              new Color([200, 200, 200]), 0.1), new Color([26, 90, 158, 0.45])
-            );
-            var rendererBasinMask = new SimpleRenderer(sfsBasinMask);
-            var pBasinsMaskFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "9", { mode: esri.layers.FeatureLayer.MODE_ONDEMAND, "opacity": 0.7, autoGeneralize: true, outFields: ['*'] });
-            pBasinsMaskFeatureLayer.setDefinitionExpression("Basin IS NULL");
-            pBasinsMaskFeatureLayer.setRenderer(rendererBasinMask);
-
-            var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
-            var pLabel1 = new TextSymbol().setColor(vGreyColor);
-            pLabel1.font.setSize("10pt");
-            pLabel1.font.setFamily("arial");
-            var pLabelRenderer1 = new SimpleRenderer(pLabel1);
-            var plabels1 = new LabelLayer({ id: "labels1" });
-            plabels1.addFeatureLayer(pWatershedsFeatureLayer, pLabelRenderer1, "{" + strlabelField1 + "}");
-
-			var strlabelField3 = "SectionID";
-			//var strlabelField3 = "SectionName";
-			
-            var sampleLabel = new TextSymbol().setColor(
-              new Color([0, 0, 128])).setAlign(Font.ALIGN_START).setAngle(45).setFont(new Font("10pt").setWeight(Font.WEIGHT_BOLD).setFamily("arial"));
-
-            var sampleLabelRenderer = new SimpleRenderer(sampleLabel);
-            var plabels3 = new LabelLayer({ id: "labels3" });
-            plabels3.addFeatureLayer(pSectionsFeatureLayer, sampleLabelRenderer, "Section {" + strlabelField3 + "}", { lineLabelPosition: "Below", labelRotation: false });
-            plabels3.minScale = 1500000;
-            
-            app.pSup.m_pRiverSymbolsFeatureLayer = new esri.layers.FeatureLayer(app.strHFL_URL + "10",
-                                                        { mode: esri.layers.FeatureLayer.MODE_ONDEMAND,  visible: true });
-            // Use CORS
-			esriConfig.defaults.io.corsEnabledServers.push("docs.google.com"); // supports CORS
-			esriConfig.defaults.io.corsEnabledServers.push("gis.dnrc.mt.gov"); // supports CORS
-			
-            var pMonitoringCSVLayer = new CSVLayer("https://docs.google.com/spreadsheets/d/e/2PACX-1vTw0rCwCLxDg2jCLLCscILrMDMGBbInS1KmwH76CPyqVYqFolKdOfw0J4DIaJhWoPDPkwVNQI_Y7OeX/pub?output=csv", {
-                visible:false
+            let pFWPFeatureLayer = new FeatureLayer({
+                url: app.strFWPURL,
+                popupTemplate: templateFWP, "opacity": 0.6, renderer: sfsr_FWP, visible: true
             });
-            var orangeRed = new Color([238, 69, 0, 0.5]); // hex is #ff4500
-            var marker = new SimpleMarkerSymbol("solid", 15, null, orangeRed);
-            var renderer = new SimpleRenderer(marker);
-            pMonitoringCSVLayer.setRenderer(renderer);
-            var pCSVTemplate = new InfoTemplate();
-            pCSVTemplate.setTitle("<b>Monitoring Sites</b>");
-            pCSVTemplate.setContent("Station Name: ${STATION_NAME}<br>Drainage Name: ${Drainage_Name}<br><a href=${URL} target='_blank'> Link monitoring data</a>");
-            pMonitoringCSVLayer.setInfoTemplate(pCSVTemplate);
+            pFWPFeatureLayer.definitionExpression = app.strFWPQuery;
 
-            app.map.addLayers([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer, pCZMFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
-                pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer, pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
-                               plabels1, plabels3, pLabelsFAS, pLabelsBLM, pLabelsSNOTEL, pLabelsNOAA, pLabelsEndPoints, pMonitoringCSVLayer]);
-            app.map.infoWindow.resize(300, 65);
+            let pCartoFeatureLayer = new FeatureLayer({ url: app.strHFL_URL + app.idx11[4],  "opacity": 0.9, autoGeneralize: true});
+            let pCartoFeatureLayerPoly = new FeatureLayer({ url: app.strHFL_URL + app.idx11[6], "opacity": 0.9, autoGeneralize: true});
+            //let pCartoFeatureLayer = new FeatureLayer({ url: app.strHFL_URL + "4", "opacity": 0.9, autoGeneralize: true });
+            //let pCartoFeatureLayerPoly = new FeatureLayer({ url: app.strHFL_URL + "6", "opacity": 0.9, autoGeneralize: true });
+            
+
+            let sfsr_Waterhsed = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: { // autocasts as new SimpleFillSymbol()
+                    type: "simple-fill", color: [255, 255, 255, 0.10], style: "solid",
+                    outline: { color: [0, 72, 118], width: 2 }
+                },
+            };
+
+            let strlabelField1 = "Name";
+            var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
+            const Watershed_labelClass = {// autocasts as new LabelClass()
+                symbol: {
+                    type: "text", color: vGreyColor, font: { family: "arial", size: 10 }
+                },
+                labelExpressionInfo: { expression: "$feature." + strlabelField1 }
+            };
+
+            let pWatershedsFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "9",
+                url: app.strHFL_URL + app.idx11[9],
+                renderer: sfsr_Waterhsed, "opacity": 0.9, autoGeneralize: true,
+                outFields: [strlabelField1], labelingInfo: [Watershed_labelClass]
+            });
+            pWatershedsFeatureLayer.definitionExpression = strQueryDef3;
+
+            let sfsr_Mask = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: { // autocasts as new SimpleFillSymbol()
+                    type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                    color: [9, 60, 114, 0.25],
+                    style: "solid", outline: { color: [200, 200, 200], width: 2 }
+                },
+            };
+
+            let pWatershedsMaskFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "9",
+                url: app.strHFL_URL + app.idx11[9],
+                renderer: sfsr_Mask, "opacity": 0.5, autoGeneralize: true, outFields: [strlabelField1]
+            });
+            pWatershedsMaskFeatureLayer.definitionExpression = strQueryDef4;
+
+            let sfsr_BasinMask = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: { // autocasts as new SimpleFillSymbol()
+                    type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                    color: [26, 90, 158, 0.45],
+                    style: "solid",
+                    outline: {  // autocasts as new SimpleLineSymbol()
+                        color: [200, 200, 200],
+                        width: 0.1
+                    }
+                },
+            };
+
+            var pBasinsMaskFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "9",
+                url: app.strHFL_URL + app.idx11[9],
+                "opacity": 0.7, autoGeneralize: true, renderer: sfsr_BasinMask
+            });
+            pBasinsMaskFeatureLayer.definitionExpression = "Basin IS NULL";
+            
+            app.pSup.m_pRiverSymbolsFeatureLayer = new FeatureLayer({
+                //url: app.strHFL_URL + "10",
+                url: app.strHFL_URL + app.idx11[10],
+                visible: true
+            });
+            
+   //         // Use CORS
+			//esriConfig.defaults.io.corsEnabledServers.push("docs.google.com"); // supports CORS
+			//esriConfig.defaults.io.corsEnabledServers.push("gis.dnrc.mt.gov"); // supports CORS
+
+            let CSV_Renderer = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: {
+                    type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                    size: 15,
+                    color: [238, 69, 0, 0.5], //orangeRed
+                    outline: {  // autocasts as new SimpleLineSymbol()
+                        width: 0.5,
+                        color: "white"
+                    }
+                }
+            };
+            var pCSVTemplate = new PopupTemplate();
+            pCSVTemplate.Title = "<b>Monitoring Sites</b>";
+            pCSVTemplate.Content = "Station Name: ${STATION_NAME}<br>Drainage Name: ${Drainage_Name}<br><a href=${URL} target='_blank'> Link monitoring data</a>";
+
+            let pMonitoringCSVLayer = new CSVLayer({
+                url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTw0rCwCLxDg2jCLLCscILrMDMGBbInS1KmwH76CPyqVYqFolKdOfw0J4DIaJhWoPDPkwVNQI_Y7OeX/pub?output=csv",
+                visible: false,
+                renderer: CSV_Renderer,
+                popupTemplate: pCSVTemplate
+            });
+
+
+            app.graphicsLayer = new GraphicsLayer();
+
+            app.map.layers.addMany([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer,
+                pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
+                pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer,
+                pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
+                pMonitoringCSVLayer, app.graphicsLayer]);
+
+            //app.map.layers.addMany([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer,
+            //    pCZMFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
+            //    pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer,
+            //    pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
+            //    pMonitoringCSVLayer, app.graphicsLayer]);
+
+            /*app.map.infoWindow.resize(300, 65);*/
 
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 0.5;
@@ -794,8 +904,8 @@ define([
             document.getElementById("txtFromToDate").innerHTML = "Conditions based on the last 3 days (" + strDateTimeMinus3UserFreindly.toString() + "-" + strDateTimeUserFreindly.toString() + ")";
             app.pGage.Start(strDateTimeMinus3, strDateTime);
 
-            var legendLayers = [];
-            legendLayers.push({ layer: pCZMFeatureLayer, title: 'Channel Migration Zones' });
+            let legendLayers = [];
+/*            legendLayers.push({ layer: pCZMFeatureLayer, title: 'Channel Migration Zones' });*/
             legendLayers.push({ layer: pMonitoringCSVLayer, title: 'Monitoring Locations' });
             legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
@@ -804,7 +914,7 @@ define([
             legendLayers.push({ layer: pBLMFeatureLayer, title: 'BLM Access Sites' });
             legendLayers.push({ layer: pEPointsFeatureLayer, title: 'Start/End Section Locations' });
             legendLayers.push({ layer: pGageFeatureLayer, title: 'Gages' });
-            //legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
+            legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
 
             if (app.test) {
                 legendLayers.push({ layer: app.pSup.m_pFWPFeatureLayer, title: 'Test Condition Messaging' });
@@ -813,23 +923,20 @@ define([
                 legendLayers.push({ layer: app.pSup.m_pFWPFeatureLayer, title: 'MT Waterbody Restrictions' });
             }
 
-			dojo.connect(app.map, 'onLayersAddResult', function (results) {
-				console.log("onLayersAddResult");
-                app.legend = new Legend({ map: app.map, layerInfos: legendLayers, respectCurrentMapScale: false, autoUpdate: true }, "legendDiv");
-				app.legend.startup();
+            app.legend = new Legend({
+                view: app.view,
+                layerInfos: legendLayers,
+                container: "legendDiv"
             });
 
             var cbxLayers = [];
-            //cbxLayers.push({ layers: [pFWPFeatureLayer, pFWPFeatureLayer], title: 'FWP Water Restrictions' });
-            //cbxLayers.push({ layers: [pWatershedsMaskFeatureLayer, pWatershedsMaskFeatureLayer], title: 'Other Watersheds' });
-            //cbxLayers.push({ layers: [pBasinsMaskFeatureLayer, pBasinsMaskFeatureLayer], title: 'Other Basins' });
-            cbxLayers.push({ layers: [pBLMFeatureLayer, pLabelsBLM], title: 'BLM Access Sites' });
-            cbxLayers.push({ layers: [pFASFeatureLayer, pLabelsFAS], title: 'MT FWP Fishing Access Sites' });
-            cbxLayers.push({ layers: [pSNOTELFeatureLayer, pLabelsSNOTEL], title: 'SNOTEL Sites' });
-            cbxLayers.push({ layers: [pNOAAFeatureLayer, pLabelsNOAA], title: 'Weather Stations' });
+            cbxLayers.push({ layers: [pBLMFeatureLayer, pBLMFeatureLayer], title: 'BLM Access Sites' });
+            cbxLayers.push({ layers: [pFASFeatureLayer, pFASFeatureLayer], title: 'MT FWP Fishing Access Sites' });
+            cbxLayers.push({ layers: [pSNOTELFeatureLayer, pSNOTELFeatureLayer], title: 'SNOTEL Sites' });
+            cbxLayers.push({ layers: [pNOAAFeatureLayer, pNOAAFeatureLayer], title: 'Weather Stations' });
             cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'MT AIS Watercraft Access' });
             cbxLayers.push({ layers: [pMonitoringCSVLayer, pMonitoringCSVLayer], title: 'Monitoring Locations' });
-            cbxLayers.push({ layers: [pCZMFeatureLayer, pCZMFeatureLayer], title: 'Channel Migration Zones' });
+            /*cbxLayers.push({ layers: [pCZMFeatureLayer, pCZMFeatureLayer], title: 'Channel Migration Zones' });*/
             
 			this.LayerCheckBoxSetup(cbxLayers);
 
@@ -1037,42 +1144,43 @@ define([
             }
 
             function mapLoaded() {        // map loaded//            // Map is ready
-                app.map.on("mouse-move", showCoordinates); //after map loads, connect to listen to mouse move & drag events
-				app.map.on("mouse-drag", showCoordinates);
-				console.log("maploaded")
+                app.view.on("pointer-move", (evt) => {
+                    /*console.log(evt.x, evt.y);*/
+                    var point = app.view.toMap(evt);
+                    var mp = webMercatorUtils.webMercatorToGeographic(point);  //the map is in web mercator but display coordinates in geographic (lat, long)
+                    dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + "<br>Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
+                }); //after map loads, connect to listen to mouse move & drag events
+                console.log("maploaded")
             }
-            function showCoordinates(evt) {
-                var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);  //the map is in web mercator but display coordinates in geographic (lat, long)
-                dom.byId("txt_xyCoords").innerHTML = "Latitude:" + mp.y.toFixed(4) + "<br>Longitude:" + mp.x.toFixed(4);  //display mouse coordinates
-            }
+
             function SetupStreamClick() {
-                dojo.connect(app.map, "onClick", executeQueryTask);
+                //dojo.connect(app.view, "onClick", executeQueryTask);
 
-                queryTask = new esri.tasks.QueryTask(app.strHFL_URL + "5");
+                //let query = new Query();
+                //let queryTask = new QueryTask(app.strHFL_URL + "5"); //sections layer
 
-                query = new esri.tasks.Query();            //build query filter
-                query.returnGeometry = true;
-                query.outFields = ["StreamName", "SectionID"];
+                //query.returnGeometry = true;
+                //query.outFields = ["StreamName", "SectionID"];
+
+                app.view.on("pointer-down", (event) => {
+                    const opts = {
+                        include: pSectionsFeatureLayer// only include graphics from pSectionsFeatureLayer in the hitTest
+                    }
+
+                    app.view.hitTest(event, opts).then((response) => {
+                        if (response.results.length) {// check if a feature is returned from the pSectionsFeatureLayer
+                            showResults(response.results);
+                        }
+                    });
+                });
 
             }
-            function executeQueryTask(pEvt) {
-                app.map.graphics.clear();                //remove all graphics on the maps graphics layer
-                var dblX = pEvt.mapPoint.x;
-                var dblY = pEvt.mapPoint.y;
-                var mSR = pEvt.mapPoint.spatialReference;
-                var pSP = pEvt.screenPoint;
-                var pxWidth = app.map.extent.getWidth() / app.map.width; // create an extent from the mapPoint that was clicked // this is used to return features within 3 pixels of the click point
-                var padding = 8 * pxWidth;
-                var qGeom = new esri.geometry.Extent({ "xmin": dblX - padding, "ymin": dblY - padding, "xmax": dblX + padding, "ymax": dblY + padding, "spatialReference": mSR });
-                query.geometry = qGeom;
-                queryTask.execute(query, showResults);
-            }
-			function showResults(featureSet) {
-				console.log("showResults")
-                //QueryTask returns a featureSet.  Loop through features in the featureSet and add them to the map.
-                dojo.forEach(featureSet.features, function (feature) {
-                    var strStreamName = feature.attributes.StreamName;
-                    var strSectionID = feature.attributes.SectionID;
+
+			function showResults(pFeatures) {
+				console.log("showResults from click")
+                dojo.forEach(pFeatures, function (feature) {
+                    var strStreamName = feature.graphic.attributes.StreamName;
+                    var strSectionID = feature.graphic.attributes.SectionID;
                     var elements = document.getElementsByTagName('tr');  //Sets the click event for the row
                     for (var i = 0; i < elements.length; i++) {
                         var strTempText = (elements)[i].innerHTML;  //parse the section summary text to set var's for charting and zooming
@@ -1082,11 +1190,19 @@ define([
                         var strClickSegmentID = strTempText.substring(0, strTempText.indexOf("</span>"));
                         
                         if ((strStreamName == strClickStreamName) & (strClickSegmentID == strSectionID)) {
-                            var graphic = feature;
-                            symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 255]), 1);
-                            graphic.setSymbol(symbol);
-                            graphic.attributes = { streamsectionClicked: true };
-                            app.map.graphics.add(graphic);
+                            //var graphic = feature.graphic;
+                            //const lineSymbol = {
+                            //    type: "simple-line", // autocasts as new SimpleFillSymbol()
+                            //    color: [232, 104, 80], width: 18
+                            //};
+                            //graphic.Symbol = lineSymbol;
+                            //graphic.attributes = { streamsectionClicked: true };
+                            //setInterval(() => {
+                            //    graphic.visible = !graphic.visible;
+                            //}, 1000);
+
+                            //app.view.graphics.removeAll(); // make sure to remmove previous highlighted feature
+                            //app.view.graphics.add(graphic);
 
                             (elements)[i].click();
 
@@ -1100,52 +1216,102 @@ define([
         },
 
         Phase3: function (pArrayOIDYellow, pArrayOIDsGold, pArrayOIDsOrange, pArrayOIDsPlum, pArrayOIDsRed) {  //creating this phase 3 to create legend items for river status based on the summarized data
-            app.pSup.m_pRiverSymbolsFeatureLayer.setRenderer(app.pSup.m_StreamStatusRenderer);
+            try {
+                app.pSup.m_pRiverSymbolsFeatureLayer.renderer = app.pSup.m_StreamStatusRenderer;
 
-			try {
-				var legendLayers = app.legend.layerInfos;
-				legendLayers.push({ layer: app.pSup.m_pRiverSymbolsFeatureLayer, title: 'River Status' });
-				app.legend.layerInfos = legendLayers;
-				app.legend.refresh();
+
+                //watchUtils.when(app.legend, "container", function () {
+                //    aspect.after(app.legend, "scheduleRender", function (response) {
+                //        if (query('.esri-legend__layer-caption')[0]) {
+                //            query('.esri-legend__layer-caption')[0].style.display = 'none';
+                //        }
+                //    });
+                //});
 			}
 			catch (err) {
 				console.log("Phase3 legendlayers issue::", err.message);
 				$("#divShowHideLegendBtn").hide;
 			}
 
-			$("#btnJump2FEMA").click(function () {
-				var pExtent = app.map.extent;
-				pSR_WKID = pExtent.spatialReference.wkid;
-				var strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
-				strURL += pExtent.xmin + ",";
-				strURL += pExtent.ymin + ",";
-				strURL += pExtent.xmax + ",";
-				strURL += pExtent.ymax + ",";
-				strURL += pSR_WKID.toString();
-				window.open(strURL);
-			});
+
+            $('#dropDownId a').click(function () {
+                let strSelectedText = $(this).text();
+                //$('#selected').text($(this).text());
+                let blnAddCoords = false;
+                let strURL;
+                var pExtent = app.view.extent;
+
+                if (strSelectedText == "Channel Migration Zones") {
+                    strURL = "https://montana.maps.arcgis.com/home/webmap/viewer.html?webmap=f59d958f8ec94e70b5a0bff9bb7dacae&extent=";
+                    blnAddCoords = true;
+                }
+                if (strSelectedText == "FEMA Flood Layer Hazard Viewer") {
+                    strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
+                    blnAddCoords = true;
+                }
+                if (strSelectedText == "Official MT FWP (closures, etc.)") {
+                    strURL = "https://experience.arcgis.com/experience/ba378e9a50ec4d53bbe92e406b647d3e";
+                    blnAddCoords = false;
+                }
+                if (strSelectedText == "GYE Aqiatic Invasives") {
+                    strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
+                    blnAddCoords = false;
+                    pSR_WKID = pExtent.spatialReference.wkid;
+                    strURL = "https://gagecarto.github.io/aquaticInvasiveExplorer/index.html#bnds=";
+                    var pGeogExtent = webMercatorUtils.webMercatorToGeographic(pExtent);  //the map is in web mercator but display coordinates in geographic (lat, long)
+                    strURL += Math.round(pGeogExtent.xmin * 100) / 100 + ",";
+                    strURL += Math.round(pGeogExtent.ymin * 100) / 100 + ",";
+                    strURL += Math.round(pGeogExtent.xmax * 100) / 100 + ",";
+                    strURL += Math.round(pGeogExtent.ymax * 100) / 100;
+                }
+                
+
+                if (blnAddCoords) {
+                    pSR_WKID = pExtent.spatialReference.wkid;
+                    strURL += pExtent.xmin + ",";
+                    strURL += pExtent.ymin + ",";
+                    strURL += pExtent.xmax + ",";
+                    strURL += pExtent.ymax + ",";
+                    strURL += pSR_WKID.toString();
+                }
+
+                window.open(strURL);
+            });
+
+
+			//$("#btnJump2FEMA").click(function () {
+   //             var pExtent = app.view.extent;
+			//	pSR_WKID = pExtent.spatialReference.wkid;
+			//	var strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
+			//	strURL += pExtent.xmin + ",";
+			//	strURL += pExtent.ymin + ",";
+			//	strURL += pExtent.xmax + ",";
+			//	strURL += pExtent.ymax + ",";
+			//	strURL += pSR_WKID.toString();
+			//	window.open(strURL);
+			//});
 
 
 			
-			$("#btnJump2GYIAIS").click(function () {
-				var pExtent = app.map.extent;
-				pSR_WKID = pExtent.spatialReference.wkid;
-				var strURL = "https://gagecarto.github.io/aquaticInvasiveExplorer/index.html#bnds=";
-				var pGeogExtent = webMercatorUtils.webMercatorToGeographic(pExtent);  //the map is in web mercator but display coordinates in geographic (lat, long)
-				strURL += Math.round(pGeogExtent.xmin * 100) / 100 + ",";
-				strURL += Math.round(pGeogExtent.ymin * 100) / 100 + ",";
-				strURL += Math.round(pGeogExtent.xmax * 100) / 100 + ",";
-				strURL += Math.round(pGeogExtent.ymax * 100) / 100;
-				//strURL += pSR_WKID.toString();
-				window.open(strURL);
-			});
+			//$("#btnJump2GYIAIS").click(function () {
+			//	var pExtent = app.map.extent;
+			//	pSR_WKID = pExtent.spatialReference.wkid;
+			//	var strURL = "https://gagecarto.github.io/aquaticInvasiveExplorer/index.html#bnds=";
+			//	var pGeogExtent = webMercatorUtils.webMercatorToGeographic(pExtent);  //the map is in web mercator but display coordinates in geographic (lat, long)
+			//	strURL += Math.round(pGeogExtent.xmin * 100) / 100 + ",";
+			//	strURL += Math.round(pGeogExtent.ymin * 100) / 100 + ",";
+			//	strURL += Math.round(pGeogExtent.xmax * 100) / 100 + ",";
+			//	strURL += Math.round(pGeogExtent.ymax * 100) / 100;
+			//	//strURL += pSR_WKID.toString();
+			//	window.open(strURL);
+			//});
 
-			$("#btnJump2FWP").click(function () {
-				var pExtent = app.map.extent;
-				pSR_WKID = pExtent.spatialReference.wkid;
-				var strURL = "http://fwp.mt.gov/gis/maps/fishingGuide/index.html";
-				window.open(strURL);
-			});
+			//$("#btnJump2FWP").click(function () {
+			//	var pExtent = app.map.extent;
+			//	pSR_WKID = pExtent.spatialReference.wkid;
+			//	var strURL = "http://fwp.mt.gov/gis/maps/fishingGuide/index.html";
+			//	window.open(strURL);
+			//});
 
 		},
 

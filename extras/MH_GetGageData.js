@@ -100,21 +100,20 @@ function sortFunction(a, b) {
 
 define([
         "esri/tasks/QueryTask",
-        "esri/tasks/query",
+        "esri/rest/support/Query",
         "esri/geometry/Polyline",
-  "dojo/_base/declare",
-  "dojo/_base/lang",
-  "esri/request",
-  "dojo/promise/all",
-  "dojo/promise/all",
-  "esri/request", "dojo/_base/array", 
-  "dojo/dom",
-  "dojo/dom-class",
-  "dijit/registry",
-  "dojo/on",
+        "dojo/_base/declare",
+        "dojo/_base/lang",
+        "esri/request",
+        "dojo/promise/all",
+        "esri/request", "dojo/_base/array", 
+        "dojo/dom",
+        "dojo/dom-class",
+        "dijit/registry",
+        "dojo/on",
 
 ], function (
-           QueryTask, Query, Polyline, declare, lang, esriRequest, all, All, request, dom, domClass, registry, on
+           QueryTask, Query, Polyline, declare, lang, esriRequest, All, request, dom, domClass, registry, on
 ) {
 
 		return declare([], {
@@ -156,7 +155,9 @@ define([
                                             strOverallSymbol,
                                             strStartEndpoint,
                                             strEndEndpoint,
-											strWatershed, strAgency
+                                            strWatershed,
+                                            strSectionName_,
+                                            strAgency
 											) {// Class to represent a row in the gage values grid
             var self = this;
             self.SiteName = strSiteName;
@@ -180,6 +181,7 @@ define([
             self.SiteFlowStatus = strSiteFlowStatus;
             self.StreamName = strStreamName;
             self.SectionID = strSectionID;
+            self.SectionName_ = strSectionName_;
             self.Day3CFSTrend = str3DayCFSTrend;
 
             self.strMONTHDAYEarlyFlowFromDroughtManagementTarget = strMONTHDAYEarlyFlowFromDroughtManagementTarget;
@@ -218,6 +220,7 @@ define([
 
             var strStreamName = "";
             var strSectionID = "";
+            var strSectionName_ = "";
             var strCFS_Prep4Conserv = "";
             var strCFS_Conserv = "";
             var strCFS_NotOfficialClosure = "";
@@ -242,6 +245,7 @@ define([
 
                 strStreamName = "";
                 strSectionID = "";
+                strSectionName_ = "";
                 strCFS_Prep4Conserv = "";
                 strCFS_Conserv = "";
                 strCFS_NotOfficialClosure = "";
@@ -261,6 +265,7 @@ define([
 				
                 strStreamName = itemSection.attributes.StreamName;
                 strSectionID = itemSection.attributes.SectionID;
+                strSectionName_ = itemSection.attributes.SectionName;
                 strCFS_Prep4Conserv = itemSection.attributes.CFS_Prep4Conserv;
                 strCFS_Conserv = itemSection.attributes.CFS_Conserv;
                 strCFS_NotOfficialClosure = itemSection.attributes.CFS_NotOfficialClosure;
@@ -275,29 +280,18 @@ define([
 
 				dom.map(items[1].features, function (itemGage) { //loop through the gages that match the sections
 					//query by     Watershed , StreamName, Section_ID
-
-					
-					 
 					if ((itemGage.attributes.Watershed === itemSection.attributes.Watershed) &
 						(itemGage.attributes.StreamName === itemSection.attributes.StreamName) &
 						(itemGage.attributes.Section_ID === itemSection.attributes.SectionID) &
 						(itemGage.attributes.Symbology === "TRIGGER MEASURE LOCATION")) {
-						//  |		(itemGage.attributes.GageID_Source === "41D 08000"))) {//remove this condition later!!!!
 
+						strGageID_Source = itemGage.attributes.GageID_Source;
+						strTempCollected = itemGage.attributes.TempCollected;
+						strAgency = itemGage.attributes.Agency;
+						if (strGageID_Source != null) {
+							DailyStat_URL = itemGage.attributes.DailyStat_URL;
+						}
 
-						//if (!(itemGage.attributes.GageID_Source === "06024540")) {//remove this condition later!!!!
-							strGageID_Source = itemGage.attributes.GageID_Source;
-
-							//if (itemGage.attributes.GageID_Source === "41D 08000") {
-							//	strGageID_Source = "74e688a07b8f48e58e0080232bd86585";
-							//}
-
-							strTempCollected = itemGage.attributes.TempCollected;
-							strAgency = itemGage.attributes.Agency;
-							if (strGageID_Source != null) {
-								DailyStat_URL = itemGage.attributes.DailyStat_URL;
-							}
-						//}
 					}
 
                 })
@@ -333,7 +327,8 @@ define([
                     strStartEndpoint,
 					strEndEndpoint,
 					strWatershed,
-					strAgency
+                    strSectionName_,
+                    strAgency
                 ]);
 
                 arrayDuplicateCheck.push(itemSection.attributes.StreamName + itemSection.attributes.SectionID);
@@ -362,15 +357,24 @@ define([
 			console.log("getArray2Process");
             var siteNameArrray = [];
 
-            qt_Layer1 = new esri.tasks.QueryTask(strURL + "5"); //sections layer
-            q_Layer1 = new esri.tasks.Query();
-            qt_Layer2 = new esri.tasks.QueryTask(strURL + "1"); //gage layer
-            q_Layer2 = new esri.tasks.Query();
-            qt_Layer3 = new esri.tasks.QueryTask(strURL + "0"); //gage layer
-            q_Layer3 = new esri.tasks.Query();
+            let q_Layer1 = new Query();
+            //let qt_Layer1 = new QueryTask(strURL + "5"); //sections layer
+            //let q_Layer2 = new Query();
+            //let qt_Layer2 = new QueryTask(strURL + "1"); //sections layer
+            //let q_Layer3 = new Query();
+            //let qt_Layer3 = new QueryTask(strURL + "0"); //sections layer
+
+            let qt_Layer1 = new QueryTask(strURL + app.idx11[5]); //sections layer
+            let q_Layer2 = new Query();
+            let qt_Layer2 = new QueryTask(strURL + app.idx11[1]); //sections layer
+            let q_Layer3 = new Query();
+            let qt_Layer3 = new QueryTask(strURL + app.idx11[0]); //sections layer
+
+            
+
+
             q_Layer1.returnGeometry = q_Layer2.returnGeometry = true;
             q_Layer1.outFields = q_Layer2.outFields = ["*"];
-            //q_Layer3.outFields = ["Watershed_Name", "WatershedName_Alt1", "WatershedName_Alt2", "Endpoint_Name", "Stream_Name", "Section_ID", "Start_End"];
             q_Layer3.outFields = ["*"];
 
             q_Layer1.where = strQuery;
@@ -691,8 +695,9 @@ define([
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][31],
                                                                 app.pGage.m_arrray_RiverSectionStatus[i][32],
 																app.pGage.m_arrray_RiverSectionStatus[i][33],
-																app.pGage.m_arrray_RiverSectionStatus[i][34],
-																app.pGage.m_arrray_RiverSectionStatus[i][35]));
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][34],
+                                                                app.pGage.m_arrray_RiverSectionStatus[i][35],
+																app.pGage.m_arrray_RiverSectionStatus[i][36]));
 
                 self.gageRecords = ko.observableArray(arrayKOTemp);
                 
@@ -847,8 +852,8 @@ define([
 					streamSectionArrray.push([strStreamName, strSiteID, iSectionID, strAgency]);
 					app.pGage.SectionsReceived(streamSectionArrray, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, false);
 
-                    app.map.enableMapNavigation();
-                    app.map.showZoomSlider();
+                    //app.map.enableMapNavigation();
+                    //app.map.showZoomSlider();
                 })
                 .fail(function (jqxhr, textStatus, error) {
                     var err = textStatus + ", " + error;
@@ -857,6 +862,7 @@ define([
         },
 
         StreamSectionSummaryUIAdditions: function (blnIsInitialPageLoad) {
+            console.log("Stream Section Summary UI Additions");
             if (blnIsInitialPageLoad) {
                 var vm = new app.pGage.readingsViewModel();
                 ko.applyBindings(vm, document.getElementById("entriesCon_div"));
@@ -870,8 +876,11 @@ define([
                         var strTempText = this.innerHTML;  //parse the section summary text to set var's for charting and zooming
                         strTempText = strTempText.substring(strTempText.indexOf("StreamName") + ("StreamName".length + 2), strTempText.length);
                         var strClickStreamName = strTempText.substring(0, strTempText.indexOf("</span>"));
-                        strTempText = strTempText.substring(strTempText.indexOf("SectionID") + ("SectionID".length + 2), strTempText.length);
-                        var strClickSegmentID = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+                        strTempText = strTempText.substring(strTempText.indexOf("SectionName_") + ("SectionName_".length + 2), strTempText.length);
+                        var strClickSectionName_ = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+
                         strTempText = strTempText.substring(strTempText.indexOf("iLateFlowPref4ConsvValue") + ("iLateFlowPref4ConsvValue".length + 2), strTempText.length);
                         var iCFSTarget1 = strTempText.substring(0, strTempText.indexOf("</span>"));
                         strTempText = strTempText.substring(strTempText.indexOf("iLateFlowConsvValue") + ("iLateFlowConsvValue".length + 2), strTempText.length);
@@ -884,6 +893,9 @@ define([
 
                         strTempText = strTempText.substring(strTempText.indexOf("strSiteID") + ("strSiteID".length + 2), strTempText.length);
                         var strClickSiteID = strTempText.substring(0, strTempText.indexOf("</span>"));
+
+                        strTempText = strTempText.substring(strTempText.indexOf("SectionID") + ("SectionID".length + 2), strTempText.length);
+                        var strClickSegmentID = strTempText.substring(0, strTempText.indexOf("</span>"));
 
                         strTempText = strTempText.substring(strTempText.indexOf("strDailyStat_URL") + ("strDailyStat_URL".length + 2), strTempText.length);
                         var strDailyStat_URL = strTempText.substring(0, strTempText.indexOf("</span>"));
@@ -922,31 +934,32 @@ define([
 
                         var blnZoom = true;
                         var pGFeature = null;
-                        for (var iG = 0; iG < app.map.graphics.graphics.length; iG++) {
-                            pGFeature = app.map.graphics.graphics[iG];
+                        //for (var iG = 0; iG < app.view.graphics.graphics.length; iG++) {
+                        //    pGFeature = app.map.graphics.graphics[iG];
              
-                            if (pGFeature.attributes) {
-                                if (pGFeature.attributes.streamsectionClicked != undefined) {
-                                    if (pGFeature.attributes.streamsectionClicked == true) {
-                                        blnZoom = false;
-                                        pGFeature.attributes.streamsectionClicked = false;
+                        //    if (pGFeature.attributes) {
+                        //        if (pGFeature.attributes.streamsectionClicked != undefined) {
+                        //            if (pGFeature.attributes.streamsectionClicked == true) {
+                        //                blnZoom = false;
+                        //                pGFeature.attributes.streamsectionClicked = false;
 
-                                    } else if (pGFeature.attributes.streamsectionClicked != true) {
-                                        app.map.graphics.clear();                //remove all graphics on the maps graphics layer
-                                    }
-                                }
-                            }
-                        }
+                        //            } else if (pGFeature.attributes.streamsectionClicked != true) {
+                        //                app.map.graphics.clear();                //remove all graphics on the maps graphics layer
+                        //            }
+                        //        }
+                        //    }
+                        //}
 
                         if (blnZoom) {
-							app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "5", "(StreamName = '" + strClickStreamName + "') and " +
+                            //app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + "5", "(StreamName = '" + strClickStreamName + "') and " +
+                            app.pZoom.qry_Zoom2FeatureLayerByQuery(app.strHFL_URL + app.idx11[5], "(StreamName = '" + strClickStreamName + "') and " +
 								 														 "(SectionID = '" + strClickSegmentID + "') and " +
 																						 "(Watershed = '" + strWatershed + "')");
 
                         }
 
-                        app.map.enableMapNavigation();
-                        app.map.showZoomSlider();
+                        //app.map.enableMapNavigation();
+                        //app.map.showZoomSlider();
                     });
 
                     var strTempText2 = (elements)[i].innerHTML;
@@ -988,8 +1001,8 @@ define([
                 document.getElementById("loadingImg2").style.display = "none";
                 document.getElementById("divLoadingUSGS").style.display = "none";
 
-                app.map.enableMapNavigation();
-                app.map.showZoomSlider();
+                //app.map.enableMapNavigation();
+                //app.map.showZoomSlider();
             }  //if initial run through, post stream section detail for all the stream sections
 
 
@@ -1030,8 +1043,8 @@ define([
 
 		DNRCSectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime, blnIsInitialPageLoad) {  //this is needed to get the SensorID for each location
 			console.log("DNRCSectionsReceived start");
-			app.map.disableMapNavigation();
-			app.map.hideZoomSlider();
+			//app.map.disableMapNavigation();
+			//app.map.hideZoomSlider();
 
 			var strURLGagePrefix = "https://gis.dnrc.mt.gov/arcgis/rest/services/WRD/WMB_StAGE/MapServer/3/query";
 			strURLGagePrefix += "?outFields=*&returnGeometry=false&f=json&where=SensorLabel+in+%28%27discharge%27%2C%27water+temp%27%29+and+LocationID+in+";
@@ -1113,11 +1126,8 @@ define([
 
 		SectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime) {
 			console.log("SectionsReceived1");
-			app.map.disableMapNavigation();
-            app.map.hideZoomSlider();
 
-
-			var iCounterTemperature = 0;
+            var iCounterTemperature = 0;
 			var strDischargeSensorID, strTempSensorID, strDNRCLocID
 			var EntiretrHTML, strHyperlinkURL, strSiteIDs, iLateFlowPref4ConsvValue, iLateFlowConsvValue, iLateFlowClosureValueFlow, strLateFlowPref4ConsvValue, strLateFlowConsvValue, strLateFlowClosureValueFlow, strDailyStat_URL, strFWPWarn, strStartEndpoint, strEndEndpoint, strAgency;
 			EntiretrHTML = strHyperlinkURL = strSiteIDs = iLateFlowPref4ConsvValue = iLateFlowConsvValue = iLateFlowClosureValueFlow = strLateFlowPref4ConsvValue = strLateFlowConsvValue = strLateFlowClosureValueFlow = strDailyStat_URL = strFWPWarn = strStartEndpoint = strEndEndpoint = strAgency = "";
@@ -1220,6 +1230,7 @@ define([
                 strSiteID = arrayProc2[0][1];  //since some sections do not have readings all the time setting this before finding data in the JSON
                 strStreamName = arrayProc2[0][0];  //since some sections do not have readings all the time setting this before finding data in the JSON
                 iSectionID = arrayProc2[0][2];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                strSectionName_ = arrayProc2[0][26]
                 iTempClosureValue = arrayProc2[0][6];
 
                 strMONTHDAYEarlyFlowFromDroughtManagementTarget = arrayProc2[0][7];
@@ -1241,7 +1252,7 @@ define([
                 strStartEndpoint = arrayProc2[0][23];
 				strEndEndpoint = arrayProc2[0][24];
 				strWatershed = arrayProc2[0][25];
-				strAgency = arrayProc2[0][26];
+				strAgency = arrayProc2[0][27];
 
 
                 iLateFlowPref4ConsvValue = arrayProc2[0][3];
@@ -1276,7 +1287,7 @@ define([
                     strLateFlowClosureValueFlow, iTempClosureValue, strTempCollected, strSiteID,
                     strDailyStat_URL, str3DayCFSTrendTMP, strFWPDESCRIPTION, strFWPLOCATION,
                     strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE, strOverallStatus,
-					strOverallSymbol, strStartEndpoint, strEndEndpoint, strWatershed, strAgency]);
+                    strOverallSymbol, strStartEndpoint, strEndEndpoint, strWatershed, strSectionName_, strAgency]);
 
                 app.pGage.mIDXQuery1AtaTime += 1;
                 if ((blnQuery1AtaTime) & (app.pGage.mIDXQuery1AtaTime < arrayProc.length)) {
@@ -1287,6 +1298,8 @@ define([
                 }
 
             } else {
+
+                //perform the trigger comparison and other sorting and tasks
                 $.getJSON(app.strURLGage)   //http://api.jquery.com/jquery.getjson/
 					.done(function (jsonResult) {
 
@@ -1317,6 +1330,7 @@ define([
 
 							strStreamName = itemSectionRefined[0];  //since some sections do not have readings all the time setting this before finding data in the JSON
                             iSectionID = itemSectionRefined[2];  //since some sections do not have readings all the time setting this before finding data in the JSON
+                            strSectionName_ = itemSectionRefined[26];
 
                             strMONTHDAYEarlyFlowFromDroughtManagementTarget = itemSectionRefined[7];
                             strMONTHDAYEarlyFlowToDroughtManagementTarget = itemSectionRefined[8];
@@ -1337,7 +1351,7 @@ define([
                             strStartEndpoint = itemSectionRefined[23];
 							strEndEndpoint = itemSectionRefined[24];
 							strWatershed = itemSectionRefined[25];
-							strAgency = itemSectionRefined[26];
+							strAgency = itemSectionRefined[27];
 
 
 							var itemFound, itemFoundTemp, itemFoundDischarge;
@@ -1526,7 +1540,7 @@ define([
 										}
                                         app.pGage.m_arrray_Detail4ChartTMP.push(obj);//populate the array that contains the data for charting
                                         obj["EPOCH"]= Date.parse(dteDateTime);
-                                        arrray_Detail4InterpolationTMP.push(obj);  //populate the array that is used to determing the flow trent
+                                        arrray_Detail4InterpolationTMP.push(obj);  //populate the array that is used to determing the flow trend
                                     }
                                 });
 
@@ -1565,9 +1579,20 @@ define([
                                 strNoDataLabel4ChartingCFS = " (No Data)";
                                 dteLatestDateTimeCFS = new Date();
                             } else {//determine the site's status based on discharge
-                                if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) {
-                                    strSiteFlowStatus = "PREPARE FOR CONSERVATION";
+                                let blnFloodCheck = false;
+                                if (iLateFlowPref4ConsvValue < 0) {
+                                    blnFloodCheck = true;
                                 }
+                                if (blnFloodCheck) {
+                                    if (dblLatestCFS >= iLateFlowPref4ConsvValue) {
+                                        strSiteFlowStatus = "PREPARE FOR CONSERVATION";
+                                    }
+                                } else {
+                                    if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) {
+                                        strSiteFlowStatus = "PREPARE FOR CONSERVATION";
+                                    }
+                                }
+
                                 if ((dblLatestCFS <= iLateFlowConsvValue) & (dblLatestCFS > iLateFlowClosureValueFlow)) {
                                         strSiteFlowStatus = "CONSERVATION";
                                 }
@@ -1613,12 +1638,16 @@ define([
                             app.pGage.m_arrray_StationIDsCFS.push(strStreamName + "," + iSectionID + strNoDataLabel4ChartingCFS);  // using this array of station id's to pivot the table for charting
 
                             if (blnIsInitialPageLoad) {
-                                var streamSectionDispalyName = strSiteName.replace(", MT", "").replace(" MT", "").replace(strStreamName, "").replace("Big Hole R", "");
+                                //var streamSectionDispalyName = strSiteName.replace(", MT", "").replace(" MT", "").replace(strStreamName, "").replace("Big Hole R", "");
+                                var streamSectionDispalyName = strSiteName.replace(strStreamName, "");
                                 streamSectionDispalyName = streamSectionDispalyName.replace("Red Rock Cr ", "");
                                 streamSectionDispalyName = streamSectionDispalyName.replace("E Gallatin R ", "");
 
                                 if (streamSectionDispalyName == "") {
-                                    streamSectionDispalyName = strStreamName + " Section";
+                                    /*streamSectionDispalyName = strStreamName + " Section";*/
+                                    console.log("this section does not have a dispaly name");
+                                } else {
+                                    streamSectionDispalyName = "(" + streamSectionDispalyName + ")";
                                 }
 
                                 OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus, strFWPTITLE, strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn);
@@ -1642,7 +1671,7 @@ define([
                                     strLateFlowClosureValueFlow, iTempClosureValue, strTempCollected, strSiteID,
                                     strDailyStat_URL, str3DayCFSTrendTMP, strFWPDESCRIPTION, strFWPLOCATION,
                                     strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPTITLE, strOverallStatus,
-									strOverallSymbol, strStartEndpoint, strEndEndpoint, strWatershed,strAgency]);
+                                    strOverallSymbol, strStartEndpoint, strEndEndpoint, strWatershed, strSectionName_, strAgency]);
 
                             }
 
