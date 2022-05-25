@@ -290,16 +290,16 @@ define([
 				["Upper Bighorn", "Upper Bighorn", "Bighorn"], ["Upper Musselshell", "Upper Musselshell", "Musselshell"],
 				["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
                 /*["City of Choteau - Teton River", "City of Choteau - Teton River", "Blackfoot-Sun"],*/
-                ["North Fork Flathead", "North Fork Flathead", "test"],
-                ["Swan", "Swan", "test"],
-                ["Bitterroot", "Bitterroot", "test"],
-                ["Lower Flathead", "Lower Flathead", "test"],
-                ["South Fork Flathead", "South Fork Flathead", "test"],
-                ["Middle Fork Flathead", "Middle Fork Flathead", "test"],
-                ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone", "test"],
-                ["South Fork Flathead", "South Fork Flathead", "test"],
-                ["Sweet Grass Creek", "Sweet Grass Creek", "test"],
-                ["Stillwater", "Stillwater", "test"]
+                ["North Fork Flathead", "North Fork Flathead", "Flathead"],
+                ["Swan", "Swan", "Flathead"],
+                ["Bitter Root", "Bitterroot", "Bitter Root"],
+                ["Lower Flathead", "Lower Flathead", "Flathead"],
+                ["South Fork Flathead", "South Fork Flathead", "Flathead"],
+                ["Middle Fork Flathead", "Middle Fork Flathead", "Flathead"],
+                ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone", "Clarks Fork Yellowstone"],
+                ["South Fork Flathead", "South Fork Flathead", "Flathead"],
+                //["Sweet Grass Creek", "Sweet Grass Creek", "test"],
+                ["Stillwater", "Stillwater", "Flathead"]
 
             ];
 
@@ -339,8 +339,10 @@ define([
 									["Blackfoot-Sun", "Blackfoot-Sun"],
 									["Bighorn", "Bighorn"],
 									["Boulder and East Boulder", "Boulder and East Boulder"],
-                                    ["All", "all"],
-                                    ["Bitter Root, CF of Y., Flathead", "test"]
+                                    ["Flathead", "Flathead"],
+                                    ["Bitter Root", "Bitter Root"],
+                                    ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone"],
+                                    ["All", "all"]
 			];
 
 			var strURLPrefix = "index.html?H2O_ID=";
