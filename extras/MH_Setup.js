@@ -291,6 +291,7 @@ define([
 				["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
                 /*["City of Choteau - Teton River", "City of Choteau - Teton River", "Blackfoot-Sun"],*/
                 ["North Fork Flathead", "North Fork Flathead", "Flathead"],
+                ["Flathead CD", "Flathead Conservation District", "Flathead"],
                 ["Swan", "Swan", "Flathead"],
                 ["Bitter Root", "Bitterroot", "Bitter Root"],
                 ["Lower Flathead", "Lower Flathead", "Flathead"],
