@@ -83,8 +83,8 @@ define([
             console.log("add Stream Condition FeatureLayer")
             let defaultUniqueSymbolRenderer = {
                 type: "unique-value",  // autocasts as new UniqueValueRenderer()
-                /*field: "OBJECTID",*/
-                valueExpression: 'When(${OBJECTID} == 36, 1111)',
+                field: "OBJECTID",
+                /*valueExpression: 'When(${OBJECTID} == 36, 1111)',*/
                 defaultSymbol: {
                     type: "simple-line", color: [0, 169, 230], width: 1
                     /*, style: "short-dot"*/
@@ -97,19 +97,19 @@ define([
           
             let ArrayUniqueVals2Add = []
 
-            //for (var i = 0; i < arrayOIDYellow.length; i++) {
-            //    ArrayUniqueVals2Add.push({
-            //        value: arrayOIDYellow[i],
-            //        symbol: {type: "simple-line", color: [255, 255, 0], width: 18},
-            //        label: "Prepare"
-            //    });
-            //}
+            for (var i = 0; i < arrayOIDYellow.length; i++) {
+                ArrayUniqueVals2Add.push({
+                    value: arrayOIDYellow[i],
+                    symbol: {type: "simple-line", color: [255, 255, 0], width: 18},
+                    label: "Prepare"
+                });
+            }
 
-            ArrayUniqueVals2Add.push({
-                value: 1111,
-                symbol: { type: "simple-line", color: [255, 255, 0], width: 18 },
-                label: "Prepare"
-            });
+            //ArrayUniqueVals2Add.push({
+            //    value: 1111,
+            //    symbol: { type: "simple-line", color: [255, 255, 0], width: 18 },
+            //    label: "Prepare"
+            //});
 
             for (var ii = 0; ii < arrayOIDsGold.length; ii++) {
                 ArrayUniqueVals2Add.push({
@@ -494,9 +494,8 @@ define([
                 position: "top-left"
             });
 
-
             let iPateWidth = getPageWidth();
-            domStyle.set("mapDiv", "height", iPateWidth - 100 + "px");
+            domStyle.set("mapDiv", "height", iPateWidth - 50 + "px");  //change map height on open based on width - 50,  bootstrap/ESRI map width changes automatically on open but height does not
 
             app.view.watch("widthBreakpoint", function (newVal) {
                 if (newVal === "xsmall") {
@@ -856,10 +855,6 @@ define([
                 url: app.strHFL_URL + app.idx11[10],
                 visible: true
             });
-            
-   //         // Use CORS
-			//esriConfig.defaults.io.corsEnabledServers.push("docs.google.com"); // supports CORS
-			//esriConfig.defaults.io.corsEnabledServers.push("gis.dnrc.mt.gov"); // supports CORS
 
             let CSV_Renderer = {
                 type: "simple",  // autocasts as new SimpleRenderer()
@@ -893,14 +888,6 @@ define([
                 pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
                 pMonitoringCSVLayer, app.graphicsLayer]);
 
-            //app.map.layers.addMany([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer,
-            //    pCZMFeatureLayer, pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
-            //    pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer,
-            //    pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
-            //    pMonitoringCSVLayer, app.graphicsLayer]);
-
-            /*app.map.infoWindow.resize(300, 65);*/
-
             app.pZoom = new MH_Zoom2FeatureLayers({}); // instantiate the class
             app.dblExpandNum = 0.5;
 
@@ -908,7 +895,6 @@ define([
             app.pGage.Start(strDateTimeMinus3, strDateTime);
 
             let legendLayers = [];
-/*            legendLayers.push({ layer: pCZMFeatureLayer, title: 'Channel Migration Zones' });*/
             legendLayers.push({ layer: pMonitoringCSVLayer, title: 'Monitoring Locations' });
             legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
@@ -1157,14 +1143,6 @@ define([
             }
 
             function SetupStreamClick() {
-                //dojo.connect(app.view, "onClick", executeQueryTask);
-
-                //let query = new Query();
-                //let queryTask = new QueryTask(app.strHFL_URL + "5"); //sections layer
-
-                //query.returnGeometry = true;
-                //query.outFields = ["StreamName", "SectionID"];
-
                 app.view.on("pointer-down", (event) => {
                     const opts = {
                         include: pSectionsFeatureLayer// only include graphics from pSectionsFeatureLayer in the hitTest
