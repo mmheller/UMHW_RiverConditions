@@ -298,6 +298,7 @@ define([
                 ["South Fork Flathead", "South Fork Flathead", "Flathead"],
                 ["Middle Fork Flathead", "Middle Fork Flathead", "Flathead"],
                 ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone", "Clarks Fork Yellowstone"],
+                ["Rock Creek", "Rock Creek", "Clarks Fork Yellowstone"],
                 ["South Fork Flathead", "South Fork Flathead", "Flathead"],
                 //["Sweet Grass Creek", "Sweet Grass Creek", "test"],
                 ["Stillwater", "Stillwater", "Flathead"]
