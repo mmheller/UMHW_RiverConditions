@@ -295,7 +295,6 @@ define([
                 ["Swan", "Swan", "Flathead"],
                 ["Bitter Root", "Bitterroot", "Bitter Root"],
                 ["Lower Flathead", "Lower Flathead", "Flathead"],
-                ["South Fork Flathead", "South Fork Flathead", "Flathead"],
                 ["Middle Fork Flathead", "Middle Fork Flathead", "Flathead"],
                 ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone", "Clarks Fork Yellowstone"],
                 ["Rock Creek", "Rock Creek", "Clarks Fork Yellowstone"],
@@ -825,10 +824,30 @@ define([
                 },
             };
 
+
+
+            const WaterShedMask_labelClass = {
+                symbol: {
+                    type: "text",
+                    color: [69,91,128],
+                    font: {
+                        family: "arial",
+                        size: 9
+                    }
+                },
+                labelExpressionInfo: {
+                    expression: "$feature.Name + 'Watershed Area'"
+                },
+                minScale: 2000000
+
+            }
+
             let pWatershedsMaskFeatureLayer = new FeatureLayer({
                 //url: app.strHFL_URL + "9",
                 url: app.strHFL_URL + app.idx11[9],
-                renderer: sfsr_Mask, "opacity": 0.5, autoGeneralize: true, outFields: [strlabelField1]
+                renderer: sfsr_Mask, "opacity": 0.5, autoGeneralize: true,
+                outFields: [strlabelField1],
+                labelingInfo: [WaterShedMask_labelClass]
             });
             pWatershedsMaskFeatureLayer.definitionExpression = strQueryDef4;
 
@@ -871,8 +890,8 @@ define([
                 }
             };
             var pCSVTemplate = new PopupTemplate();
-            pCSVTemplate.Title = "<b>Monitoring Sites</b>";
-            pCSVTemplate.Content = "Station Name: ${STATION_NAME}<br>Drainage Name: ${Drainage_Name}<br><a href=${URL} target='_blank'> Link monitoring data</a>";
+            pCSVTemplate.title = "<b>Monitoring Sites</b>";
+            pCSVTemplate.content = "Station Name: {STATION_NAME}<br>Drainage Name: {Drainage_Name}<br><a href={URL} target='_blank'> Link monitoring data</a>";
 
             let pMonitoringCSVLayer = new CSVLayer({
                 url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTw0rCwCLxDg2jCLLCscILrMDMGBbInS1KmwH76CPyqVYqFolKdOfw0J4DIaJhWoPDPkwVNQI_Y7OeX/pub?output=csv",
