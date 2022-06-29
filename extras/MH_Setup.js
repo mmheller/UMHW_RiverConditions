@@ -263,20 +263,27 @@ define([
 				app.Basin_ID = "Upper Yellowstone Headwaters";
 			}
 
-            $("#dropDownId").append("<li><a data-value='MT Channel Migration Zones'>Channel Migration Zones</a></li>")
+
+            
+            $("#dropDownId").append("<li><a data-value='American Whitewater Difficulty and Flow'>American Whitewater Difficulty and Flow</a></li>")
             $("#dropDownId").append("<li><a data-value='FEMA Flood Layer Hazard Viewer'>FEMA Flood Layer Hazard Viewer</a></li>")
             $("#dropDownId").append("<li><a data-value='GYE Aqiatic Invasives'>GYE Aqiatic Invasives</a></li>")
+            $("#dropDownId").append("<li><a data-value='MT Channel Migration Zones'>Channel Migration Zones</a></li>")
+            $("#dropDownId").append("<li><a data-value='MT DNRC Stream and Gage Explorer'>MT DNRC Stream and Gage Explorer</a></li>")
             $("#dropDownId").append("<li><a data-value='Official MT FWP (closures, etc.)'>Official MT FWP (closures, etc.)</a></li>")
+            $("#dropDownId").append("<li><a data-value='USGS National Water Dashboard'>USGS National Water Dashboard</a></li>")
 
 			//array [watershed listed on website, watershed in layer, basin name in website]
 			app.arrayEntireList = [["Beaverhead/Centennial", "Beaverhead", "UMH"],
 				["Big Hole", "Big Hole", "UMH"],
 				["Boulder", "Boulder", "UMH"], ["Broadwater", "Broadwater", "UMH"], 
 				["Gallatin-Lower", "Lower Gallatin", "UMH"], ["Gallatin-Upper", "Upper Gallatin", "UMH"], ["Jefferson", "Jefferson", "UMH"],
-				["Madison", "Madison", "UMH"], ["Ruby", "Ruby", "UMH"],
+                ["Madison", "Madison", "UMH"], ["Ruby", "Ruby", "UMH"],
+
 				["Shields", "Shields", "Upper Yellowstone Headwaters"],
-				["Upper Yellowstone", "Upper Yellowstone", "Upper Yellowstone Headwaters"],
-				["Yellowstone Headwaters", "Yellowstone Headwaters", "Upper Yellowstone Headwaters"],
+                ["Upper Yellowstone", "Upper Yellowstone", "Upper Yellowstone Headwaters"],
+                ["Yellowstone Headwaters", "Yellowstone Headwaters", "Upper Yellowstone Headwaters"],
+
 				["Middle Musselshell", "Middle Musselshell", "Musselshell"],
 				["Sun", "Sun", "Blackfoot-Sun"], ["Lower Musselshell", "Lower Musselshell", "Musselshell"],
 				["Lower Bighorn", "Lower Bighorn", "Bighorn"], ["Little Bighorn", "Little Bighorn", "Bighorn"],
@@ -291,7 +298,7 @@ define([
 				["Boulder and East Boulder", "Boulder and East Boulder", "Boulder and East Boulder"],
                 /*["City of Choteau - Teton River", "City of Choteau - Teton River", "Blackfoot-Sun"],*/
                 ["North Fork Flathead", "North Fork Flathead", "Flathead"],
-                ["Mainstem Flathead", "Flathead Conservation District", "Flathead"],
+                ["Mainstem Flathead", "Mainstem Flathead", "Flathead"],
                 ["Swan", "Swan", "Flathead"],
                 ["Bitter Root", "Bitterroot", "Bitter Root"],
                 ["Lower Flathead", "Lower Flathead", "Flathead"],
@@ -457,10 +464,11 @@ define([
 
             
 			//app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_Support/FeatureServer/";  //PRODUCTION
-            //app.idx11 = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];  //PRODUCTION
+            app.strHFL_URL = "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_Support_FY22/FeatureServer/";  //PRODUCTION
+            app.idx11 = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];  //PRODUCTION
 
-            app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/RCT_2022_Initial_Update/FeatureServer/";  //Melissa dev
-            app.idx11 = ["0", "1", "2", "3", "6", "9", "8", "10", "11", "12", "13", "15"];  //Melissa dev
+            //app.strHFL_URL = "https://services.arcgis.com/9ecg2KpMLcsUv1Oh/arcgis/rest/services/RCT_2022_Initial_Update/FeatureServer/";  //Melissa dev
+            //app.idx11 = ["0", "1", "2", "3", "6", "9", "8", "10", "11", "12", "13", "15"];  //Melissa dev
 
             this.GetSetHeaderWarningContent(app.strHFL_URL + app.idx11[11], app.H2O_ID, blnUseAlternateHeader, app.Basin_ID);
         },
@@ -836,7 +844,7 @@ define([
                     }
                 },
                 labelExpressionInfo: {
-                    expression: "$feature.Name + 'Watershed Area'"
+                    expression: "$feature.Name + ' Watershed Area'"
                 },
                 minScale: 2000000
 
@@ -1240,6 +1248,7 @@ define([
                 let strSelectedText = $(this).text();
                 //$('#selected').text($(this).text());
                 let blnAddCoords = false;
+                let blnAddCoordsUSGS = false;
                 let strURL;
                 var pExtent = app.view.extent;
 
@@ -1251,12 +1260,40 @@ define([
                     strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
                     blnAddCoords = true;
                 }
+
+                if (strSelectedText == "MT DNRC Stream and Gage Explorer") {
+                    strURL = "https://gis.dnrc.mt.gov/apps/StAGE/index.html?extent=";
+                    blnAddCoords = true;
+                }
+
+                if (strSelectedText == "American Whitewater Difficulty and Flow") {
+                    strURL = "https://www.americanwhitewater.org/content/River/view/river-index";
+                    blnAddCoords = false;
+                }
+
+                if (strSelectedText == "USGS National Water Dashboard") {
+                    //strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
+                    blnAddCoords = false;
+                    pSR_WKID = pExtent.spatialReference.wkid;
+                    strURL = "https://dashboard.waterdata.usgs.gov/app/nwd/?view=%7B%22basemap%22%3A%22EsriTopo%22,%22bounds%22%3A%22";
+                    var pGeogExtent = webMercatorUtils.webMercatorToGeographic(pExtent);  //the map is in web mercator but display coordinates in geographic (lat, long)
+                    strURL += Math.round(pGeogExtent.xmin * 100) / 100 + ",";
+                    strURL += Math.round(pGeogExtent.ymin * 100) / 100 + ",";
+                    strURL += Math.round(pGeogExtent.xmax * 100) / 100 + ",";
+                    strURL += Math.round(pGeogExtent.ymax * 100) / 100;
+                    strURL += '","panelRange"%3A"0%3A1.0,1%3A1.0,2%3A1.0,3%3A1.0,4%3A1.0,5%3A1.0,6%3A1.0,7%3A0.8,8%3A0.3,9%3A0.5,10%3A0.5,11%3A0.5,12%3A0.5,13%3A0.5,14%3A0.5,15%3A0.5,16%3A1.0,17%3A1.0,18%3A1.0,19%3A1.0"';
+                    //strURL += ',"panelSelect"%3A"0%3A0,1%3A0,2%3A0,3%3A0,4%3A0,5%3A0,6%3A0,7%3A0,8%3A0,9%3A0,10%3A0,11%3A0,12%3A0,13%3A0,14%3A0,15%3A0,16%3A0,17%3A0,18%3A0"';
+                    strURL += ',"panelCheckbox"%3A"0,9,19,20,21,22"';
+                    strURL += '%7D&aoi=default';
+                    //strURL += '","insetmap"%3Afalse,"panelRange"%3A"0%3A1.0,1%3A1.0,2%3A1.0,3%3A1.0,4%3A1.0,5%3A1.0,6%3A1.0,7%3A0.8,8%3A0.3,9%3A0.5,10%3A0.5,11%3A0.5,12%3A0.5,13%3A0.5,14%3A0.5,15%3A0.5,16%3A1.0,17%3A1.0,18%3A1.0,19%3A1.0","panelSelect"%3A"0%3A0,1%3A0,2%3A0,3%3A0,4%3A0,5%3A0,6%3A0,7%3A0,8%3A0,9%3A0,10%3A0,11%3A0,12%3A0,13%3A0,14%3A0,15%3A0,16%3A0,17%3A0,18%3A0","panelCheckbox"%3A"0,9,19,20,21,22"%7D&aoi=default';
+                }
+
                 if (strSelectedText == "Official MT FWP (closures, etc.)") {
                     strURL = "https://experience.arcgis.com/experience/ba378e9a50ec4d53bbe92e406b647d3e";
                     blnAddCoords = false;
                 }
                 if (strSelectedText == "GYE Aqiatic Invasives") {
-                    strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
+                    //strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
                     blnAddCoords = false;
                     pSR_WKID = pExtent.spatialReference.wkid;
                     strURL = "https://gagecarto.github.io/aquaticInvasiveExplorer/index.html#bnds=";

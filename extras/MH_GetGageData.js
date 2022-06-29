@@ -343,7 +343,7 @@ define([
                     return a[0]> b[0]? 1: -1;
                 });
 
-            var sectionGeometries = new Polyline(app.map.spatialReference);
+            var sectionGeometries = new Polyline(app.view.spatialReference);
             for (var i = 0; i < items[0].features.length; i++) {
                 var paths = items[0].features[i].geometry.paths;
                 for (var j = 0; j < paths.length; j++) { //needed for multi part lines  
@@ -369,9 +369,6 @@ define([
             let qt_Layer2 = new QueryTask(strURL + app.idx11[1]); //sections layer
             let q_Layer3 = new Query();
             let qt_Layer3 = new QueryTask(strURL + app.idx11[0]); //sections layer
-
-            
-
 
             q_Layer1.returnGeometry = q_Layer2.returnGeometry = true;
             q_Layer1.outFields = q_Layer2.outFields = ["*"];
