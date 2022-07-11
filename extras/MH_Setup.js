@@ -344,12 +344,12 @@ define([
 			var arrayNavListBasin = [["Upper Missouri Headwaters", "UMH"],
 									["Upper Yellowstone/Shields", "UY_Shields"],
 									["Musselshell", "Musselshell"],
-									["Blackfoot-Sun", "Blackfoot-Sun"],
-									["Bighorn", "Bighorn"],
-									["Boulder and East Boulder", "Boulder and East Boulder"],
                                     ["Flathead", "Flathead"],
-                                    ["Bitter Root", "Bitter Root"],
                                     ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone"],
+                                    ["Boulder and East Boulder", "Boulder and East Boulder"],
+                                    ["Blackfoot-Sun", "Blackfoot-Sun"],
+                                    ["Bitter Root", "Bitter Root"],
+                                    ["Bighorn", "Bighorn"],
                                     ["All", "all"]
 			];
 
