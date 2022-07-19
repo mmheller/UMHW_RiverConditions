@@ -1,12 +1,7 @@
 ﻿function returnURL4GSgage(strURL) {
     strHyperlinkURL = strURL; 
-    strHyperlinkURL = strHyperlinkURL.replace("?format=json", "?cb_00010=on&cb_00060=on&cb_00065=on&format=gif_default");
-    strHyperlinkURL = strHyperlinkURL.replace("nwis.waterservices.usgs.gov/nwis/iv/", "nwis.waterdata.usgs.gov/mt/nwis/uv");
-    strHyperlinkURL = strHyperlinkURL.replace("&siteStatus=all", "");
-    strHyperlinkURL = strHyperlinkURL.replace("startDT", "begin_date");
-    strHyperlinkURL = strHyperlinkURL.replace("endDT", "end_date");
-    strHyperlinkURL = strHyperlinkURL.replace("sites", "site_no");
-    strHyperlinkURL = strHyperlinkURL.replace("&parameterCd=00010,00060", "&period=");
+    strHyperlinkURL = strHyperlinkURL.substring(strHyperlinkURL.search("sites=") + 6), strHyperlinkURL.length;  //find the site id
+    strHyperlinkURL = "https://waterdata.usgs.gov/monitoring-location/" + strHyperlinkURL + "/#period=P3D";
     return strHyperlinkURL;
 }
 

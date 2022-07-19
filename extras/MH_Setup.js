@@ -267,7 +267,7 @@ define([
             
             $("#dropDownId").append("<li><a data-value='American Whitewater Difficulty and Flow'>American Whitewater Difficulty and Flow</a></li>")
             $("#dropDownId").append("<li><a data-value='FEMA Flood Layer Hazard Viewer'>FEMA Flood Layer Hazard Viewer</a></li>")
-            $("#dropDownId").append("<li><a data-value='GYE Aqiatic Invasives'>GYE Aqiatic Invasives</a></li>")
+            $("#dropDownId").append("<li><a data-value='GYE Aqiatic Invasives'>GYE Aquatic Invasives</a></li>")
             $("#dropDownId").append("<li><a data-value='MT Channel Migration Zones'>Channel Migration Zones</a></li>")
             $("#dropDownId").append("<li><a data-value='MT DNRC Stream and Gage Explorer'>MT DNRC Stream and Gage Explorer</a></li>")
             $("#dropDownId").append("<li><a data-value='Official MT FWP (closures, etc.)'>Official MT FWP (closures, etc.)</a></li>")
@@ -300,7 +300,7 @@ define([
                 ["North Fork Flathead", "North Fork Flathead", "Flathead"],
                 ["Mainstem Flathead", "Mainstem Flathead", "Flathead"],
                 ["Swan", "Swan", "Flathead"],
-                ["Bitter Root", "Bitterroot", "Bitter Root"],
+                ["Bitterroot", "Bitterroot", "Bitter Root"],
                 ["Lower Flathead", "Lower Flathead", "Flathead"],
                 ["Middle Fork Flathead", "Middle Fork Flathead", "Flathead"],
                 ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone", "Clarks Fork Yellowstone"],
@@ -319,7 +319,9 @@ define([
 			if (app.Basin_ID == "all") {
 				arrayNavList = app.arrayEntireList;
 				app.H2O_ID = undefined;
-				app.Basin_ID = undefined;
+                app.Basin_ID = undefined;
+
+                document.getElementById("bdy1").style["paddingTop"] = "130px";
 			} else if (app.Basin_ID != undefined) {
 				for (var ib2 = 0; ib2 < app.arrayEntireList.length; ib2++) { 							//if a watershed is passed, determine the correspoinding watersheds
 					if (app.Basin_ID == app.arrayEntireList[ib2][2]) {
@@ -348,7 +350,7 @@ define([
                                     ["Clarks Fork Yellowstone", "Clarks Fork Yellowstone"],
                                     ["Boulder and East Boulder", "Boulder and East Boulder"],
                                     ["Blackfoot-Sun", "Blackfoot-Sun"],
-                                    ["Bitter Root", "Bitter Root"],
+                                    ["Bitterroot", "Bitter Root"],
                                     ["Bighorn", "Bighorn"],
                                     ["All", "all"]
 			];
@@ -704,13 +706,6 @@ define([
                 visible: false, labelingInfo: [BLM_labelClass]
             });
 
-            //let templateCZM = new PopupTemplate();
-            //templateCZM.title = "<b>Channel Migration Zone</b>";
-            //templateCZM.content = "CMZ: ${CMZ}<br>Reach ID: ${RchID}";
-            //let pCZMFeatureLayer = new FeatureLayer({
-            //    url: "https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/RCT_CMZ/FeatureServer/" + "0",
-            //    popupTemplate: templateCZM, visible: false });
-
             var templateFWPAISAccess = new PopupTemplate();
             templateFWPAISAccess.title = "Montana AIS Watercraft Access";
             templateFWPAISAccess.content = "{SITENAME}</br>{ACCESSTYPE}</br>{WATERBODY}</br>{STATUS}</b>";
@@ -794,9 +789,42 @@ define([
 
             let pCartoFeatureLayer = new FeatureLayer({ url: app.strHFL_URL + app.idx11[4],  "opacity": 0.9, autoGeneralize: true});
             let pCartoFeatureLayerPoly = new FeatureLayer({ url: app.strHFL_URL + app.idx11[6], "opacity": 0.9, autoGeneralize: true});
-            //let pCartoFeatureLayer = new FeatureLayer({ url: app.strHFL_URL + "4", "opacity": 0.9, autoGeneralize: true });
-            //let pCartoFeatureLayerPoly = new FeatureLayer({ url: app.strHFL_URL + "6", "opacity": 0.9, autoGeneralize: true });
-            
+
+
+            //////////////////////////
+            let sfsr_MTSP = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: { // autocasts as new SimpleFillSymbol()
+                    type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                    color: [57, 168, 87, 0.45],
+                    style: "solid",
+                    outline: {  // autocasts as new SimpleLineSymbol()
+                        color: [29, 112, 52],
+                        width: 0.1
+                    }
+                },
+            };
+
+            let strlabelField11 = "Name";
+            var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
+            const MTSP_labelClass = {// autocasts as new LabelClass()
+                symbol: {type: "text", color: vGreyColor, font: { family: "arial", size: 10 }},
+                labelExpressionInfo: { expression: "$feature." + strlabelField11 },
+                minScale: 2000000
+            };
+
+            var templateMTSP= new PopupTemplate();
+            templateMTSP.title = "Montana State Parks";
+            templateMTSP.content = "{NAME} <a href={WEB_PAGE} target='_blank'>(link here)</a></br>{BOAT_FAC}</br>{STATUS}</b>";
+
+
+            let pMTSPFeatureLayer = new FeatureLayer({
+                url: "https://services3.arcgis.com/Cdxz8r11hT0MGzg1/ArcGIS/rest/services/FWPLND_STATEPARKS/FeatureServer/0",
+                renderer: sfsr_MTSP, "opacity": 0.9, autoGeneralize: true,
+                outFields: [strlabelField11], labelingInfo: [MTSP_labelClass], popupTemplate: templateMTSP
+            });
+
+            //////////////////////////
 
             let sfsr_Waterhsed = {
                 type: "simple",  // autocasts as new SimpleRenderer()
@@ -809,19 +837,19 @@ define([
             let strlabelField1 = "Name";
             var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
             const Watershed_labelClass = {// autocasts as new LabelClass()
-                symbol: {
-                    type: "text", color: vGreyColor, font: { family: "arial", size: 10 }
-                },
+                symbol: { type: "text", color: vGreyColor, font: { family: "arial", size: 10 }},
                 labelExpressionInfo: { expression: "$feature." + strlabelField1 }
             };
 
             let pWatershedsFeatureLayer = new FeatureLayer({
-                //url: app.strHFL_URL + "9",
                 url: app.strHFL_URL + app.idx11[9],
                 renderer: sfsr_Waterhsed, "opacity": 0.9, autoGeneralize: true,
                 outFields: [strlabelField1], labelingInfo: [Watershed_labelClass]
             });
             pWatershedsFeatureLayer.definitionExpression = strQueryDef3;
+
+            //////////////////////////
+
 
             let sfsr_Mask = {
                 type: "simple",  // autocasts as new SimpleRenderer()
@@ -831,8 +859,6 @@ define([
                     style: "solid", outline: { color: [200, 200, 200], width: 2 }
                 },
             };
-
-
 
             const WaterShedMask_labelClass = {
                 symbol: {
@@ -847,11 +873,9 @@ define([
                     expression: "$feature.Name + ' Watershed Area'"
                 },
                 minScale: 2000000
-
             }
 
             let pWatershedsMaskFeatureLayer = new FeatureLayer({
-                //url: app.strHFL_URL + "9",
                 url: app.strHFL_URL + app.idx11[9],
                 renderer: sfsr_Mask, "opacity": 0.5, autoGeneralize: true,
                 outFields: [strlabelField1],
@@ -873,7 +897,6 @@ define([
             };
 
             var pBasinsMaskFeatureLayer = new FeatureLayer({
-                //url: app.strHFL_URL + "9",
                 url: app.strHFL_URL + app.idx11[9],
                 "opacity": 0.7, autoGeneralize: true, renderer: sfsr_BasinMask
             });
@@ -912,7 +935,7 @@ define([
             app.graphicsLayer = new GraphicsLayer();
 
             app.map.layers.addMany([app.pSup.m_pRiverSymbolsFeatureLayer, pWatershedsMaskFeatureLayer, pBasinsMaskFeatureLayer,
-                pWatershedsFeatureLayer, pBasinsFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
+                pWatershedsFeatureLayer, pBasinsFeatureLayer, pMTSPFeatureLayer, pCartoFeatureLayer, pCartoFeatureLayerPoly,
                 pSectionsFeatureLayer, pSNOTELFeatureLayer, pNOAAFeatureLayer, pFWPAISAccessFeatureLayer, pFWPFeatureLayer,
                 pBLMFeatureLayer, pFASFeatureLayer, pGageFeatureLayer, pEPointsFeatureLayer,
                 pMonitoringCSVLayer, app.graphicsLayer]);
@@ -926,6 +949,7 @@ define([
             let legendLayers = [];
             legendLayers.push({ layer: pMonitoringCSVLayer, title: 'Monitoring Locations' });
             legendLayers.push({ layer: pFWPAISAccessFeatureLayer, title: 'MT AIS Watercraft Access' });
+            legendLayers.push({ layer: pMTSPFeatureLayer, title: 'MT State Parks' });
             legendLayers.push({ layer: pSNOTELFeatureLayer, title: 'SNOTEL Sites' });
             legendLayers.push({ layer: pNOAAFeatureLayer, title: 'Weather Stations' });
             legendLayers.push({ layer: pFASFeatureLayer, title: 'FWP Fish Access Sites' });
@@ -954,6 +978,7 @@ define([
             cbxLayers.push({ layers: [pNOAAFeatureLayer, pNOAAFeatureLayer], title: 'Weather Stations' });
             cbxLayers.push({ layers: [pFWPAISAccessFeatureLayer, pFWPAISAccessFeatureLayer], title: 'MT AIS Watercraft Access' });
             cbxLayers.push({ layers: [pMonitoringCSVLayer, pMonitoringCSVLayer], title: 'Monitoring Locations' });
+            cbxLayers.push({ layers: [pMTSPFeatureLayer, pMTSPFeatureLayer], title: 'MT State Parks' });
             /*cbxLayers.push({ layers: [pCZMFeatureLayer, pCZMFeatureLayer], title: 'Channel Migration Zones' });*/
             
 			this.LayerCheckBoxSetup(cbxLayers);
