@@ -267,9 +267,10 @@ define([
             
             $("#dropDownId").append("<li><a data-value='American Whitewater Difficulty and Flow'>American Whitewater Difficulty and Flow</a></li>")
             $("#dropDownId").append("<li><a data-value='FEMA Flood Layer Hazard Viewer'>FEMA Flood Layer Hazard Viewer</a></li>")
-            $("#dropDownId").append("<li><a data-value='GYE Aqiatic Invasives'>GYE Aquatic Invasives</a></li>")
+            $("#dropDownId").append("<li><a data-value='GYE Aquatic Invasives'>GYE Aquatic Invasives</a></li>")
             $("#dropDownId").append("<li><a data-value='MT Channel Migration Zones'>Channel Migration Zones</a></li>")
             $("#dropDownId").append("<li><a data-value='MT DNRC Stream and Gage Explorer'>MT DNRC Stream and Gage Explorer</a></li>")
+            $("#dropDownId").append("<li><a data-value='MT FWP AIS Inspection & Decontamination Stations'>MT FWP AIS Inspection & Decontamination Stations</a></li>")
             $("#dropDownId").append("<li><a data-value='Official MT FWP (closures, etc.)'>Official MT FWP (closures, etc.)</a></li>")
             $("#dropDownId").append("<li><a data-value='USGS National Water Dashboard'>USGS National Water Dashboard</a></li>")
 
@@ -808,7 +809,7 @@ define([
             let strlabelField11 = "Name";
             var vGreyColor = new Color("#666");              // create a text symbol to define the style of labels
             const MTSP_labelClass = {// autocasts as new LabelClass()
-                symbol: {type: "text", color: vGreyColor, font: { family: "arial", size: 10 }},
+                symbol: { type: "text", color: [29, 112, 52], font: { family: "arial", size: 9 }},
                 labelExpressionInfo: { expression: "$feature." + strlabelField11 },
                 minScale: 2000000
             };
@@ -923,13 +924,16 @@ define([
             var pCSVTemplate = new PopupTemplate();
             pCSVTemplate.title = "<b>Monitoring Sites</b>";
             pCSVTemplate.content = "Station Name: {STATION_NAME}<br>Drainage Name: {Drainage_Name}<br><a href={URL} target='_blank'> Link monitoring data</a>";
-
             let pMonitoringCSVLayer = new CSVLayer({
                 url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTw0rCwCLxDg2jCLLCscILrMDMGBbInS1KmwH76CPyqVYqFolKdOfw0J4DIaJhWoPDPkwVNQI_Y7OeX/pub?output=csv",
                 visible: false,
                 renderer: CSV_Renderer,
                 popupTemplate: pCSVTemplate
             });
+            if (app.Basin_ID == "Flathead") {
+                pMonitoringCSVLayer.visible = "True";
+            }
+
 
 
             app.graphicsLayer = new GraphicsLayer();
@@ -1296,6 +1300,11 @@ define([
                     blnAddCoords = false;
                 }
 
+                if (strSelectedText == "MT FWP AIS Inspection & Decontamination Stations") {
+                    strURL = "https://mtfwp.maps.arcgis.com/apps/webappviewer/index.html?id=5d0af93a2b6c4d9390dd5fde8ee8d5cf&extent=";
+                    blnAddCoords = true;
+                }
+
                 if (strSelectedText == "USGS National Water Dashboard") {
                     //strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
                     blnAddCoords = false;
@@ -1317,8 +1326,7 @@ define([
                     strURL = "https://experience.arcgis.com/experience/ba378e9a50ec4d53bbe92e406b647d3e";
                     blnAddCoords = false;
                 }
-                if (strSelectedText == "GYE Aqiatic Invasives") {
-                    //strURL = "https://hazards-fema.maps.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd&extent=";
+                if (strSelectedText == "GYE Aquatic Invasives") {
                     blnAddCoords = false;
                     pSR_WKID = pExtent.spatialReference.wkid;
                     strURL = "https://gagecarto.github.io/aquaticInvasiveExplorer/index.html#bnds=";
