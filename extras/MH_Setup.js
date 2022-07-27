@@ -129,7 +129,7 @@ define([
                 ArrayUniqueVals2Add.push({
                     value: arrayOIDPlum[iii2],
                     symbol: { type: "simple-line", color: [221, 160, 221], width: 18 },
-                    label: "Hoot Owl"
+                    label: "Hoot Owl and/or Conservation Measures"
                 });
             }
             for (var iiii = 0; iiii < arrayOIDsRed.length; iiii++) {

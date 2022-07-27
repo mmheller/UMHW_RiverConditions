@@ -172,6 +172,11 @@ define([
                 return strDateTimeWaterTemp ? strDateTimeWaterTemp : "Data No Available";
             });
 
+
+            if ((strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") & (strWatershed == "Mainstem Flathead")) {
+                strSiteTempStatus = "Recommendation to anglers to use caution when handling westslope cutthroat trout and bull trout to minimize stress";
+            }
+
             self.SiteTempStatus = strSiteTempStatus;
             self.SiteFlowStatus = strSiteFlowStatus;
             self.StreamName = strStreamName;
@@ -1218,7 +1223,8 @@ define([
                 dteLatestDateTimeCFS = new Date();
                 dteLatestDateTimeTMP = new Date();
 
-                OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus, strFWPTITLE, strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn);
+                OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus, strFWPTITLE, strFWPDESCRIPTION,
+                                                                            strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn, strWatershed);
                 var strOverallStatus = OverallStatusAndColor[0];
                 var strOverallSymbol = OverallStatusAndColor[1];
 
@@ -1550,17 +1556,14 @@ define([
                                 }
                             }
                             var strNoDataLabel4ChartingTMP = "";
-                            //if (dblLatestTMP == - 999999) {
                             if (dteGreatestTMP == - 999999) {
                                 dblLatestTMP = "Not Available"
                                 strNoDataLabel4ChartingTMP = " (No Data)";
                                 dteLatestDateTimeTMP = new Date();
-                            //} else if (dblLatestTMP == "") {
                             } else if (dteGreatestTMP == "") {
                                 dblLatestTMP = "*Not collected"
                                 strNoDataLabel4ChartingTMP = " (No Data)";
                                 dteLatestDateTimeTMP = new Date();
-                            //} else if ((dblLatestTMP > iTempClosureValue) & (iTempClosureValue != 0)) {
                             } else if ((dteGreatestTMP > iTempClosureValue) & (iTempClosureValue != 0)) {
                                 strSiteTempStatus = "EXPANDED CONSERVATION MEASURES";
                             }
@@ -1601,7 +1604,8 @@ define([
                                     streamSectionDispalyName = "(" + streamSectionDispalyName + ")";
                                 }
 
-                                OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus, strFWPTITLE, strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn);
+                                OverallStatusAndColor = app.pGage.DivyUpStatusandColors(iOID, strSiteFlowStatus, strSiteTempStatus, strFWPTITLE,
+                                                                        strFWPDESCRIPTION, strFWPLOCATION, strFWPPRESSRELEASE, strFWPPUBLISHDATE, strFWPWarn, strWatershed);
                                 var strOverallStatus = OverallStatusAndColor[0];
                                 var strOverallSymbol = OverallStatusAndColor[1];
 
@@ -1677,7 +1681,8 @@ define([
 
 
 
-        DivyUpStatusandColors: function (iOID, strSiteFlowStatus, strSiteTempStatus, strTITLE, strDESCRIPTION, strLOCATION, strPRESSRELEASE, strPUBLISHDATE, strFWPWarn) {
+            DivyUpStatusandColors: function (iOID, strSiteFlowStatus, strSiteTempStatus, strTITLE, strDESCRIPTION, strLOCATION, strPRESSRELEASE,
+                                    strPUBLISHDATE, strFWPWarn, strWatershed) {
             var strOverallStatus = "Open";
             var strOverallSymbol = "White";
             
@@ -1699,10 +1704,15 @@ define([
                 m_arrayOIDsOrange.push(iOID);
             }
 
-            if (strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") {
-                strOverallStatus = "PREPARE FOR HOOT-OWL FISHING RESTRICTIONS";
+            if ((strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") & (strWatershed == "Mainstem Flathead")) {
+                strOverallStatus = "RECOMMENDED CONSERVATION MEASURES";
                 strOverallSymbol = "Plum";
                 m_arrayOIDsPlum.push(iOID);
+                }
+            else if (strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") {
+                    strOverallStatus = "PREPARE FOR HOOT-OWL FISHING RESTRICTIONS";
+                    strOverallSymbol = "Plum";
+                    m_arrayOIDsPlum.push(iOID);
             }
 
             if (strFWPWarn != "") {
