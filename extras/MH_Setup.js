@@ -80,16 +80,15 @@ define([
         m_StreamStatusRenderer: null,
 
         addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDPlum, arrayOIDsRed) {
-            console.log("add Stream Condition FeatureLayer")
+            console.log("add Stream Condition FeatureLayer and custom legend")
+            let strValueExpression = "";
+            let arrayValueExpression = [];
+
             let defaultUniqueSymbolRenderer = {
                 type: "unique-value",  // autocasts as new UniqueValueRenderer()
-                field: "OBJECTID",
-                /*valueExpression: 'When(${OBJECTID} == 36, 1111)',*/
                 defaultSymbol: {
                     type: "simple-line", color: [0, 169, 230], width: 1
-                    /*, style: "short-dot"*/
                 }  // autocasts as new SimplelineSymbol()
-                
             };
 
             app.pSup.m_StreamStatusRenderer = defaultUniqueSymbolRenderer;
@@ -97,55 +96,55 @@ define([
           
             let ArrayUniqueVals2Add = []
 
-            for (var i = 0; i < arrayOIDYellow.length; i++) {
+            if (arrayOIDYellow.length > 0) {
+                arrayValueExpression.push("Includes([" + arrayOIDYellow.join(", ") + "], $feature.OBJECTID), 'Yellow'");
                 ArrayUniqueVals2Add.push({
-                    value: arrayOIDYellow[i],
-                    symbol: {type: "simple-line", color: [255, 255, 0], width: 18},
+                    value: 'Yellow',
+                    symbol: { type: "simple-line", color: [255, 255, 0], width: 18 },
                     label: "Prepare"
                 });
             }
 
-            //ArrayUniqueVals2Add.push({
-            //    value: 1111,
-            //    symbol: { type: "simple-line", color: [255, 255, 0], width: 18 },
-            //    label: "Prepare"
-            //});
-
-            for (var ii = 0; ii < arrayOIDsGold.length; ii++) {
+            if (arrayOIDsGold.length > 0) {
+                arrayValueExpression.push("Includes([" + arrayOIDsGold.join(", ") + "], $feature.OBJECTID), 'Gold'");
                 ArrayUniqueVals2Add.push({
-                    value: arrayOIDsGold[ii],
+                    value: 'Gold',
                     symbol: { type: "simple-line", color: [249, 166, 2], width: 18 },
                     label: "Conservation Actions"
                 });
             }
-            for (var iii = 0; iii < arrayOIDsOrange.length; iii++) {
+            if (arrayOIDsOrange.length > 0) {
+                arrayValueExpression.push("Includes([" + arrayOIDsOrange.join(", ") + "], $feature.OBJECTID), 'Orange'");
                 ArrayUniqueVals2Add.push({
-                    value: arrayOIDsOrange[iii],
+                    value: 'Orange',
                     symbol: { type: "simple-line", color: [253, 106, 2], width: 18 },
                     label: "Unofficial Closure"
                 });
             }
-            for (var iii2 = 0; iii2 < arrayOIDPlum.length; iii2++) {
+            if (arrayOIDPlum.length > 0) {
+                arrayValueExpression.push("Includes([" + arrayOIDPlum.join(", ") + "], $feature.OBJECTID), 'Plum'");
                 ArrayUniqueVals2Add.push({
-                    value: arrayOIDPlum[iii2],
+                    value: 'Plum',
                     symbol: { type: "simple-line", color: [221, 160, 221], width: 18 },
                     label: "Hoot Owl and/or Conservation Measures"
                 });
             }
-            for (var iiii = 0; iiii < arrayOIDsRed.length; iiii++) {
+            if (arrayOIDsRed.length > 0) {
+                arrayValueExpression.push("Includes([" + arrayOIDsRed.join(", ") + "], $feature.OBJECTID), 'Red'");
                 ArrayUniqueVals2Add.push({
-                    value: arrayOIDsRed[iiii],
+                    value: 'Red',
                     symbol: { type: "simple-line", color: [255, 0, 0], width: 18 },
                     label: "Offical Restriction"
                 });
             }
 
+            strValueExpression = "When(" + arrayValueExpression.join(", ") + ", 'other')";
+            app.pSup.m_StreamStatusRenderer["valueExpression"] = strValueExpression;
+
             if (ArrayUniqueVals2Add.length > 0) {  //getting an error when trying to use addUniqueValueInfo, I think due to the google chart api conflict, so using universal adding to an array then adding to the unique value renderer dictionary
                 app.pSup.m_StreamStatusRenderer["uniqueValueInfos"] = ArrayUniqueVals2Add;
             }
 
-
-            //let featureLayer = new FeatureLayer({url: app.strHFL_URL + "5",
             let featureLayer = new FeatureLayer({
                 url: app.strHFL_URL + app.idx11[5],
                 outFields: ["OBJECTID"],
@@ -270,7 +269,6 @@ define([
             $("#dropDownId").append("<li><a data-value='GYE Aquatic Invasives'>GYE Aquatic Invasives</a></li>")
             $("#dropDownId").append("<li><a data-value='MT Channel Migration Zones'>Channel Migration Zones</a></li>")
             $("#dropDownId").append("<li><a data-value='MT DNRC Stream and Gage Explorer'>MT DNRC Stream and Gage Explorer</a></li>")
-            $("#dropDownId").append("<li><a data-value='MT FWP AIS Inspection & Decontamination Stations'>MT FWP AIS Inspection & Decontamination Stations</a></li>")
             $("#dropDownId").append("<li><a data-value='Official MT FWP (closures, etc.)'>Official MT FWP (closures, etc.)</a></li>")
             $("#dropDownId").append("<li><a data-value='USGS National Water Dashboard'>USGS National Water Dashboard</a></li>")
 
@@ -1006,6 +1004,10 @@ define([
                     else if ((value.getColumnLabel(0) == "DatetimeCFS") | (value.getColumnLabel(0) == "DatetimeCFSSingle")) {
                         strTitle = "Stream Section Discharge (CFS)"
                     }
+                    else if ((value.getColumnLabel(0) == "DatetimeHt") | (value.getColumnLabel(0) == "DatetimeHtSingle")) {
+                        strTitle = "Gage Height (ft)"
+                    }
+
 
                     for (var i = 0; i < value.getNumberOfRows(); i += 48) {
                         tickMarks.push(value.getValue(i, 0));
@@ -1062,7 +1064,8 @@ define([
                                                     '#919191'];  //medium grey
                         options.series = optionsSeries;
                         options.colors = optionsSeriesColors;
-                    } else if (value.getColumnLabel(0) == "DatetimeCFSSingle") {
+                    } else if ((value.getColumnLabel(0) == "DatetimeHtSingle") |
+                                                        (value.getColumnLabel(0) == "DatetimeCFSSingle")) {
                         var optionsSeries = null;
                         var optionsSeriesColors = null;
 
@@ -1099,18 +1102,34 @@ define([
                             optionsSeriesColors = ['#3385ff', //blue
                                 '#61605f', //dark grey
                                 '#df7206'];  //dark orange
-                        } else if (value.getNumberOfColumns() == 3) {
+                        } else if ((value.getNumberOfColumns() == 3) & (value.getColumnLabel(0) == "DatetimeCFSSingle")) {
                             optionsSeries = {
                                 0: { lineWidth: 3 }, //blue
                                 1: { lineWidth: 8 }  //dark orange
+                                //1: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
                             };
                             optionsSeriesColors = ['#3385ff', //blue
+                                '#df7206', ////dark orange
+                                '#61605f']; ///dark grey
+                        } else if ((value.getNumberOfColumns() == 3) & (value.getColumnLabel(0) == "DatetimeHtSingle")) {
+                            optionsSeries = {
+                                0: { lineWidth: 3 }, //blue
+                                //1: { lineWidth: 8 }  //dark orange
+                                1: { lineWidth: 10, lineDashStyle: [1, 1] }, //dark grey
+                            };
+                            optionsSeriesColors = ['#3385ff', //blue
+                                '#61605f', //dark grey
                                 '#df7206'];  //dark orange
+                        }
+
+                        let strTrendLinePrefix = "Gage Ht";
+                        if (value.getColumnLabel(0) == "DatetimeCFSSingle") {
+                            strTrendLinePrefix = "CFS";
                         }
 
                         var options4ChartAreaTrendlines = {
                             0: {
-                                labelInLegend: 'CFS Trend Line',
+                                labelInLegend: strTrendLinePrefix + ' Trend Line',
                                 visibleInLegend: true,
                             }
                         };
@@ -1298,11 +1317,6 @@ define([
                 if (strSelectedText == "American Whitewater Difficulty and Flow") {
                     strURL = "https://www.americanwhitewater.org/content/River/view/river-index";
                     blnAddCoords = false;
-                }
-
-                if (strSelectedText == "MT FWP AIS Inspection & Decontamination Stations") {
-                    strURL = "https://mtfwp.maps.arcgis.com/apps/webappviewer/index.html?id=5d0af93a2b6c4d9390dd5fde8ee8d5cf&extent=";
-                    blnAddCoords = true;
                 }
 
                 if (strSelectedText == "USGS National Water Dashboard") {

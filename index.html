@@ -282,19 +282,19 @@
 						</div>
 						<div class="col-xs-5">
 
-							<div class="dropup" >
-								<button class="btn btn-primary dropdown-toggle" 
+							<div class="dropup">
+								<button class="btn btn-primary dropdown-toggle"
 										style="position: relative; font-size: 12px; float: right;
-										right: 15px; margin-bottom: 5px; padding-top: 1px; padding-bottom: 1px; 
-										vertical-align: text-top; background-color: #31b0d5; border-color: #31b0d5" 
+										right: 15px; margin-bottom: 5px; padding-top: 1px; padding-bottom: 1px;
+										vertical-align: text-top; background-color: #31b0d5; border-color: #31b0d5"
 										type="button" data-toggle="dropdown">
 									Jump to Map...
 									<span class="caret"></span>
 								</button>
 								<ul class="nav dropdown-menu" id="dropDownId">
 									<!--<li><a href="#">HTML</a></li>
-									<li><a href="#">CSS</a></li>
-									<li><a href="#">JavaScript</a></li>-->
+						<li><a href="#">CSS</a></li>
+						<li><a href="#">JavaScript</a></li>-->
 								</ul>
 							</div>
 						</div>
@@ -329,7 +329,7 @@
 							<div>Stream Section Number: <span data-bind='text: $root.CurrentDisplayGageRecord().SectionID'></span></div>
 							<div>Gage Name:  <span data-bind='text: $root.CurrentDisplayGageRecord().SiteName'></span></div>
 							<!--<div>Section Start:  <span data-bind='text: $root.CurrentDisplayGageRecord().StartEndpoint'></span></div>
-							<div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>-->
+				<div>Section End:  <span data-bind='text: $root.CurrentDisplayGageRecord().EndEndpoint'></span></div>-->
 							<hr style="margin-top:5px; margin-bottom:5px;">
 							<div id="detailSectionUSGSCurrent">Gage Source Data: <a data-bind="attr: {href: $root.CurrentDisplayGageRecord().Hyperlink}" target="_blank">Current</a> readings for gage #<span data-bind='text: $root.CurrentDisplayGageRecord().strSiteID'></span> (Note: Some gages may not provide year round current data)</div>
 							<br />
@@ -381,7 +381,7 @@
 							<div>Temperature Closure Target: <span data-bind='text: $root.CurrentDisplayGageRecord().iTempClosureValue'></span></div>
 							<!--<div>Temperature Collected: <span data-bind='text: $root.CurrentDisplayGageRecord().strTempCollected'></span></div>-->
 							<!--<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowFromDroughtManagementTarget'></span></div>
-							<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>-->
+				<div><span data-bind='text: $root.CurrentDisplayGageRecord().strMONTHDAYEarlyFlowToDroughtManagementTarget'></span></div>-->
 						</div>
 					</div>
 				</div>
@@ -392,8 +392,38 @@
 					</div>
 				</div>
 
+
+
+				<div id="divSectionDetail_C" style="display:none; margin-bottom:0;">
+					<div id="detailSection5" style="background-color:#eee !important;">
+						<div><h3>Gage Height Data</h3></div>
+						<div style="margin-left:10px;">
+							<div>Current Gage Height (ft): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterHt'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterHtDateTime'></span></div>
+							<div id="divDay3HtTrend">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3HtTrend}" />)</div>
+							<div>Stream status based on Gage Height target: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteHtStatus'></span></div>
+							<br />
+							<div style="margin-left:30px"> <u>Gage Height definitions for this stream section</u></div>
+							<div class="tab">
+								<table>
+									<tr><td>RECOMMENDED CONSERVATION MEASURES:</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateHtPref4ConsvValue'></span> (ft):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateHtPref4ConsvValue'></span></td></tr>
+									<tr><td>CONSERVATION:</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateHtConsvValue'></span> (ft):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateHtConsvValue'></span></td></tr>
+									<tr><td>EXPANDED CONSERVATION MEASURES:</td><td><span data-bind='text: $root.CurrentDisplayGageRecord().iLateHtClosureValueFlow'></span> (ft):<span data-bind='text: $root.CurrentDisplayGageRecord().strLateHtClosureValueFlow'></span></td></tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="ViewModel2HtBinding_div" style="background-color:#eee; padding:10px; margin-top:0;">
+					<div id="ViewModel2Ht_line_div" data-bind="googleBarChart: new ViewModel2Ht_LineData, chartOptions: {interpolateNulls: true,
+                            legend: { position: 'none' }, chart: { title: 'title-text', subtitle: 'subtitle-text' }}">
+					</div>
+				</div>
+
+
+
 				<br />
-				<button type="button" class="btn btn-info" id="btnGetHistoricRestrctions" style="position:relative; display: none; font-size:12px; left:25px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#ViewModelHistoricRestrctions_div">Retrieve Historic Closure/Restriction Information</button>
+					<button type="button" class="btn btn-info" id="btnGetHistoricRestrctions" style="position:relative; display: none; font-size:12px; left:25px; margin-bottom:5px; padding-top:1px; padding-bottom:1px; vertical-align:text-top;" data-toggle="collapse" data-target="#ViewModelHistoricRestrctions_div">Retrieve Historic Closure/Restriction Information</button>
 				<br />
 
 				<div id="ViewModelHistoricRestrctions_div" class="collapse">
@@ -465,6 +495,15 @@
 
 									<div class="rTableRow">
 										<div class="rTableCellFW">
+											Gage Height (ft)
+										</div>
+										<div class="rTableCell">
+											<span data-bind='text: GageHt, attr: {title: formattedGageHtDateTime}'></span>        (3 day trend <img height="16px" data-bind="attr:{src: Day3HtTrend}" />)
+										</div>
+									</div>
+
+									<div class="rTableRow">
+										<div class="rTableCellFW">
 											Status
 										</div>
 										<div class="rTableCell">
@@ -479,6 +518,11 @@
 								<div><span data-bind='text: iLateFlowPref4ConsvValue'></span></div>
 								<div><span data-bind='text: iLateFlowConsvValue'></span></div>
 								<div><span data-bind='text: iLateFlowClosureValueFlow'></span></div>
+
+								<div><span data-bind='text: iLateHtPref4ConsvValue'></span></div>
+								<div><span data-bind='text: iLateHtConsvValue'></span></div>
+								<div><span data-bind='text: iLateHtClosureValue'></span></div>
+
 								<div><span data-bind='text: strLateFlowPref4ConsvValue'></span></div>
 								<div><span data-bind='text: strLateFlowConsvValue'></span></div>
 								<div><span data-bind='text: strLateFlowClosureValueFlow'></span></div>
@@ -507,7 +551,7 @@
 
 		<hr>
 		<footer>
-			<p>Hosted by the <a href="https://uppermissouriheadwaters.org/" target="_blank"> Upper Missouri Headwaters</a> via <a href="https://katearpin.com/" target="_blank">Kate Arpin Graphics & Web Design</a>.  Developed by the USFWS (Region 6, Science Applications) and Montana State University (<a href="https://www.montana.edu/earthsciences/directory/2139973/eric-sproles" target="_blank">Eric Sproles</a>) in cooperation with <a href="http://dnrc.mt.gov/" target="_blank">Montana DNRC</a> and associated watershed groups of Montana and Wyoming.  Version: 2.0.1</p>
+			<p>Hosted by the <a href="https://uppermissouriheadwaters.org/" target="_blank"> Upper Missouri Headwaters</a> via <a href="https://katearpin.com/" target="_blank">Kate Arpin Graphics & Web Design</a>.  Developed by the USFWS (Region 6, Science Applications) and Montana State University (<a href="https://www.montana.edu/earthsciences/directory/2139973/eric-sproles" target="_blank">Eric Sproles</a>) in cooperation with <a href="http://dnrc.mt.gov/" target="_blank">Montana DNRC</a> and associated watershed groups of Montana and Wyoming.  Version: 2.1.0</p>
 		</footer>
 	</div> <!-- /container -->
 
