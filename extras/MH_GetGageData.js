@@ -5,6 +5,14 @@
     return strHyperlinkURL;
 }
 
+
+//function getSum(data, column) {
+//    var total = 0;
+//    for (i = 0; i < data.getNumberOfRows(); i++)
+//        total = total + data.getValue(i, column);
+//    return total;
+//}
+
 function multiDimensionalUnique(arr) {
 	var uniques = [];
 	var itemsFound = {};
@@ -547,10 +555,10 @@ define([
 
                 var data = new google.visualization.DataTable();
                 data.addColumn('date', strDateColumnName);
+
                 for (var ii = 0; ii < uniqueSiteIDs.length; ii++) {
                     data.addColumn('number', uniqueSiteIDs[ii]);
                 }
-
 
                 if (blnSingleCharting) {
                     for (var ii = 0; ii < iChart_TMP_ColumnNames.length; ii++) {
@@ -768,16 +776,6 @@ define([
                         }
                     }
                 }
-                //else if (app.pGage.m_arrray_Detail4ChartHistoryHt.length > 0) {  //if historical data AND NO CURRNET DATA, only gathered for single sections, then add the the datatable
-                //    for (var ih = 0; ih < app.pGage.m_arrray_Detail4ChartHistoryHt.length; ih++) {
-                //        arrayPrelimData_3.push([app.pGage.m_arrray_Detail4ChartHistoryHt[ih].gagedatetime, null, Number(app.pGage.m_arrray_Detail4ChartHistoryHt[ih].Ht)])  //add historical to an array to chart without other values
-                //        for (var iAddhr = 15; iAddhr < 1440; iAddhr += 15) {
-                //            var dteDate4Null = new Date(app.pGage.m_arrray_Detail4ChartHistoryHt[ih].gagedatetime);
-                //            dteDate4Null.setMinutes(dteDate4Null.getMinutes() + iAddhr);
-                //            arrayPrelimData_3.push([dteDate4Null, null, null])  //add historical to an array to chart without other values
-                //        }
-                //    }
-                //}
 
                 for (var i = 0; i < app.pGage.m_arrray_Detail4ChartHt.length; i++) {
                     var strID = app.pGage.m_arrray_Detail4ChartHt[i].id;
@@ -806,32 +804,17 @@ define([
                             arrayPrelimData_2.push(iVal2Chart);
 
                             if (blnSingleCharting) {
-                                if (iHtTarget1 != 0) {
+                                if ((iHtTarget1 != 0) & (iHtTarget1 != undefined)) {
                                     arrayPrelimData_2.push(iHtTarget1);
                                 }
-                                if (iHtTarget2 != 0) {
+                                if ((iHtTarget2 != 0) & (iHtTarget2 != undefined)) {
                                     arrayPrelimData_2.push(iHtTarget2);
                                 }
-                                if (iHtTarget3 != 0) {
+                                if ((iHtTarget3 != 0) & (iHtTarget3 != undefined)) {
                                     arrayPrelimData_2.push(iHtTarget3);
                                 }
                             }
                         }
-
-                        //if (app.pGage.m_arrray_Detail4ChartHistoryHt.length > 0) {  //if historical data, only gathered for single sections, then add the the datatable
-                        //    if ((iHours == 12) & (iMinutes == 00)) {
-                        //        for (var ih = 0; ih < app.pGage.m_arrray_Detail4ChartHistoryHt.length; ih++) {
-                        //            var dteDate4ChartingHistorycheck = dteDateTime.getFullYear() + "-" + ("0" + (dteDateTime.getMonth() + 1)).slice(-2) + "-" + ("0" + dteDateTime.getDate()).slice(-2);
-
-                        //            if (app.pGage.m_arrray_Detail4ChartHistoryHt[ih].date == dteDate4ChartingHistorycheck) {
-                        //                arrayPrelimData_2.push(Number(app.pGage.m_arrray_Detail4ChartHistoryHt[ih].Ht))  //convert the string value to number type
-                        //                break;  //if found then don't check for more for this date/time
-                        //            }
-                        //        }
-                        //    } else {
-                        //        arrayPrelimData_2.push(null)
-                        //    }
-                        //}
 
                         arrayPrelimData_3.push(arrayPrelimData_2);
                         arrayPrelimData_1 = [];
@@ -862,12 +845,7 @@ define([
                     }
                 }
 
-                //if (app.pGage.m_arrray_Detail4ChartHistoryHt.length > 0) {
-                //    data.addColumn('number', "Historical Daily Mean");
-                //}
-
                 data.addRows(arrayPrelimData_3);
-
                 var date_formatter = new google.visualization.DateFormat({  //this will format the crosshair in the google chart
                     pattern: "MMM dd, yyyy HH:mm"
                 });
@@ -947,7 +925,17 @@ define([
                     } else {
                         document.getElementById("divCFSTargetDefinitions").style.display = 'inline';
                     }
-                    
+
+
+                    if (((item.iLateHtPref4ConsvValue == null) | (item.iLateHtPref4ConsvValue == 0)) &
+                        ((item.iLateHtConsvValue == null) | (item.iLateHtConsvValue == 0)) &
+                        ((item.iLateHtClosureValue == null) | (item.iLateHtClosureValue == 0))) {
+                        document.getElementById("divHtTargetDefinitions").style.display = 'none';
+                    } else {
+                        document.getElementById("divHtTargetDefinitions").style.display = 'inline';
+                    }
+
+
                     if ((item.strDailyStat_URL == null) | (item.strDailyStat_URL == "")) {
                         document.getElementById("detailSectionUSGSHistorical").style.display = 'none';
                     } else {
@@ -1275,14 +1263,11 @@ define([
             });
         },
 
-
-
-
-            DNRCSectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime, blnIsInitialPageLoad,
+        DNRCSectionsReceived: function (arrayProc, iCFSTarget1, iCFSTarget2, iCFSTarget3, iTMPTarget1, blnQuery1AtaTime, blnIsInitialPageLoad,
                 iHtTarget1, iHtTarget2, iHtTarget3) {  //this is needed to get the SensorID for each location
 			console.log("DNRCSectionsReceived start");
 			var strURLGagePrefix = "https://gis.dnrc.mt.gov/arcgis/rest/services/WRD/WMB_StAGE/MapServer/3/query";
-			strURLGagePrefix += "?outFields=*&returnGeometry=false&f=json&where=SensorLabel+in+%28%27discharge%27%2C%27water+temp%27%29+and+LocationID+in+";
+            strURLGagePrefix += "?outFields=*&returnGeometry=false&f=json&where=SensorLabel+in+%28%27discharge%27%2C%27water+temp%27%2C%27working%27%29+and+LocationID+in+";
 
 			var arrayProc2 = [];
 			var arraySiteIDsDNRC = [];
@@ -1312,9 +1297,7 @@ define([
 			$.getJSON(app.strURLGage)   //http://api.jquery.com/jquery.getjson/
 				.done(function (jsonResult) {
 					arrayJSONValues = jsonResult.features;
-
 					for (var i = 0; i < arrayJSONValues.length; i++) {
-
 						arrayDNRC_Sens_Loc.push([arrayJSONValues[i].attributes.LocationID,
 							arrayJSONValues[i].attributes.LocationName,
 							arrayJSONValues[i].attributes.LocationCode,
@@ -1344,9 +1327,9 @@ define([
 						dom.map(arrayProc2, function (itemSectionRefined) {  //loop through the sections  //run through the elements in the section array to pick out the relevant JSON elements
 							iSectionID = itemSectionRefined[2];
 							strStreamName = itemSectionRefined[0];
-							app.pGage.m_arrray_StationIDsTMP.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
-                            app.pGage.m_arrray_StationIDsCFS.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
-                            app.pGage.m_arrray_StationIDsHt.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsTMP.push("(No Data) " + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsCFS.push("(No Data) " + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsHt.push("(No Data) " + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
 							app.pGage.StreamSectionSummaryUIAdditions(blnIsInitialPageLoad);
 						})
 					}
@@ -1529,7 +1512,7 @@ define([
                 var str3DayCFSTrendHt = "images/blank.png";
                 var str3DayCFSTrendTMP = "images/blank.png";
 
-                strNoDataLabel4Charting = " (No Data)";
+                strNoDataLabel4Charting = "(No Data) ";
                 dteLatestDateTimeCFS = new Date();
                 dteLatestDateTimeTMP = new Date();
                 dteLatestDateTimeHt = new Date();
@@ -1624,7 +1607,7 @@ define([
 									if ((arrayDNRC_Sens_Loc[iS2][0] == strSiteID) & (arrayDNRC_Sens_Loc[iS2][4] == "discharge")) {
 										strDischargeSensorID = arrayDNRC_Sens_Loc[iS2][3];
                                     }
-                                    if ((arrayDNRC_Sens_Loc[iS2][0] == strSiteID) & (arrayDNRC_Sens_Loc[iS2][4] == "height")) {
+                                    if ((arrayDNRC_Sens_Loc[iS2][0] == strSiteID) & (arrayDNRC_Sens_Loc[iS2][4] == "working")) {
                                         strHtSensorID = arrayDNRC_Sens_Loc[iS2][3];
                                     }
 								}
@@ -1963,10 +1946,10 @@ define([
                             if (dblLatestHt == -999999) {
                                 dblLatestHt = "Not Available"
                                 dteLatestDateTimeHt = new Date();
-                                strNoDataLabel4ChartingHt = " (No Data)";
+                                strNoDataLabel4ChartingHt = "(No Data) ";
                             } else if (dblLatestHt == "") {
                                 dblLatestHt = "*Not collected"
-                                strNoDataLabel4ChartingHt = " (No Data)";
+                                strNoDataLabel4ChartingHt = "(No Data) ";
                                 dteLatestDateTimeHt = new Date();
                             } else {//determine the site's status based on discharge
                                 if ((dblLatestHt >= iLateHtPref4ConsvValue) & (iLateHtPref4ConsvValue != null)) {
@@ -1986,10 +1969,10 @@ define([
                             if (dblLatestCFS == -999999) {
                                 dblLatestCFS = "Not Available"
                                 dteLatestDateTimeCFS = new Date();
-                                strNoDataLabel4ChartingCFS = " (No Data)";
+                                strNoDataLabel4ChartingCFS = "(No Data) ";
                             } else if (dblLatestCFS == "") {
                                 dblLatestCFS = "*Not collected"
-                                strNoDataLabel4ChartingCFS = " (No Data)";
+                                strNoDataLabel4ChartingCFS = "(No Data) ";
                                 dteLatestDateTimeCFS = new Date();
                             } else {//determine the site's status based on discharge
                                 if ((dblLatestCFS <= iLateFlowPref4ConsvValue) & (dblLatestCFS > iLateFlowConsvValue)) {
@@ -2006,11 +1989,11 @@ define([
                             var strNoDataLabel4ChartingTMP = "";
                             if (dteGreatestTMP == - 999999) {
                                 dblLatestTMP = "Not Available"
-                                strNoDataLabel4ChartingTMP = " (No Data)";
+                                strNoDataLabel4ChartingTMP = "(No Data) ";
                                 dteLatestDateTimeTMP = new Date();
                             } else if (dteGreatestTMP == "") {
                                 dblLatestTMP = "*Not collected"
-                                strNoDataLabel4ChartingTMP = " (No Data)";
+                                strNoDataLabel4ChartingTMP = "(No Data) ";
                                 dteLatestDateTimeTMP = new Date();
                             } else if ((dteGreatestTMP > iTempClosureValue) & (iTempClosureValue != 0)) {
                                 strSiteTempStatus = "EXPANDED CONSERVATION MEASURES";
@@ -2024,31 +2007,27 @@ define([
 
 							if (arrayDNRC_Sens_Loc != null) {
 								for (var iSL = 0; iSL < app.pGage.m_arrray_StationIDsTMP.length; iSL++) {  //remove placeholder sections if entered
-									if (app.pGage.m_arrray_StationIDsTMP[iSL] == strStreamName + "," + iSectionID + " (No Data)") {
+                                    if (app.pGage.m_arrray_StationIDsTMP[iSL] == "(No Data) " + strStreamName + "," + iSectionID) {
 										app.pGage.m_arrray_StationIDsTMP.splice(iSL, 1);
 										break;
 									}
 								}
 								for (var iSL2 = 0; iSL2 < app.pGage.m_arrray_StationIDsCFS.length; iSL2++) {  //remove placeholder sections if entered
-									if (app.pGage.m_arrray_StationIDsCFS[iSL2] == strStreamName + "," + iSectionID + " (No Data)") {
+                                    if (app.pGage.m_arrray_StationIDsCFS[iSL2] == "(No Data) " + strStreamName + "," + iSectionID) {
 										app.pGage.m_arrray_StationIDsCFS.splice(iSL2, 1);
 										break;
 									}
 								}
-
                                 for (var iSL2Ht = 0; iSL2Ht < app.pGage.m_arrray_StationIDsHt.length; iSL2Ht++) {  //remove placeholder sections if entered
-                                    if (app.pGage.m_arrray_StationIDsHt[iSL2Ht] == strStreamName + "," + iSectionID + " (No Data)") {
+                                    if (app.pGage.m_arrray_StationIDsHt[iSL2Ht] == "(No Data) " + strStreamName + "," + iSectionID) {
                                         app.pGage.m_arrray_StationIDsHt.splice(iSL2Ht, 1);
                                         break;
                                     }
                                 }
-
-
                             }
-
-                            app.pGage.m_arrray_StationIDsTMP.push(strStreamName + "," + iSectionID + strNoDataLabel4ChartingTMP);  // using this array of station id's to pivot the table for charting
-                            app.pGage.m_arrray_StationIDsCFS.push(strStreamName + "," + iSectionID + strNoDataLabel4ChartingCFS);  // using this array of station id's to pivot the table for charting
-                            app.pGage.m_arrray_StationIDsHt.push(strStreamName + "," + iSectionID + strNoDataLabel4ChartingHt);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsTMP.push(strNoDataLabel4ChartingTMP + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsCFS.push(strNoDataLabel4ChartingCFS + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
+                            app.pGage.m_arrray_StationIDsHt.push(strNoDataLabel4ChartingHt + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
 
                             if (blnIsInitialPageLoad) {
                                 //var streamSectionDispalyName = strSiteName.replace(", MT", "").replace(" MT", "").replace(strStreamName, "").replace("Big Hole R", "");
@@ -2174,9 +2153,9 @@ define([
                             dom.map(arrayProc2, function (itemSectionRefined) {  //loop through the sections  //run through the elements in the section array to pick out the relevant JSON elements
                                 iSectionID = itemSectionRefined[2];  
                                 strStreamName = itemSectionRefined[0];
-                                app.pGage.m_arrray_StationIDsTMP.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
-                                app.pGage.m_arrray_StationIDsCFS.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
-                                app.pGage.m_arrray_StationIDsHt.push(strStreamName + "," + iSectionID + " (No Data)");  // using this array of station id's to pivot the table for charting
+                                app.pGage.m_arrray_StationIDsTMP.push("(No Data) " + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
+                                app.pGage.m_arrray_StationIDsCFS.push("(No Data) " + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
+                                app.pGage.m_arrray_StationIDsHt.push("(No Data) " + strStreamName + "," + iSectionID);  // using this array of station id's to pivot the table for charting
                                 app.pGage.StreamSectionSummaryUIAdditions(blnIsInitialPageLoad);
                             })
                         }
@@ -2194,7 +2173,7 @@ define([
             var strOverallSymbol = "White";
 
             if (strSiteHtStatus == "PREPARE FOR CONSERVATION") {
-                strOverallStatus = "RECOMMENDED CONSERVATION MEASURES";
+                strOverallStatus = "RECOMMENDED CONSERVATION MEASURES (click for details and see table below for more info)";
                 strOverallSymbol = "Yellow";
                 m_arrayOIDYellow.push(iOID);
             }
@@ -2204,7 +2183,7 @@ define([
                 m_arrayOIDsGold.push(iOID);
             }
                 if (strSiteHtStatus == "EXPANDED CONSERVATION MEASURES") {
-                strOverallStatus = "EXPANDED CONSERVATION MEASURES";
+                    strOverallStatus = "EXPANDED CONSERVATION MEASURES (click for details and see table below for more info)";
                 strOverallSymbol = "Orange";
                 m_arrayOIDsOrange.push(iOID);
             }
@@ -2212,36 +2191,36 @@ define([
 
            
             if (strSiteFlowStatus == "PREPARE FOR CONSERVATION") {
-                strOverallStatus = "PREPARE FOR CONSERVATION";
+                strOverallStatus = "PREPARE FOR CONSERVATION (click for details and see table below for more info)";
                 strOverallSymbol = "Yellow";
                 m_arrayOIDYellow.push(iOID);
             }
             if (strSiteFlowStatus == "CONSERVATION") {
-                strOverallStatus = "CONSERVATION";
+                strOverallStatus = "CONSERVATION (click for details and see table below for more info)";
                 strOverallSymbol = "Gold";
                 m_arrayOIDsGold.push(iOID);
             }
             if (strSiteFlowStatus == "EXPANDED CONSERVATION MEASURES") {
-                strOverallStatus = "EXPANDED CONSERVATION MEASURES";
+                strOverallStatus = "EXPANDED CONSERVATION MEASURES (click for details and see table below for more info)";
                 strOverallSymbol = "Orange";
                 m_arrayOIDsOrange.push(iOID);
             }
 
-                if ((strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") &
-                    ((strWatershed == "North Fork Flathead") |
-                     (strWatershed == "Mainstem Flathead") |
-                     (strWatershed == "Swan") |
-                     (strWatershed == "Lower Flathead") |
-                     (strWatershed == "Stillwater") |
-                     (strWatershed == "South Fork Flathead") |
-                     (strWatershed == "Middle Fork Flathead")
-                    )) {
-                strOverallStatus = "RECOMMENDED CONSERVATION MEASURES";
+            if ((strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") &
+                ((strWatershed == "North Fork Flathead") |
+                    (strWatershed == "Mainstem Flathead") |
+                    (strWatershed == "Swan") |
+                    (strWatershed == "Lower Flathead") |
+                    (strWatershed == "Stillwater") |
+                    (strWatershed == "South Fork Flathead") |
+                    (strWatershed == "Middle Fork Flathead")
+                )) {
+                strOverallStatus = "RECOMMENDED CONSERVATION MEASURES (click for details and see temp. section below for more info)";
                 strOverallSymbol = "Plum";
                 m_arrayOIDsPlum.push(iOID);
             }
             else if (strSiteTempStatus == "EXPANDED CONSERVATION MEASURES") {
-                strOverallStatus = "PREPARE FOR HOOT-OWL FISHING RESTRICTIONS";
+                strOverallStatus = "PREPARE FOR HOOT-OWL FISHING RESTRICTIONS (click for details and see temp. section below for more info)";
                 strOverallSymbol = "Plum";
                 m_arrayOIDsPlum.push(iOID);
             }

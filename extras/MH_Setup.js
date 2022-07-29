@@ -79,7 +79,33 @@ define([
         m_pRiverSymbolsFeatureLayer: null,
         m_StreamStatusRenderer: null,
 
-        addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDPlum, arrayOIDsRed) {
+        addStreamConditionFeatureLayer: function (arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange,
+            arrayOIDPlum, arrayOIDsRed) {
+
+            ////// for each array, red takes presedence so remove OID's from non-red arrays if in Red arra
+            let arrayofArrays = [arrayOIDYellow, arrayOIDsGold, arrayOIDsOrange, arrayOIDPlum];
+            let nonRedOID = null;
+            let arrayItems2remove = [];
+            let index2Remove = null;
+            for (let i = 0; i < arrayofArrays.length; i++) {
+                for (let iColor = 0; iColor < arrayofArrays[i].length; iColor++) {
+                    nonRedOID = arrayofArrays[i][iColor];
+                    for (let iRedOID = 0; iRedOID < arrayOIDsRed.length; iRedOID++) {
+                        if (nonRedOID == arrayOIDsRed[iRedOID]) {  //remove the OID from the non-red array
+                            arrayItems2remove.push(nonRedOID);
+                            break;
+                        }
+                    }
+                }
+                for (let iRemove = 0; iRemove < arrayItems2remove.length; iRemove++) {
+                    index2Remove = arrayofArrays[i].indexOf(arrayItems2remove[iRemove]);
+                    if (index2Remove > -1) {
+                        arrayofArrays[i].splice(index2Remove, 1); // 2nd parameter means remove one item only
+                    }
+                }
+                arrayItems2remove = [];
+            }
+            //\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
             console.log("add Stream Condition FeatureLayer and custom legend")
             let strValueExpression = "";
             let arrayValueExpression = [];
@@ -138,10 +164,9 @@ define([
                 });
             }
 
-            strValueExpression = "When(" + arrayValueExpression.join(", ") + ", 'other')";
-            app.pSup.m_StreamStatusRenderer["valueExpression"] = strValueExpression;
-
             if (ArrayUniqueVals2Add.length > 0) {  //getting an error when trying to use addUniqueValueInfo, I think due to the google chart api conflict, so using universal adding to an array then adding to the unique value renderer dictionary
+                strValueExpression = "When(" + arrayValueExpression.join(", ") + ", 'other')";
+                app.pSup.m_StreamStatusRenderer["valueExpression"] = strValueExpression;
                 app.pSup.m_StreamStatusRenderer["uniqueValueInfos"] = ArrayUniqueVals2Add;
             }
 
@@ -994,7 +1019,30 @@ define([
 					ko.utils.domData.set(element, 'googleLineChart', chart);
                 },
                 update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var value = ko.unwrap(valueAccessor());
+                    var value1 = ko.unwrap(valueAccessor());
+                    //////////////////////////////////// reorder the data columns to put no-data columns to the end
+                    var value = new google.visualization.DataView(value1);// build data view
+                    let arryNoDataColumns = [];
+                    let arryDataColumns = [];
+                    let strColName = "";
+                    for (ic = 0; ic < value.getNumberOfColumns(); ic++) {  //find columns that have no data
+                        if (ic == 0) {
+                            arryDataColumns.push(value.getColumnLabel(ic))
+                        } else {
+                            strColName = value.getColumnLabel(ic);
+                            if (strColName.indexOf("No Data") > 0) {
+                                arryNoDataColumns.push(value.getColumnLabel(ic))
+                            } else {
+                                arryDataColumns.push(value.getColumnLabel(ic))
+                            }
+                        }
+                    }
+                    for (iic = 0; iic < arryNoDataColumns.length; iic++) {  //add the columns with no data to the back of the array
+                        arryDataColumns.push(arryNoDataColumns[iic])
+                    }
+                    value.setColumns(arryDataColumns);
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                     var tickMarks = [];
                     var strTitle = "";
 
@@ -1030,7 +1078,6 @@ define([
                               textStyle: {fontSize: 10 }
                           },
                           "title": strTitle,
-                          //width: '100%',
                           height: 400,
                           chartArea: {
                               left: "5%", top: "5%"
@@ -1044,9 +1091,12 @@ define([
                             1: { lineWidth: 8 }  //dark orange
                         };
                         var optionsSeriesColors = ['#3385ff', //blue
-                                                    '#df7206'];  //dark orange
+                            '#df7206'];  //dark orange
                         options.series = optionsSeries;
                         options.colors = optionsSeriesColors;
+                    //}
+                    //else if (value.getColumnLabel(0) == "DatetimeHt") {
+                    //    options.trendlines = { 0: {} };
                     } else if (value.getColumnLabel(0) == "DatetimeTMPSingle") {
                         var options4ChartAreaTrendlines = {
                             0: {
@@ -1276,15 +1326,6 @@ define([
         Phase3: function (pArrayOIDYellow, pArrayOIDsGold, pArrayOIDsOrange, pArrayOIDsPlum, pArrayOIDsRed) {  //creating this phase 3 to create legend items for river status based on the summarized data
             try {
                 app.pSup.m_pRiverSymbolsFeatureLayer.renderer = app.pSup.m_StreamStatusRenderer;
-
-
-                //watchUtils.when(app.legend, "container", function () {
-                //    aspect.after(app.legend, "scheduleRender", function (response) {
-                //        if (query('.esri-legend__layer-caption')[0]) {
-                //            query('.esri-legend__layer-caption')[0].style.display = 'none';
-                //        }
-                //    });
-                //});
 			}
 			catch (err) {
 				console.log("Phase3 legendlayers issue::", err.message);

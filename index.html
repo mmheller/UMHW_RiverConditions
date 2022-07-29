@@ -398,8 +398,10 @@
 					<div id="detailSection5" style="background-color:#eee !important;">
 						<div><h3>Gage Height Data</h3></div>
 						<div style="margin-left:10px;">
-							<div>Current Gage Height (ft): <span data-bind='text: $root.CurrentDisplayGageRecord().WaterHt'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedWaterHtDateTime'></span></div>
+							<div>Current Gage Height (ft): <span data-bind='text: $root.CurrentDisplayGageRecord().GageHt'></span> as of <span data-bind='text: $root.CurrentDisplayGageRecord().formattedGageHtDateTime'></span></div>
 							<div id="divDay3HtTrend">(3 day trend <img height="26px" data-bind="attr:{src: $root.CurrentDisplayGageRecord().Day3HtTrend}" />)</div>
+						</div>
+						<div id="divHtTargetDefinitions" style="display:none;background-color:#eee !important; margin-top:0;margin-bottom:0;">
 							<div>Stream status based on Gage Height target: <span data-bind='text: $root.CurrentDisplayGageRecord().SiteHtStatus'></span></div>
 							<br />
 							<div style="margin-left:30px"> <u>Gage Height definitions for this stream section</u></div>
