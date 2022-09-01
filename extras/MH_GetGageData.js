@@ -6,13 +6,6 @@
 }
 
 
-//function getSum(data, column) {
-//    var total = 0;
-//    for (i = 0; i < data.getNumberOfRows(); i++)
-//        total = total + data.getValue(i, column);
-//    return total;
-//}
-
 function multiDimensionalUnique(arr) {
 	var uniques = [];
 	var itemsFound = {};
@@ -98,6 +91,14 @@ function sortFunction(a, b) {
     }
 }   
 
+function sortFunction10Column(a, b) {
+    if (a[10] === b[10]) {
+        return 0;
+    }
+    else {
+        return (a[10] < b[10]) ? -1 : 1;
+    }
+}
 
 //Explore drilldown examples https://js.devexpress.com/Demos/WidgetsGallery/Demo/Charts/ChartsDrillDown/Knockout/Light/
 
@@ -858,7 +859,12 @@ define([
 		readingsViewModel: function () {
 			console.log("readingsViewModel");
             var self = this;
-            
+
+            //app.pGage.m_arrray_RiverSectionStatus.sort(sortFunction10Column);
+
+            app.pGage.m_arrray_RiverSectionStatus =
+                app.pGage.m_arrray_RiverSectionStatus.sort(function (a, b) { return a[9]+a[10] > b[9]+b[10] ? 1 : -1; }); //sorting by contcatonating stream name and secitonID
+
             if (typeof app.pGage.m_arrray_RiverSectionStatus !== "undefined") {//this feed then gageReadings: function 
                 var arrayKOTemp = [];
                 for (var i = 0; i < app.pGage.m_arrray_RiverSectionStatus.length; i++)
